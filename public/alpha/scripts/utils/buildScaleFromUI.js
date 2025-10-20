@@ -145,7 +145,16 @@ export function buildScaleFromUI({
     preferredFamily = "sharps";
   }
   scaleNotes = scaleNotes.map((spn) => {
-    let note = convertToAccidentalFamily(spn, preferredFamily);
+    let note = spn;
+    // For auto-direction or auto-key + descending, always use flats
+    if (
+      (accType === "auto-direction" || accType === "auto-key") &&
+      direction === "descending"
+    ) {
+      note = convertToAccidentalFamily(note, "flats");
+    } else {
+      note = convertToAccidentalFamily(note, preferredFamily);
+    }
     note = formatVexflowNote(
       note,
       rootNote,
