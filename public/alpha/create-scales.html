@@ -87,77 +87,223 @@ footer<!-- Design goals:
         🎚 Scale Configuration
       </div>
       <div class="collapse-content flex flex-col gap-4">
-        <div class="flex items-center gap-4">
-          <label for="key-select" class="font-semibold w-32">Key</label>
-          <select
-            id="key-select"
-            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select Key</option>
-          </select>
-        </div>
-        <div class="flex items-center gap-4">
-          <label for="scale-type-select" class="font-semibold w-32"
-            >Scale Type</label
-          >
-          <select
-            id="scale-type-select"
-            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select Scale Type</option>
-          </select>
+        <div class="mb-4">
+          <h3 class="font-semibold text-gray-700 mb-2">Scale Selector</h3>
+          <div id="scale-name-label" class="mb-2 text-blue-700 font-semibold">
+            Scale Name: ---
+          </div>
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+              <label for="key-select" class="font-semibold">Key</label>
+              <select
+                id="key-select"
+                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Key</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <label for="scale-type-select" class="font-semibold"
+                >Scale Type</label
+              >
+              <select
+                id="scale-type-select"
+                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Scale Type</option>
+              </select>
+            </div>
+          </div>
+          <script>
+            // Update Scale Name label dynamically
+            function updateScaleNameLabel() {
+              const key = document.getElementById("key-select")?.value || "";
+              const scaleType =
+                document.getElementById("scale-type-select")?.value || "";
+              // Remove accidental info from key (e.g., "A (3 sharps)" -> "A")
+              const keyClean = key.replace(/\s*\(.*\)/, "");
+              const label =
+                keyClean && scaleType
+                  ? `Scale Name: ${keyClean} ${
+                      scaleType.charAt(0).toUpperCase() + scaleType.slice(1)
+                    }`
+                  : "Scale Name: ---";
+              document.getElementById("scale-name-label").textContent = label;
+            }
+            document.addEventListener("DOMContentLoaded", function () {
+              updateScaleNameLabel();
+              document
+                .getElementById("key-select")
+                ?.addEventListener("change", updateScaleNameLabel);
+              document
+                .getElementById("scale-type-select")
+                ?.addEventListener("change", updateScaleNameLabel);
+            });
+          </script>
         </div>
 
-        <!-- Octaves -->
-        <div class="flex items-center gap-4">
-          <label for="octave-count" class="font-semibold w-32">Octaves</label>
-          <select
-            id="octave-count"
-            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="1" selected>1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
+        <!-- Scale Range Settings Group -->
+        <div class="mb-4 p-4 rounded bg-base-100 border border-base-300 shadow">
+          <h4 class="font-semibold text-gray-700 mb-2">Scale Range Settings</h4>
+          <div class="flex flex-col md:flex-row gap-4 items-center">
+            <div class="flex-1 flex items-center gap-2">
+              <label for="octave-count" class="font-semibold"
+                >Number of Octaves</label
+              >
+              <button
+                id="octave-minus"
+                type="button"
+                class="btn btn-xs btn-outline"
+              >
+                -
+              </button>
+              <span
+                id="octave-value"
+                class="px-3 py-1 rounded bg-base-200 border"
+                >2</span
+              >
+              <button
+                id="octave-plus"
+                type="button"
+                class="btn btn-xs btn-outline"
+              >
+                +
+              </button>
+            </div>
+            <div class="flex-1 flex items-center gap-4">
+              <label for="starting-octave" class="font-semibold"
+                >Starting Octave</label
+              >
+              <select
+                id="starting-octave"
+                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <!-- Options will be populated dynamically -->
+              </select>
+            </div>
+          </div>
         </div>
+        <script>
+          // Octaves stepper logic
+          document.addEventListener("DOMContentLoaded", function () {
+            const minOctaves = 1;
+            const maxOctaves = 5;
+            const octaveValue = document.getElementById("octave-value");
+            const minusBtn = document.getElementById("octave-minus");
+            const plusBtn = document.getElementById("octave-plus");
+            let octaves = 2;
+            function updateOctaveDisplay() {
+              octaveValue.textContent = octaves;
+            }
+            function triggerScaleUpdate() {
+              if (globalThis.updateAllScaleOutputs)
+                globalThis.updateAllScaleOutputs();
+            }
+            globalThis.getNumberOfOctaves = function () {
+              return octaves;
+            };
+            minusBtn.addEventListener("click", function () {
+              if (octaves > minOctaves) {
+                octaves--;
+                updateOctaveDisplay();
+                triggerScaleUpdate();
+              }
+            });
+            plusBtn.addEventListener("click", function () {
+              if (octaves < maxOctaves) {
+                octaves++;
+                updateOctaveDisplay();
+                triggerScaleUpdate();
+              }
+            });
+            updateOctaveDisplay();
+            if (globalThis.updateAllScaleOutputs)
+              globalThis.updateAllScaleOutputs();
+          });
 
-        <!-- Direction -->
-        <div class="flex items-center gap-4">
-          <label for="direction" class="font-semibold w-32">Direction</label>
-          <select
-            id="direction"
-            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="Ascending" selected>Ascending</option>
-            <option value="Descending">Descending</option>
-          </select>
-        </div>
+          // Starting Octave dropdown logic (example: F#2 to C6)
+          document.addEventListener("DOMContentLoaded", function () {
+            const startingOctaveSelect =
+              document.getElementById("starting-octave");
+            // Example: derive from instruments.json, here hardcoded for demo
+            const rangeStart = "F#2";
+            const rangeEnd = "C6";
+            // Generate octave options from F#2 to C6
+            const notes = [
+              "C",
+              "C#",
+              "D",
+              "D#",
+              "E",
+              "F",
+              "F#",
+              "G",
+              "G#",
+              "A",
+              "A#",
+              "B",
+            ];
+            function getOctave(spn) {
+              const m = spn.match(/([A-G]#?)(\d+)/);
+              return m ? parseInt(m[2], 10) : 2;
+            }
+            const startOctave = getOctave(rangeStart);
+            const endOctave = getOctave(rangeEnd);
+            for (let oct = startOctave; oct <= endOctave; oct++) {
+              for (const note of notes) {
+                const spn = `${note}${oct}`;
+                startingOctaveSelect.appendChild(new Option(spn, spn));
+                if (spn === rangeStart.replace(/\//, "")) {
+                  startingOctaveSelect.value = spn;
+                }
+                if (spn === rangeEnd.replace(/\//, "")) break;
+              }
+            }
+          });
+        </script>
 
-        <!-- Note Duration -->
-        <div class="mb-3">
-          <div class="font-semibold mb-2">Note Duration</div>
-          <div class="flex flex-wrap gap-4 text-sm">
-            <label class="flex items-center gap-2">
-              <input type="radio" name="note-duration" value="eighth" />
-              Eighth Notes
-            </label>
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                name="note-duration"
-                value="quarter"
-                checked
-              />
-              Quarter Notes
-            </label>
-            <label class="flex items-center gap-2">
-              <input type="radio" name="note-duration" value="half" />
-              Half Notes
-            </label>
-            <label class="flex items-center gap-2">
-              <input type="radio" name="note-duration" value="whole" />
-              Whole Notes
-            </label>
+        <!-- Timing & Trajectory Group -->
+        <div class="mb-4 p-4 rounded bg-base-100 border border-base-300 shadow">
+          <h4 class="font-semibold text-gray-700 mb-2">
+            Timing &amp; Trajectory
+          </h4>
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 flex items-center gap-4">
+              <label for="direction" class="font-semibold">Direction</label>
+              <select
+                id="direction"
+                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Ascending" selected>Ascending</option>
+                <option value="Descending">Descending</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <div class="font-semibold mb-2">Note Duration</div>
+              <div class="flex flex-wrap gap-4 text-sm">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="note-duration" value="eighth" />
+                  Eighth Notes
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="note-duration"
+                    value="quarter"
+                    checked
+                  />
+                  Quarter Notes
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="note-duration" value="half" />
+                  Half Notes
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="note-duration" value="whole" />
+                  Whole Notes
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -220,8 +366,33 @@ footer<!-- Design goals:
           id="diagnostics-scale"
           class="bg-gray-100 p-2 rounded text-xs"
         ></pre>
-        <div class="font-semibold mt-2">Log:</div>
-        <pre id="diagnostics-log" class="bg-gray-100 p-2 rounded text-xs"></pre>
+        <div class="font-semibold mt-2 flex items-center justify-between">
+          <span>Log:</span>
+          <button
+            id="clear-log-btn"
+            class="btn btn-xs btn-outline ml-2"
+            type="button"
+          >
+            Clear Log
+          </button>
+        </div>
+        <pre
+          id="diagnostics-log"
+          style="max-height: 180px; overflow-y: auto"
+          class="bg-gray-100 p-2 rounded text-xs"
+        ></pre>
+        <script>
+          // Clear Log button functionality
+          document.addEventListener("DOMContentLoaded", function () {
+            const clearBtn = document.getElementById("clear-log-btn");
+            const logEl = document.getElementById("diagnostics-log");
+            if (clearBtn && logEl) {
+              clearBtn.addEventListener("click", function () {
+                logEl.textContent = "";
+              });
+            }
+          });
+        </script>
       </div>
     </div>
 
@@ -251,9 +422,9 @@ footer<!-- Design goals:
           key: document.getElementById("key-select")?.value || "C",
           scaleType:
             document.getElementById("scale-type-select")?.value || "major",
-          octaves: parseInt(
-            document.getElementById("octave-count")?.value || "1"
-          ),
+          octaves: globalThis.getNumberOfOctaves
+            ? globalThis.getNumberOfOctaves()
+            : 2,
           direction:
             document.getElementById("direction")?.value?.toLowerCase() ||
             "ascending",
@@ -301,15 +472,15 @@ footer<!-- Design goals:
       }
 
       function wireScaleConfigEvents() {
-        for (const id of [
-          "key-select",
-          "scale-type-select",
-          "octave-count",
-          "direction",
-        ]) {
+        for (const id of ["key-select", "scale-type-select", "direction"]) {
           const el = document.getElementById(id);
           if (el) el.addEventListener("change", updateAllScaleOutputs);
         }
+        // Wire up octave stepper
+        const minusBtn = document.getElementById("octave-minus");
+        const plusBtn = document.getElementById("octave-plus");
+        if (minusBtn) minusBtn.addEventListener("click", updateAllScaleOutputs);
+        if (plusBtn) plusBtn.addEventListener("click", updateAllScaleOutputs);
         for (const el of document.querySelectorAll(
           'input[name="note-duration"]'
         )) {

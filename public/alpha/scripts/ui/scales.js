@@ -17,9 +17,9 @@ export function setupScaleDisplay({
   function updateDisplayBlock() {
     const key = keyEl?.value;
     const scaleType = scaleTypeEl?.value;
-    const octaves = Number.parseInt(
-      document.getElementById("octave-count")?.value || "1"
-    );
+    const octaves = globalThis.getNumberOfOctaves
+      ? globalThis.getNumberOfOctaves()
+      : 2;
     const direction =
       document.getElementById("direction")?.value?.toLowerCase() || "ascending";
     const noteDuration =
@@ -57,7 +57,12 @@ export function setupScaleDisplay({
   if (keyEl) keyEl.addEventListener("change", updateDisplayBlock);
   if (scaleTypeEl) scaleTypeEl.addEventListener("change", updateDisplayBlock);
   // Also wire up other controls
-  for (const id of ["octave-count", "direction"]) {
+  // Wire up octave stepper
+  const minusBtn = document.getElementById("octave-minus");
+  const plusBtn = document.getElementById("octave-plus");
+  if (minusBtn) minusBtn.addEventListener("click", updateDisplayBlock);
+  if (plusBtn) plusBtn.addEventListener("click", updateDisplayBlock);
+  for (const id of ["direction"]) {
     const el = document.getElementById(id);
     if (el) el.addEventListener("change", updateDisplayBlock);
   }
