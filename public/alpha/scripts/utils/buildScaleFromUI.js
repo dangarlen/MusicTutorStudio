@@ -1,3 +1,31 @@
+// Convert note to preferred accidental family (flat/sharp)
+function convertToAccidentalFamily(note, preferredFamily) {
+  // Accept "C#/5" or "Db/5" format
+  const m = note.match(/^([A-G][#b]?)(\/\d+)$/i);
+  if (!m) return note;
+  let noteName = m[1];
+  const octave = m[2];
+  if (preferredFamily === "flats") {
+    const sharpToFlat = {
+      "c#": "db",
+      "d#": "eb",
+      "f#": "gb",
+      "g#": "ab",
+      "a#": "bb",
+    };
+    noteName = sharpToFlat[noteName.toLowerCase()] || noteName;
+  } else if (preferredFamily === "sharps") {
+    const flatToSharp = {
+      db: "c#",
+      eb: "d#",
+      gb: "f#",
+      ab: "g#",
+      bb: "a#",
+    };
+    noteName = flatToSharp[noteName.toLowerCase()] || noteName;
+  }
+  return `${noteName}/${octave.replace("/", "")}`;
+}
 // buildScaleFromUI.js
 // Generates a scale based on UI configuration controls
 // Arguments: key, scaleType, octaves, direction, noteDuration, accidentals
@@ -104,45 +132,64 @@ export function buildScaleFromUI({
     scaleNotes = [...scaleNotes].reverse();
   }
   // Apply accidental family after reversing for auto-direction
+  // Determine preferred accidental family
+  let preferredFamily = "sharps";
+  const accType = accidentalFamily(accidentals);
+  if (accType === "force-flats") {
+    preferredFamily = "flats";
+  } else if (accType === "force-sharps") {
+    preferredFamily = "sharps";
+  } else if (accType === "auto-key") {
+    // Use key signature logic if available
+    // For now, default to sharps
+    preferredFamily = "sharps";
+  }
   scaleNotes = scaleNotes.map((spn) => {
-    let note = formatVexflowNote(
-      spn,
+    let note = convertToAccidentalFamily(spn, preferredFamily);
+    note = formatVexflowNote(
+      note,
       rootNote,
-      spn.split("/")[1],
+      note.split("/")[1],
       accidentals,
-      accidentals === "auto-direction"
+      accType === "auto-direction"
         ? direction === "descending"
           ? "Descending"
           : "Ascending"
         : direction
     );
-    // Guarantee no sharps in descending/auto-direction
-    if (
-      accidentals === "auto-direction" &&
-      direction === "descending" &&
-      globalThis.convertToFlats
-    ) {
-      note = note
-        .replaceAll("c#/", "db/")
-        .replaceAll("d#/", "eb/")
-        .replaceAll("f#/", "gb/")
-        .replaceAll("g#/", "ab/")
-        .replaceAll("a#/", "bb/");
-    }
     return note;
   });
+
+  function applyAccidentalFamily(noteWithOctave, accidentalType) {
+    // Only convert sharps to flats for force-flats
+    if (accidentalType === "force-flats") {
+      return noteWithOctave
+        .replaceAll("c#", "db")
+        .replaceAll("d#", "eb")
+        .replaceAll("f#", "gb")
+        .replaceAll("g#", "ab")
+        .replaceAll("a#", "bb");
+    }
+    // Only convert flats to sharps for force-sharps
+    if (accidentalType === "force-sharps") {
+      return noteWithOctave
+        .replaceAll("db", "c#")
+        .replaceAll("eb", "d#")
+        .replaceAll("gb", "f#")
+        .replaceAll("ab", "g#")
+        .replaceAll("bb", "a#");
+    }
+    return noteWithOctave;
+  }
 
   function formatVexflowNote(spn, rootNote, octave, accidentals, direction) {
     const [note, oct] = spn.split("/");
     let noteWithOctave = note + oct;
-    if (globalThis.applyAccidentalFamily) {
-      noteWithOctave = globalThis.applyAccidentalFamily(
-        noteWithOctave,
-        accidentalFamily(accidentals),
-        rootNote,
-        direction
-      );
-    }
+    // Use local accidental logic
+    noteWithOctave = applyAccidentalFamily(
+      noteWithOctave,
+      accidentalFamily(accidentals)
+    );
     const regex = /^([A-Ga-g][#b]?)(\d+)$/;
     const match = regex.exec(noteWithOctave);
     if (match) {
