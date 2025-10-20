@@ -203,6 +203,28 @@ footer<!-- Design goals:
       </div>
     </div>
 
+    <!-- Diagnostics DaisyUI Collapse Block -->
+    <div class="collapse bg-base-100 shadow mb-8">
+      <input type="checkbox" class="peer" checked />
+      <div class="collapse-title text-lg font-semibold">
+        🧪 Diagnostics: Behind the Curtain
+      </div>
+      <div class="collapse-content flex flex-col gap-2">
+        <div class="font-semibold">Arguments sent to buildScaleFromUI:</div>
+        <pre
+          id="diagnostics-args"
+          class="bg-gray-100 p-2 rounded text-xs"
+        ></pre>
+        <div class="font-semibold mt-2">Notes scale returned:</div>
+        <pre
+          id="diagnostics-scale"
+          class="bg-gray-100 p-2 rounded text-xs"
+        ></pre>
+        <div class="font-semibold mt-2">Log:</div>
+        <pre id="diagnostics-log" class="bg-gray-100 p-2 rounded text-xs"></pre>
+      </div>
+    </div>
+
     <!-- Back button: Return to Creator (moved to bottom) -->
     <div style="max-width: 400px; margin: 2em auto">
       <a href="creator.html" class="mtsFormatCreatorButtons">
@@ -222,15 +244,89 @@ footer<!-- Design goals:
         setupDynamicCreateTitle,
         setupScaleDisplay,
       } from "./scripts/ui/scales.js";
-      fetch("./data/scales.json")
-        .then((res) => res.json())
-        .then((data) => {
-          initScaleConfiguration({
-            keys: data.keys,
-            scaleTypes: data.scaleTypes,
+      import { buildScaleFromUI } from "./scripts/utils/buildScaleFromUI.js";
+
+      function getScaleConfigFromUI() {
+        return {
+          key: document.getElementById("key-select")?.value || "C",
+          scaleType:
+            document.getElementById("scale-type-select")?.value || "major",
+          octaves: parseInt(
+            document.getElementById("octave-count")?.value || "1"
+          ),
+          direction:
+            document.getElementById("direction")?.value?.toLowerCase() ||
+            "ascending",
+          noteDuration:
+            document.querySelector('input[name="note-duration"]:checked')
+              ?.value || "quarter",
+          accidentals:
+            document.querySelector('input[name="accidental-family"]:checked')
+              ?.value || "auto-key",
+        };
+      }
+
+      // Unified update: diagnostics and staff display
+      function updateAllScaleOutputs() {
+        const config = getScaleConfigFromUI();
+        const result = buildScaleFromUI(config);
+        document.getElementById("diagnostics-args").textContent =
+          JSON.stringify(result.args, null, 2);
+        document.getElementById("diagnostics-scale").textContent =
+          JSON.stringify(result.scaleNotes, null, 2);
+        document.getElementById("diagnostics-log").textContent =
+          result.log && result.log.length ? result.log.join("\n") : "";
+        // Also update staff and note display
+        import("./scripts/ui/scales.js").then(({ renderVexflowStaff }) => {
+          const vfDiv = document.getElementById("vf");
+          renderVexflowStaff(vfDiv, result.scaleNotes);
+          const notesDisplay = document.getElementById("scale-notes-display");
+          if (notesDisplay) {
+            notesDisplay.textContent = result.scaleNotes.join(", ");
+          }
+        });
+      }
+
+      function wireScaleConfigEvents() {
+        [
+          "key-select",
+          "scale-type-select",
+          "octave-count",
+          "direction",
+        ].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.addEventListener("change", updateAllScaleOutputs);
+        });
+        document
+          .querySelectorAll('input[name="note-duration"]')
+          .forEach((el) => {
+            el.addEventListener("change", updateAllScaleOutputs);
           });
-          setupDynamicCreateTitle();
-          setupScaleDisplay();
+        document
+          .querySelectorAll('input[name="accidental-family"]')
+          .forEach((el) => {
+            el.addEventListener("change", updateAllScaleOutputs);
+          });
+      }
+
+      // Load pitch-class.json and assign to globalThis.pitchClassData before initializing UI
+      fetch("../prototype/data/pitch-class.json")
+        .then((res) => res.json())
+        .then((pitchClassData) => {
+          globalThis.pitchClassData = pitchClassData;
+          // Now load scales.json and initialize UI
+          fetch("./data/scales.json")
+            .then((res) => res.json())
+            .then((data) => {
+              initScaleConfiguration({
+                keys: data.keys,
+                scaleTypes: data.scaleTypes,
+              });
+              setupDynamicCreateTitle();
+              setupScaleDisplay();
+              wireScaleConfigEvents();
+              updateAllScaleOutputs();
+            });
         });
       // Load VexFlow from CDN if not already present
       if (!window.Vex) {

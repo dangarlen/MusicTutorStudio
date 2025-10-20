@@ -11,16 +11,43 @@ export function setupScaleDisplay({
 } = {}) {
   const keyEl = document.querySelector(keySelector);
   const scaleTypeEl = document.querySelector(scaleTypeSelector);
-  const displayBlock = document.getElementById(displayBlockId);
   const displayToggle = document.getElementById(displayToggleId);
   const vfDiv = document.getElementById(vexflowContainerId);
 
   function updateDisplayBlock() {
     const key = keyEl?.value;
     const scaleType = scaleTypeEl?.value;
+    const octaves = Number.parseInt(
+      document.getElementById("octave-count")?.value || "1"
+    );
+    const direction =
+      document.getElementById("direction")?.value?.toLowerCase() || "ascending";
+    const noteDuration =
+      document.querySelector('input[name="note-duration"]:checked')?.value ||
+      "quarter";
+    const accidentals =
+      document.querySelector('input[name="accidental-family"]:checked')
+        ?.value || "auto-key";
+
     if (key && scaleType) {
       displayToggle.checked = true;
-      renderVexflowStaff(vfDiv);
+      // Call buildScaleFromUI and render staff
+      import("../utils/buildScaleFromUI.js").then(({ buildScaleFromUI }) => {
+        const result = buildScaleFromUI({
+          key,
+          scaleType,
+          octaves,
+          direction,
+          noteDuration,
+          accidentals,
+        });
+        renderVexflowStaff(vfDiv, result.scaleNotes);
+        // Optionally update textual note output
+        const notesDisplay = document.getElementById("scale-notes-display");
+        if (notesDisplay) {
+          notesDisplay.textContent = result.scaleNotes.join(", ");
+        }
+      });
     } else {
       displayToggle.checked = false;
       if (vfDiv) vfDiv.innerHTML = "";
@@ -29,17 +56,30 @@ export function setupScaleDisplay({
 
   if (keyEl) keyEl.addEventListener("change", updateDisplayBlock);
   if (scaleTypeEl) scaleTypeEl.addEventListener("change", updateDisplayBlock);
+  // Also wire up other controls
+  for (const id of ["octave-count", "direction"]) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", updateDisplayBlock);
+  }
+  for (const el of document.querySelectorAll('input[name="note-duration"]')) {
+    el.addEventListener("change", updateDisplayBlock);
+  }
+  for (const el of document.querySelectorAll(
+    'input[name="accidental-family"]'
+  )) {
+    el.addEventListener("change", updateDisplayBlock);
+  }
 }
 
 // Minimal VexFlow rendering for demonstration
-function renderVexflowStaff(container) {
+export function renderVexflowStaff(container, scaleNotes = []) {
   if (!container) return;
   container.innerHTML = "";
-  if (!window.Vex || !window.Vex.Flow) {
+  if (!globalThis?.Vex?.Flow) {
     container.textContent = "VexFlow not loaded.";
     return;
   }
-  const VF = window.Vex.Flow;
+  const VF = globalThis.Vex.Flow;
   const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
   renderer.resize(400, 120);
   const context = renderer.getContext();
@@ -47,6 +87,22 @@ function renderVexflowStaff(container) {
   const stave = new VF.Stave(10, 40, 380);
   stave.addClef("treble").addTimeSignature("4/4");
   stave.setContext(context).draw();
+  // Render notes if available
+  if (scaleNotes.length > 0) {
+    // This is a stub: render all notes as quarter notes on the staff
+    const notes = scaleNotes.map(
+      (n) =>
+        new VF.StaveNote({
+          clef: "treble",
+          keys: [n.toLowerCase()],
+          duration: "q",
+        })
+    );
+    const voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 });
+    voice.addTickables(notes);
+    new VF.Formatter().joinVoices([voice]).format([voice], 350);
+    voice.draw(context, stave);
+  }
 }
 
 export function setupDynamicCreateTitle({

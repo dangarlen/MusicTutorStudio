@@ -7,6 +7,9 @@ Contributing to Music Tutor Studio
 - Use DaisyUI/Tailwind for UI components
 - All config/data must be loaded from JSON
 - Use VexFlow for music notation
+- New js files should be created in alpha/scripts/audio if they generate/outpout or analyize (input) audio
+- New js files should be created in alpha/scripts/ui if they are dirctly called by the html with the same route name and generate content for its parent html page. ie create-scales.js is hosts the scripts that direclty support create-scales.html
+- New js files should be created in alpha/scripts/utils they do not fall into any other catagory of routines
 
 ## Commit Rules
 

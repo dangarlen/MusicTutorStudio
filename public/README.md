@@ -6,7 +6,6 @@ Welcome to the modular, stage-aware development of Music Tutor Studio (formerly 
 
 ## 🔄 Versioning Strategy
 
-- Each version is stored in a folder: `MTS_v15A`, `MTS_v15B`, etc.
 - Each release stage is nested under `public/`:
   - `prototype/`
   - `Alpha/`
@@ -39,6 +38,7 @@ Welcome to the modular, stage-aware development of Music Tutor Studio (formerly 
 
 - `prototype`, `Alpha`, `Beta` use camel case for web compatibility
 - Future folders may include `Release`, `LTS`, etc.
+- Filenames will use dashes to seperate included words such as file-refactor-targets.md
 
 ## 🌐 Deployment
 

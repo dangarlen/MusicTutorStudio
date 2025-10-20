@@ -1,0 +1,8 @@
+[
+  {
+    "name": "GitHub",
+    "description": "Open the VS Code GitHub dialog to commit changes (Source Control pane)",
+    "action": "Show Source Control (Git) pane in VS Code",
+    "shortcut": "Ctrl+Shift+G"
+  }
+]
