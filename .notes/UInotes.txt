@@ -1,0 +1,71 @@
+Add back ♯/♭ Accidental Family (1 set of raido buttons in 2 lines)
+Auto: [ ] Based on Key  [ ] Based on assending/decending
+Force: [ ] Sharps  [ ] Flats
+Default is Based on Key
+10x8x4.5
+blue bins
+
+User changes scale parameters
+    ↓
+updateScaleNotesDisplay() called (FIRST)
+    ↓ 
+generateScaleNotesForDisplay() → "C4 | D4 | E4 | F4 | G4 | A4 | B4 | C5"
+    ↓
+renderScale() called (SECOND)  
+    ↓
+generateScaleNotesForDisplay() → Same notes → Staff notation
+
+UI Components on show-scales.html
+	Components READ FROM COOKIES ✅
+		Display Options (Radio Buttons) - Cookie: displayOption
+			Notes ONLY
+			Note Names
+			Scientific Pitch Notation
+			MIDI Note Number
+			Standard Fingering
+			Fingering with alternates
+		Instrument Selection (Dropdown) - Cookie: instrument
+			Dynamically populated from instruments.json
+			Saves selected instrument
+
+		Accidental Display Options (Radio Buttons) - Cookie: accidentalDisplay
+			Both Key Signature AND Accidentals
+			Key Signature Only
+			Accidentals Only
+			Legacy Fingering Alt (Backwards Compatibility) - Cookie: fingering-alt
+				Used for backward compatibility to map old fingering-alt cookie to new display options
+
+	Components NOT READ FROM COOKIES ❌
+		Scale Type (Dropdown) - No cookie persistence
+			Major
+			Natural Minor
+			Chromatic
+		Accidental Family (Radio Buttons) - No cookie persistence
+			Auto: Based on Key
+			Auto: Based on ascending/descending
+			Force: Sharps
+			Force: Flats
+
+		Octaves (Dropdown) - No cookie persistence
+			1, 2, or 3 octaves
+			
+		Starting Note (Dropdown) - No cookie persistence
+			Dynamically populated from show-scales.json
+			Contains major scale options with key signature info
+			Starting Octave Controls - No cookie persistence
+
+		Decrement button [–]
+			Current octave display
+			Increment button [+]
+
+		Direction (Dropdown) - No cookie persistence
+			Ascending
+			Descending
+
+		Display/Output Components 📊
+			Staff Notation Display (#vf) - Visual output only
+			Scale Notes Display (#scale-notes-display) - Visual output only
+
+		Header Fragment (#header-container) - Navigation/branding
+		
+		Footer Fragment (#footer-container) - Navigation/link

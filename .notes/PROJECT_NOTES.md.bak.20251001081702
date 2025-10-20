@@ -1,0 +1,87 @@
+# Project Notes — Euphonium Tutor
+
+This is a persistent, structured single-file tracker intended to be the canonical place for:
+
+- Revision notes (what changed and why)
+- Known bug list (repro steps, severity, status)
+- TTD / Tests To Do (explicit test cases to run)
+- Future features / roadmap (scoped and prioritized)
+
+Guidelines
+
+- Keep entries short and date-stamped (YYYY-MM-DD). Use verbs and a reproducible steps section for bugs.
+- Prefer linking to a GitHub Issue when a bug or feature is actionable. Use `#NN` once you create the issue.
+- Use the Trouble → Fix → Verify pattern for every bug entry.
+
+Usage examples (copyable templates)
+
+- Revision note
+
+  - 2025-10-01 — Upgraded Live Server root to `/public` to serve index.html directly. (PR: #123)
+
+- Known bug
+
+  - ID: BUG-001
+  - Title: Live Preview opens directory instead of index.html
+  - First reported: 2025-09-30
+  - Severity: medium
+  - Environment: Windows 10, Live Server extension
+  - Steps to reproduce:
+    1. Open workspace root
+    2. Click Live Server → Go Live
+  - Observed: Browser shows directory listing
+  - Expected: `public/index.html` loads
+  - Notes / root cause: Live Server was serving `/` instead of `/public`
+  - Fix: Set `liveServer.settings.root = "/public"` in `.vscode/settings.json`
+  - Status: fixed (2025-10-01)
+
+- Test case (TTD)
+
+  - ID: TTD-001
+  - Title: Show Scales — Render major scale and display fingering
+  - Steps:
+    1. Open `public/show-scales.html`
+    2. Select Instrument: "Euphonium"
+    3. Root note: C, Octaves: 1, Display: fingering
+    4. Press render
+  - Expected: VexFlow SVG draws scale and fingering annotations appear for each note
+  - Status: todo
+
+- Future feature
+  - ID: FTR-001
+  - Title: Persist user preferences to localStorage plus export/import
+  - Priority: P2
+  - Notes: Currently prefs use cookies; migrating to localStorage simplifies sync.
+  - Status: proposed
+
+Sections (start here)
+
+## Revision Notes
+
+- 2025-10-01 — Created project notes and migrated Live Server root change.
+
+## Known bugs
+
+- BUG-001 — Live Server root served workspace root (directory view) — fixed 2025-10-01
+
+## Tests To Do (TTD)
+
+- TTD-001 — Show Scales: validate fingering display for standard euphonium (todo)
+
+## Future features / roadmap
+
+- FTR-001 — Persist prefs via localStorage (proposed)
+
+## How I can help (ways I can assist you)
+
+- Convert your current freeform notes from `.notes/Coding_Notes.txt` into this structured format (I can copy/paste or summarise).
+- Create GitHub Issues automatically from items you flag (requires repository permission and GitHub token).
+- Add a simple script to render this file into a checklist or generate a Kanban board markdown (local HTML) for quick review.
+
+---
+
+Small next step suggestion: if you want, reply "MIGRATE" and I'll read your existing `.notes/Coding_Notes.txt` and propose a set of items extracted into this file.
+
+## Uprev 0.12D - 2025-10-01T08:11:57-04:00
+Uprev to 0.12D (canonical SPN no-slash release)
+

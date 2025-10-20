@@ -1,0 +1,12 @@
+{
+  "name": "mts-tailwind-alpha",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npx tailwindcss -c tailwind.config.js -i ./input.css -o ../public/alpha/site.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "daisyui": "^4.0.0"
+  }
+}

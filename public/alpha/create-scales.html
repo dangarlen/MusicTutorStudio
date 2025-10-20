@@ -1,0 +1,250 @@
+footer<!-- Design goals:
+     - Mobile-first, modular layout
+     - Tailwind CSS + daisyUI components only
+     - Audit-safe, semantic structure for Music Tutor Studio
+     - Every page should include header and footer
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Scales</title>
+    <!-- Tailwind CSS CDN (official) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- daisyUI CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.css"
+      rel="stylesheet"
+    />
+    <!-- Google Material Symbols -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <!-- Centralized theme for consistent UI -->
+    <link href="styles/theme.css" rel="stylesheet" />
+  </head>
+
+  <body class="bg-base-200 flex flex-col min-h-screen">
+    <div id="header-container"></div>
+    <script src="scripts/header-fetch.js"></script>
+    <script>
+      headerFetch();
+    </script>
+
+    <div
+      class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatCreatorPages"
+    >
+      <span class="material-symbols-outlined">edit_square</span>
+      <span id="dynamic-create-title" class="text-2xl">Create Scales</span>
+    </div>
+
+    <!-- DaisyUI Collapse Block for Scale Display (moved to top, closed by default) -->
+    <div class="collapse bg-base-100 shadow mb-8" id="scale-display-block">
+      <input type="checkbox" class="peer" id="scale-display-toggle" />
+      <div class="collapse-title text-lg font-semibold">🎼 Scale Display</div>
+      <div class="collapse-content flex flex-col gap-4">
+        <!-- Textual Note Output -->
+        <div id="textual-note-output" class="mb-4" style="display: none">
+          <h3 class="font-semibold text-gray-700 mb-2">Textual Note Output</h3>
+          <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+            <div
+              id="textual-note-label"
+              class="font-semibold text-blue-800 mb-2"
+            >
+              🎵 Current Scale:
+            </div>
+            <div
+              id="scale-notes-display"
+              class="text-sm text-blue-700 font-mono break-words whitespace-pre-line"
+            >
+              Select scale parameters to see notes...
+            </div>
+            <div class="text-xs text-gray-600 mt-2">
+              → SPN, MIDI, note names, fingering, etc.
+            </div>
+          </div>
+        </div>
+        <!-- Staff Notation Area -->
+        <div class="mb-4">
+          <h3 class="font-semibold text-gray-700 mb-2">Staff Notation Area</h3>
+          <div
+            id="vf"
+            class="border border-gray-300 rounded p-4 bg-gray-50 min-h-[200px]"
+          ></div>
+          <div class="text-xs text-gray-600 mt-2">
+            → Visual rendering of scale or practice passage
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DaisyUI Collapse Block for Scale Configuration -->
+    <div class="collapse bg-base-100 shadow mb-8">
+      <input type="checkbox" class="peer" checked />
+      <div class="collapse-title text-lg font-semibold">
+        🎚 Scale Configuration
+      </div>
+      <div class="collapse-content flex flex-col gap-4">
+        <div class="flex items-center gap-4">
+          <label for="key-select" class="font-semibold w-32">Key</label>
+          <select
+            id="key-select"
+            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Key</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-4">
+          <label for="scale-type-select" class="font-semibold w-32"
+            >Scale Type</label
+          >
+          <select
+            id="scale-type-select"
+            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Scale Type</option>
+          </select>
+        </div>
+
+        <!-- Octaves -->
+        <div class="flex items-center gap-4">
+          <label for="octave-count" class="font-semibold w-32">Octaves</label>
+          <select
+            id="octave-count"
+            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+
+        <!-- Direction -->
+        <div class="flex items-center gap-4">
+          <label for="direction" class="font-semibold w-32">Direction</label>
+          <select
+            id="direction"
+            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="Ascending" selected>Ascending</option>
+            <option value="Descending">Descending</option>
+          </select>
+        </div>
+
+        <!-- Note Duration -->
+        <div class="mb-3">
+          <div class="font-semibold mb-2">Note Duration</div>
+          <div class="flex flex-wrap gap-4 text-sm">
+            <label class="flex items-center gap-2">
+              <input type="radio" name="note-duration" value="eighth" />
+              Eighth Notes
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="note-duration"
+                value="quarter"
+                checked
+              />
+              Quarter Notes
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="radio" name="note-duration" value="half" />
+              Half Notes
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="radio" name="note-duration" value="whole" />
+              Whole Notes
+            </label>
+          </div>
+        </div>
+
+        <!-- Accidentals -->
+        <div class="mb-3">
+          <div class="font-semibold mb-2">Accidentals</div>
+          <div class="flex flex-wrap gap-4 text-sm">
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="accidental-family"
+                value="auto-key"
+                checked
+              />
+              Auto: Based on Key
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="accidental-family"
+                value="auto-direction"
+              />
+              Auto: Based on Asc/Desc
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="accidental-family"
+                value="force-sharps"
+              />
+              Force: Sharps
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="accidental-family"
+                value="force-flats"
+              />
+              Force: Flats
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back button: Return to Creator (moved to bottom) -->
+    <div style="max-width: 400px; margin: 2em auto">
+      <a href="creator.html" class="mtsFormatCreatorButtons">
+        <span
+          class="material-symbols-outlined align-middle mr-2"
+          aria-hidden="true"
+          >edit_square</span
+        >
+        Return to Creator
+      </a>
+    </div>
+    <div id="footer-container"></div>
+    <script src="scripts/footer-fetch.js"></script>
+    <script type="module">
+      import { initScaleConfiguration } from "./scripts/ui/create-scales.js";
+      import {
+        setupDynamicCreateTitle,
+        setupScaleDisplay,
+      } from "./scripts/ui/scales.js";
+      fetch("./data/scales.json")
+        .then((res) => res.json())
+        .then((data) => {
+          initScaleConfiguration({
+            keys: data.keys,
+            scaleTypes: data.scaleTypes,
+          });
+          setupDynamicCreateTitle();
+          setupScaleDisplay();
+        });
+      // Load VexFlow from CDN if not already present
+      if (!window.Vex) {
+        const script = document.createElement("script");
+        script.src =
+          "https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js";
+        script.onload = () => {
+          // VexFlow loaded
+        };
+        document.head.appendChild(script);
+      }
+    </script>
+    <script>
+      footerFetch();
+    </script>
+  </body>
+</html>

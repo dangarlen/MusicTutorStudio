@@ -1,0 +1,6 @@
+Copilot added e npx serve server in the background 
+    and then opens the live preview.
+    To Launch Command Palette → 
+        Tasks: Run Task → 
+            pick Serve + Open Live Preview.
+

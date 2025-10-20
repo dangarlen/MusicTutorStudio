@@ -1,0 +1,20 @@
+{
+  "workbench.panel.defaultLocation": "right",
+  "workbench.sideBar.location": "left",
+  "workbench.editor.openSideBySideDirection": "right",
+  "workbench.startupEditor": "none",
+  "workbench.editor.restoreViewState": true,
+  "files.hotExit": "onExitAndWindowClose",
+
+  "liveServer.settings.ignoreFiles": [
+    "**/*.js",
+    "**/*.css",
+    "**/partials/**",
+    "**/fragments/**"
+  ],
+  "liveServer.settings.root": "/public",
+  "liveServer.settings.wait": 500,
+  "liveServer.settings.NoBrowser": false,
+  "liveServer.settings.open": "index.html",
+  "liveServer.settings.useLocalIp": true
+}

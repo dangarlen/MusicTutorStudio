@@ -1,0 +1,114 @@
+ETA_vTBD
+├── public/
+│   ├── about.html (...)
+│   ├── assets/
+│   │   └── double-bell-euphonium.png (...)
+│   ├── cmtDocs.html (...)
+│   ├── data/
+│   │   └── 
+│   ├── fragments/
+│   ├── hear-notes.html (...)
+│   ├── index.html (...)
+│   ├── lessons.html (...)
+│   ├── play-scales.html (...)
+│   ├── practice-passages-info.html (...)
+│   ├── practicePassages/
+│   ├── preferences.html (...)
+│   ├── say-notes.html (...)
+│   ├── scripts/
+│   └── show-scales.html (...)
+
+
+=====================================================
+prototype JavaScript File Listing 
+    Target ≤ 300 lines    
+
+show-scales (old).js (8,192 bytes, 320 lines, 8 procs)
+show-scales.js (16,384 bytes, 640 lines, 18 procs)
+about.js (1,324 bytes, 74 lines, 3 procs)
+cmtConverter.js (2,073 bytes, 74 lines, 3 procs)
+cookies.js (312 bytes, 13 lines, 2 procs)
+global.js (324 bytes, 13 lines, 1 proc)
+load-footer.js (202 bytes, 9 lines, 1 proc)
+pitchConverter.js (324 bytes, 13 lines, 1 proc)
+pitchUtils.js (2,073 bytes, 74 lines, 13 procs)
+play-scales.js (2,073 bytes, 74 lines, 4 procs)
+preferences.js (1,324 bytes, 74 lines, 4 procs)
+render-scale.js (8,192 bytes, 320 lines, 8 procs)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+=====================================================
+prototype HTML File Listing (with size and line count)
+    ≤ 500 lines    
+
+show-scales.html (38,964 bytes, 775 lines)
+cmtDocs.html (38,964 bytes, 548 lines)
+
+about.html (10,857 bytes, 170 lines)
+footer.html (142 bytes, 6 lines)
+fragments/header.html (181 bytes, 10 lines)
+fragments/footer.html (272 bytes, 16 lines)
+hear-notes.html (1,180 bytes, 36 lines)
+index.html (5,073 bytes, 110 lines)
+lessons.html (38,073 bytes, 670 lines)
+play-scales.html (4,019 bytes, 96 lines)
+practice-passages-info.html (8,019 bytes, 178 lines)
+preferences.html (2,234 bytes, 55 lines)
+say-notes.html (2,073 bytes, 66 lines)
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+JS files referenced by HTML:
+
+JS files referenced by JS imports:
+
+Potentially orphaned JS files:
+  - .vscode/extension/extension.js
+  - public/prototype/scripts/about.js
+  - public/prototype/scripts/cmtConverter.js
+  - public/prototype/scripts/cookies.js
+  - public/prototype/scripts/global.js
+  - public/prototype/scripts/load-footer.js
+  - public/prototype/scripts/load-header.js
+  - public/prototype/scripts/pitchConverter.js
+  - public/prototype/scripts/pitchUtils.js
+  - public/prototype/scripts/play-scales.js
+  - public/prototype/scripts/preferences.js
+  - public/prototype/scripts/render-scale.js
+  - public/prototype/scripts/show-scales (old).js
+  - public/prototype/scripts/show-scales.js
+  - tools/flats-to-sharps-no-slash.js
+  - tools/migrate-instruments.js
+  - tools/normalize-instruments.js
+  - tools/remove-slash-instruments.js
+
+JSON files referenced (with function context):
+  - data/ack.json <- public/prototype/scripts/about.js > toggleAcknowledgements
+  - data/change-log.json <- public/prototype/scripts/about.js > toggleChangeLog
+  - data/feature-pipeline.json <- public/prototype/scripts/about.js > togglePipeline
+  - data/instruments.json <- public/prototype/scripts/preferences.js > savePreferences, public/prototype/scripts/show-scales (old).js > initializeDisplayOption, public/prototype/scripts/show-scales.js > initializeDisplayOption
+  - data/noteColors.json <- public/prototype/scripts/render-scale.js > loadNoteColors, public/prototype/scripts/show-scales.js > global, public/prototype/scripts/show-scales.js > resetNoteColors
+  - data/pitch-class.json <- public/prototype/scripts/show-scales (old).js > initializeDisplayOption, public/prototype/scripts/show-scales.js > initializeDisplayOption
+  - data/show-scales.json <- public/prototype/scripts/show-scales (old).js > initializeDisplayOption, public/prototype/scripts/show-scales.js > initializeDisplayOption
+  - data/version.json <- public/prototype/scripts/global.js > global, public/prototype/scripts/load-header.js > fetchVersion
+
+Potentially orphaned JSON files:
+  - .netlify/state.json
+  - .vscode/extension/package.json
+  - .vscode/keybindings.json
+  - .vscode/settings.json
+  - .vscode/tasks.json
+  - public/prototype/data/ack.json
+  - public/prototype/data/change-log.json
+  - public/prototype/data/clef.json
+  - public/prototype/data/feature-pipeline.json
+  - public/prototype/data/instruments.json
+  - public/prototype/data/noteColors.json
+  - public/prototype/data/notesAscending.json
+  - public/prototype/data/pitch-class.json
+  - public/prototype/data/show-scales copy.json
+  - public/prototype/data/show-scales.json
+  - public/prototype/data/version.json
+  - public/prototype/practicePassages/danny-boy.json
+  - public/prototype/practicePassages/king-of-the-road.json
+  - public/prototype/practicePassages/twinkle-twinkle-little-star.json

@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+    ],
+    "settings": {
+        "workbench.panel.defaultLocation": "right",
+        "workbench.sideBar.location": "left",
+        "workbench.editor.openSideBySideDirection": "right",
+        "liveServer.settings.ignoreFiles": [
+            "**/*.js",
+            "**/*.css",
+            "**/partials/**",
+            "**/fragments/**"
+        ],
+        "liveServer.settings.root": "/public",
+        "liveServer.settings.wait": 500,
+        "liveServer.settings.NoBrowser": false,
+        "liveServer.settings.useLocalIp": true
+    }
+}

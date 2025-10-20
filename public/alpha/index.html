@@ -1,0 +1,65 @@
+<!-- Design goals:
+		 - Mobile-first, modular layout
+		 - Tailwind CSS + daisyUI components only
+		 - Audit-safe, semantic structure for Music Tutor Studio
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Tutor Studio (Version alpha - WIP)</title>
+    <!-- Tailwind CSS CDN (official) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- daisyUI CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.css"
+      rel="stylesheet"
+    />
+    <!-- Google Material Symbols -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-base-200 flex flex-col min-h-screen">
+    <div id="header-container"></div>
+    <script src="scripts/header-fetch.js"></script>
+    <script>
+      headerFetch();
+    </script>
+    <main class="container mx-auto p-4 flex-1">
+      <div class="flex flex-col gap-4 max-w-xs mx-auto">
+        <a href="creator.html" class="btn btn-primary shadow-lg"
+          ><span class="material-symbols-outlined align-middle mr-2"
+            >edit_square</span
+          >Creator</a
+        >
+        <a href="practice.html" class="btn btn-secondary shadow-lg"
+          ><span class="material-symbols-outlined align-middle mr-2"
+            >music_note</span
+          >Practice</a
+        >
+        <a href="lessons.html" class="btn btn-accent shadow-lg"
+          ><span class="material-symbols-outlined align-middle mr-2"
+            >menu_book</span
+          >Lessons</a
+        >
+        <a href="preferences.html" class="btn btn-info shadow-lg"
+          ><span class="material-symbols-outlined align-middle mr-2"
+            >settings</span
+          >Preferences</a
+        >
+        <a href="about.html" class="btn btn-warning shadow-lg"
+          ><span class="material-symbols-outlined align-middle mr-2">info</span
+          >About</a
+        >
+      </div>
+    </main>
+    <div id="footer-container"></div>
+    <script src="scripts/footer-fetch.js"></script>
+    <script>
+      footerFetch(false);
+    </script>
+  </body>
+</html>

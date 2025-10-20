@@ -1,0 +1,106 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Serve public (Python http.server)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "python -m http.server 8000 -d public"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Serve public (npx serve)",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-NoProfile", "-Command", "npx serve public -l 8000 --single"],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Open Live Preview (browser)",
+      "type": "shell",
+      "command": "cmd",
+      "args": ["/c", "start \"\" \"http://localhost:8000/index.html\""],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Push & Deploy to Netlify",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/deploy.ps1"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Run Finder",
+      "type": "shell",
+      "command": "cmd",
+      "args": ["/c", "${workspaceFolder}\\finder.bat"],
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Orphan Scanner",
+      "type": "shell",
+      "command": "cmd",
+      "args": ["/c", "${workspaceFolder}\\orphans.bat"],
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test Task 2",
+      "type": "shell",
+      "command": "echo",
+      "args": ["Hello from VS Code"],
+      "group": "none"
+    },
+    {
+      "label": "Serve + Open Live Preview",
+      "dependsOn": ["Serve public (npx serve)", "Open Live Preview (browser)"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    }
+  ]
+}

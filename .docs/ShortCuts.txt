@@ -1,0 +1,6 @@
+^f Local find 
+^h Local find-and-replace 
+^[Shift]F Global Find 
+^[Shift]P Select "Tasks: Run Tasks"
+            Select User Tasks defined in tasks.json
+    

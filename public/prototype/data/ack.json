@@ -1,0 +1,85 @@
+{
+  "tools": [
+    {
+      "name": "VexFlow",
+      "publisher": "0xfe",
+      "description": "A powerful music notation rendering library for web applications.",
+      "homepage": "https://www.vexflow.com",
+      "links": [
+        "https://github.com/0xfe/vexflow/wiki/Using-EasyScore",
+        "https://github.com/0xfe/vexflow/wiki/Tutorial",
+        "https://jsfiddle.net/ronyeh/c36p8eo2/"
+      ]
+    },
+    {
+      "name": "Tailwind CSS via CDN",
+      "publisher": "Tailwind Labs",
+      "description": "A utility-first CSS framework for rapid UI development.  Instead of installing via npm, I am referencing Tailwind through the CDN using an inline script tag pointing to cdn.tailwindcss.com allowing me to prototype without a build step.",
+      "homepage": "https://tailwindcss.com",
+      "links": ["https://tailwindcss.com/docs"]
+    },
+
+    {
+      "name": "Tone.js",
+      "publisher": "Yotam Mann",
+      "description": "A Web Audio framework for creating interactive music in the browser.",
+      "homepage": "https://tonejs.github.io",
+      "links": ["https://tonejs.github.io"]
+    },
+    {
+      "name": "SpeechSynthesis API",
+      "publisher": "W3C",
+      "description": "Browser-native API for converting text to spoken voice.",
+      "homepage": "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis",
+      "links": [
+        "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis"
+      ]
+    },
+    {
+      "name": "Microsoft Visual Studio Code",
+      "publisher": "Microsoft",
+      "description": "A lightweight but powerful source code editor with built-in support for JavaScript, TypeScript, and Node.js.",
+      "homepage": "https://code.visualstudio.com",
+      "links": ["https://code.visualstudio.com/docs"]
+    },
+    {
+      "name": "Microsoft Copilot",
+      "publisher": "Microsoft",
+      "description": "An AI companion that assists with coding, documentation, and modular design workflows.",
+      "homepage": "https://copilot.microsoft.com",
+      "links": ["https://copilot.microsoft.com"]
+    },
+    {
+      "name": "Netlify",
+      "publisher": "Netlify, Inc.",
+      "description": "A modern web development platform for deploying and hosting static sites with continuous deployment from Git repositories.",
+      "homepage": "https://netlify.com",
+      "links": ["https://docs.netlify.com"]
+    },
+    {
+      "name": "Berklee College of Music - Scales",
+      "publisher": "Berklee College of Music",
+      "description": "Comprehensive educational resource for music scales and theory.",
+      "homepage": "https://pulse.berklee.edu/scales/index.html",
+      "links": ["https://pulse.berklee.edu/scales/index.html"]
+    },
+    {
+      "name": "Musician Icon (favicon)",
+      "publisher": "Freepik - Flaticon",
+      "description": "Favicon icon used in the app, generated from Flaticon.",
+      "homepage": "https://www.flaticon.com/free-icon/musician_6032377?term=music+tutor&page=1&position=4&origin=search",
+      "links": [
+        "https://www.flaticon.com/free-icon/musician_6032377?term=music+tutor&page=1&position=4&origin=search",
+        "https://www.flaticon.com/authors/freepik"
+      ],
+      "attribution": "Icon by Freepik - Flaticon (https://www.flaticon.com/free-icon/musician_6032377)"
+    },
+    {
+      "name": "SithasoDaisy Wireframes",
+      "publisher": "SithasoDaisy",
+      "description": "Open source daisyUI wireframe and component inspiration.",
+      "homepage": "https://wireframes.sithasodaisy.com/",
+      "links": ["https://wireframes.sithasodaisy.com/"]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+prototype HTML File Listing (with size and line count)
+=====================================================
+
+# 📊 HTML File Size Overview (Sorted Largest First)
+
+| File Name                     | Size (bytes) | Line Count |
+|------------------------------|--------------|------------|
+| show-scales.html             | 38,964       | 775        |
+| cmtDocs.html                 | 38,964       | 548        |
+| lessons.html                 | 38,073       | 670        |
+| about.html                   | 10,857       | 170        |
+| practice-passages-info.html | 8,019        | 178        |
+| index.html                   | 5,073        | 110        |
+| play-scales.html             | 4,019        | 96         |
+| preferences.html             | 2,234        | 55         |
+| say-notes.html               | 2,073        | 66         |
+| hear-notes.html              | 1,180        | 36         |
+| fragments/footer.html        | 272          | 16         |
+| fragments/header.html        | 181          | 10         |
+| footer.html                  | 142          | 6          |
+
+
+
+# 📦 JavaScript File Overview (Sorted by Size)
+
+| File Name               | Size (bytes) | Line Count | Procedures |
+|------------------------|--------------|------------|------------|
+| render-scale.js        | 8,192        | 320        | 8          |
+| show-scales (old).js   | 8,192        | 320        | 8          |
+| pitchUtils.js          | 2,073        | 74         | 13         |
+| play-scales.js         | 2,073        | 74         | 4          |
+| cmtConverter.js        | 2,073        | 74         | 3          |
+| preferences.js         | 1,324        | 74         | 4          |
+| about.js               | 1,324        | 74         | 3          |
+| load-header.js         | 670          | 32         | 3          |
+| pitchConverter.js      | 324          | 13         | 1          |
+| global.js              | 324          | 13         | 1          |
+| cookies.js             | 312          | 13         | 2          |
+
+

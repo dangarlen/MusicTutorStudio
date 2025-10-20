@@ -1,0 +1,774 @@
+<!-- show-scales.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Show Scale | Euphonium Tutor App</title>
+
+    <!-- VexFlow for music notation -->
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js"></script>
+
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Cookie utility -->
+    <script src="scripts/cookies.js"></script>
+
+    <!-- Optional: favicon and theme color -->
+    <link rel="icon" href="favicon.ico" />
+    <meta name="theme-color" content="#1e40af" />
+  </head>
+
+  <body class="p-6 bg-gray-100 font-sans">
+    <!-- Header fragment -->
+    <div id="header-container"></div>
+    <div id="return-to-lessons-container" class="flex justify-end items-center mt-2 mb-2" style="display:none;">
+      <button id="return-to-lessons-btn" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition text-sm font-semibold">Return to Lessons</button>
+    </div>
+    <script>
+      // Show Return to Lessons button if user arrived from lessons.html
+      document.addEventListener('DOMContentLoaded', function() {
+        // If sessionStorage flag set by lessons.html, show the button
+        if (sessionStorage.getItem('fromLessons') === '1') {
+          document.getElementById('return-to-lessons-container').style.display = '';
+        }
+        const btn = document.getElementById('return-to-lessons-btn');
+        if (btn) {
+          btn.onclick = function() {
+            window.location.href = 'lessons.html';
+          };
+        }
+      });
+    </script>
+
+  <!-- Snapshot Load UI -->
+  <div id="snapshot-load-list" class="mb-4"></div>
+  <!-- Title / Instrument Selection -->
+    <script>
+      // Replace file dialog with localStorage snapshot list for Load Snapshot
+      document.addEventListener('DOMContentLoaded', function() {
+        const loadBtn = document.getElementById('load-snapshot-btn');
+        const listDiv = document.getElementById('snapshot-load-list');
+        const statusDiv = document.getElementById('snapshot-status');
+        if (loadBtn && listDiv) {
+          loadBtn.onclick = function() {
+            listDiv.innerHTML = '';
+            let units = JSON.parse(localStorage.getItem('userPracticeUnits') || '[]');
+            if (!units.length) {
+              listDiv.innerHTML = '<span class="text-gray-500">No Practice Units saved.</span>';
+              if (statusDiv) statusDiv.textContent = 'No Practice Units found in browser storage.';
+              return;
+            }
+            const ul = document.createElement('ul');
+            ul.className = 'list-disc pl-6';
+            units.forEach((unit, idx) => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = '#';
+              a.className = 'text-blue-700 hover:underline';
+              a.textContent = unit.name || `Practice Unit ${idx+1}`;
+              a.onclick = function(e) {
+                e.preventDefault();
+                if (unit.snapshot) {
+                  window.applyWorkspaceSnapshot(unit.snapshot);
+                  if (statusDiv) statusDiv.textContent = `Snapshot loaded: ${unit.name || idx+1}`;
+                }
+              };
+              li.appendChild(a);
+              ul.appendChild(li);
+            });
+            listDiv.appendChild(ul);
+          };
+        }
+      });
+    </script>
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎚 Title / Instrument Selection
+        </button>
+      </legend>
+      
+      <div class="fieldset-content">
+        <!-- Dynamic Title -->
+        <h1 id="dynamic-title" class="text-2xl font-bold mb-4 text-left">
+          🎼 Show Scale
+        </h1>
+
+        <!-- Instrument selection -->
+        <div class="flex items-center gap-4 mb-2">
+          <label for="instrument-select" class="font-semibold w-32"
+            >Instrument</label
+          >
+          <select
+            id="instrument-select"
+            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></select>
+          <span class="text-sm text-gray-600"
+            >→ Affects fingering, range, and display logic</span
+          >
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Music Display -->
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎼 Music Display
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
+
+      <!-- Textual Note Output -->
+      <div id="textual-note-output" class="mb-4" style="display: none;">
+        <h3 class="font-semibold text-gray-700 mb-2">Textual Note Output</h3>
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+          <div id="textual-note-label" class="font-semibold text-blue-800 mb-2">🎵 Current Scale:</div>
+          <div
+            id="scale-notes-display"
+            class="text-sm text-blue-700 font-mono break-words whitespace-pre-line"
+          >
+            Select scale parameters to see notes...
+          </div>
+          <div class="text-xs text-gray-600 mt-2">
+            → SPN, MIDI, note names, fingering, etc.
+          </div>
+        </div>
+      </div>
+
+      <!-- Staff Notation Area -->
+      <div class="mb-4">
+        <h3 class="font-semibold text-gray-700 mb-2">Staff Notation Area</h3>
+        <div
+          id="vf"
+          class="border border-gray-300 rounded p-4 bg-gray-50 min-h-[200px]"
+        ></div>
+        <div class="text-xs text-gray-600 mt-2">
+          → Visual rendering of scale or practice passage
+        </div>
+      </div>
+
+      <!-- Playback Controls (Placeholder) -->
+      <div class="mb-4">
+        <h3 class="font-semibold text-gray-700 mb-2">▶️🎛️ Playback Controls</h3>
+        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded">
+          <div class="text-sm text-yellow-800 mb-2">🚧 Coming Soon</div>
+          <div class="text-xs text-gray-600">
+            [Play] [Pause] [Restart] [Rewind] [Loop]
+          </div>
+          <div class="text-xs text-gray-600">
+            [Tempo Slider] [Highlight Current]
+          </div>
+          <div class="text-xs text-gray-600">[✓] Highlight Current Note</div>
+        </div>
+      </div>
+      </div>
+    </fieldset>
+
+    <!-- Note Colors UI -->
+    <fieldset class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white">
+      <legend class="px-2 font-bold text-lg">🎨 Note Colors</legend>
+      <div id="note-colors-container" class="fieldset-content">
+        <div class="mb-4 text-gray-700 text-sm">
+          Each color below is used to highlight notes in the scale. You can type a personal meaning for each color (e.g. "too high for me to reach", "can't remember fingering").
+        </div>
+        <div id="note-colors-list" class="flex flex-wrap gap-4 mb-4"></div>
+        <button id="reset-note-colors-btn" class="bg-gray-700 text-white px-3 py-1 rounded shadow hover:bg-black transition text-sm font-semibold">Reset Colors</button>
+      </div>
+    </fieldset>
+
+    <!-- Practice Type -->
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎛 Practice Type
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
+        <div class="space-y-2">
+          <label class="flex items-center gap-2">
+            <input type="radio" name="practice-type" value="scales" checked />
+            Scales
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="practice-type" value="passages" />
+            Practice Passage
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Select Practice Passage (Hidden by default) -->
+    <fieldset
+      data-persistence="session"
+      data-mode="passages"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white"
+      style="display: none"
+    >
+      <legend class="px-2 font-bold text-lg">📁 Select Practice Passage</legend>
+
+      <div class="space-y-3">
+        <div class="flex items-center gap-4">
+          <label for="passage-select" class="font-semibold w-32">Passage</label>
+          <select
+            id="passage-select"
+            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select passage...</option>
+          </select>
+        </div>
+        <div class="text-sm text-gray-600 mt-2">
+          Practice Units are now saved and recalled from your browser storage.<br>
+          <button id="recall-practice-unit-btn" class="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Recall Practice Unit</button>
+          <div id="practice-unit-list" class="mt-2"></div>
+        </div>
+    <script>
+      // Practice Unit recall UI
+      document.addEventListener('DOMContentLoaded', function() {
+        const recallBtn = document.getElementById('recall-practice-unit-btn');
+        const listDiv = document.getElementById('practice-unit-list');
+        if (recallBtn && listDiv) {
+          recallBtn.onclick = function() {
+            listDiv.innerHTML = '';
+            let units = JSON.parse(localStorage.getItem('userPracticeUnits') || '[]');
+            if (!units.length) {
+              listDiv.innerHTML = '<span class="text-gray-500">No Practice Units saved.</span>';
+              return;
+            }
+            const ul = document.createElement('ul');
+            ul.className = 'list-disc pl-6';
+            units.forEach((unit, idx) => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = '#';
+              a.className = 'text-blue-700 hover:underline';
+              a.textContent = unit.name || `Practice Unit ${idx+1}`;
+              a.onclick = function(e) {
+                e.preventDefault();
+                // Load and apply this Practice Unit
+                if (unit.snapshot) {
+                  applyWorkspaceSnapshot(unit.snapshot);
+                  const title = document.getElementById('dynamic-title');
+                  if (title) title.textContent = `🎼 Practice Unit: ${unit.name || idx+1}`;
+                }
+              };
+              li.appendChild(a);
+              ul.appendChild(li);
+            });
+            listDiv.appendChild(ul);
+          };
+        }
+      });
+    </script>
+      </div>
+    </fieldset>
+
+    <!-- Display Settings -->
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎚 Display Settings
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
+
+      <!-- Staff Display Options -->
+      <div class="mb-4">
+        <h3 class="font-semibold text-gray-700 mb-2">Staff Display Options:</h3>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-key-signature"
+              checked
+            />
+            Key Signature
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows the key signature at the beginning of the staff"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-accidentals"
+              checked
+            />
+            Accidentals
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows individual accidentals next to notes"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-bar-lines"
+              checked
+            />
+            Bar Lines
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows bar lines to separate measures"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-time-signature"
+              checked
+            />
+            Time Signature
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows the time signature at the beginning of the staff"
+              >ⓘ</span
+            >
+          </label>
+        </div>
+        <div class="text-xs text-gray-600 mt-2">
+          → Check both for traditional notation
+        </div>
+      </div>
+
+      <!-- Practice Overlays -->
+      <div>
+        <h3 class="font-semibold text-gray-700 mb-2">Practice Overlays:</h3>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="show-overlays-tooltip" />
+            Show overlays as note tooltip ONLY
+            <span
+              class="text-blue-600 cursor-help"
+              title="Display overlay information in tooltips when hovering over notes"
+            >ℹ️</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="display-option" value="none" checked />
+            Notes ONLY
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="display-option" value="names" />
+            Note Names
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="display-option" value="pitch" />
+            Scientific Pitch Notation (SPN)
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="display-option" value="cmt" />
+            Compact Music Token (CMT)
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="display-option" value="midi" />
+            MIDI Note Number
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="display-option" value="fingering" />
+            Standard Fingering
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="display-option" value="fingering-alt" />
+            Fingering with alternates
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Scale Configuration -->
+    <fieldset
+      data-persistence="session"
+      data-mode="scales"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎼 Scale Configuration
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
+
+      <!-- Key -->
+      <div class="flex items-center gap-4 mb-3">
+        <label for="root-note" class="font-semibold w-32">Key:</label>
+        <select
+          id="root-note"
+          class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        ></select>
+      </div>
+
+      <!-- Scale Type -->
+      <div class="flex items-center gap-4 mb-3">
+        <label for="scale-type" class="font-semibold w-32">Scale Type:</label>
+        <select id="scale-type" class="flex-1 p-2 border rounded">
+          <option value="major">Major</option>
+          <option value="minor">Minor</option>
+          <option value="chromatic">Chromatic</option>
+        </select>
+      </div>
+
+      <!-- Octaves -->
+      <div class="flex items-center gap-4 mb-3">
+        <label for="octave-count" class="font-semibold w-32">Octaves:</label>
+        <select id="octave-count" class="flex-1 p-2 border rounded">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+      </div>
+
+      <!-- Direction -->
+      <div class="flex items-center gap-4 mb-3">
+        <label for="direction" class="font-semibold w-32">Direction:</label>
+        <select id="direction" class="flex-1 p-2 border rounded">
+          <option value="Ascending">Ascending</option>
+          <option value="Descending">Descending</option>
+        </select>
+      </div>
+
+      <!-- Note Duration -->
+      <div class="mb-3">
+        <div class="font-semibold mb-2">Note Duration:</div>
+        <div class="flex flex-wrap gap-4 text-sm">
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="note-duration"
+              value="eighth"
+            />
+            Eighth Notes
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="note-duration"
+              value="quarter"
+              checked
+            />
+            Quarter Notes
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="note-duration"
+              value="half"
+            />
+            Half Notes
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="note-duration"
+              value="whole"
+            />
+            Whole Notes
+          </label>
+        </div>
+      </div>
+
+      <!-- Accidental Family -->
+      <div class="mb-3">
+        <div class="font-semibold mb-2">Accidental Family:</div>
+        <div class="flex flex-wrap gap-4 text-sm">
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="accidental-family"
+              value="auto-key"
+              checked
+            />
+            Auto: Based on Key
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="accidental-family"
+              value="auto-direction"
+            />
+            Auto: Based on Asc/Desc
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="accidental-family"
+              value="force-sharps"
+            />
+            Force: Sharps
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="accidental-family"
+              value="force-flats"
+            />
+            Force: Flats
+          </label>
+        </div>
+      </div>
+
+        </div>
+    </fieldset>
+
+    <!-- Octave Controls -->
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🔢 Octave Controls
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
+        <div class="flex items-center gap-4">
+          <button
+            id="octave-decrement"
+            class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            [–]
+          </button>
+          <div class="text-center">
+            <div id="octave-label" class="font-semibold mb-1">
+              Starting Octave
+            </div>
+            <span
+              id="starting-octave-label"
+              class="px-3 py-1 border rounded bg-white text-gray-800 font-mono"
+            >
+              —
+            </span>
+          </div>
+          <button
+            id="octave-increment"
+            class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            [+]
+          </button>
+        </div>
+      </div>
+    </fieldset>
+
+      <!-- Snapshot Save/Recall UI -->
+      <div id="snapshot-controls" class="mb-6 p-4 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 flex flex-col gap-3">
+        <div class="font-bold text-blue-800 text-lg flex items-center gap-2">
+          <span>💾</span> Save/Recall Workspace Snapshot
+        </div>
+        <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+          <button id="save-snapshot-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save Snapshot</button>
+          <input type="file" id="load-snapshot-input" accept="application/json" class="hidden" />
+          <button id="load-snapshot-btn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Load Snapshot</button>
+          <span class="text-xs text-gray-600">
+            (Snapshots are saved in your browser storage. You can recall them from this device at any time. No files are downloaded or required.)
+          </span>
+        </div>
+        <div id="snapshot-status" class="text-xs text-blue-700"></div>
+      </div>
+
+    <!-- Diagnostics -->
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🛠️ Diagnostics
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
+        <div class="space-y-2">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="diagnostic-mode" onchange="toggleDiagnosticLink()" />
+            Enable Diagnostic Mode
+          </label>
+          <div class="text-xs text-gray-600">
+            → Reveals note mapping, MATCH overlays, and trace logs
+          </div>
+          <div id="diagnostic-about-link" class="mt-3 pt-2 border-t border-gray-200" style="display: none;">
+            <a
+              href="about.html"
+              class="text-sm text-blue-600 hover:text-blue-800 underline"
+            >
+              📄 About This Application
+            </a>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Footer fragment -->
+    <div id="footer-container"></div>
+
+    <!-- External logic and fragments -->
+    <script src="scripts/pitchUtils.js"></script>
+    <script src="scripts/pitchConverter.js"></script>
+    <script src="scripts/cmtConverter.js"></script>
+    <script src="scripts/show-scales.js"></script>
+    <script src="scripts/render-scale.js"></script>
+    <script src="scripts/load-header.js"></script>
+    <script src="scripts/load-footer.js"></script>
+    
+    <!-- Collapsible Fieldsets Functionality -->
+    <style>
+      .fieldset-content {
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+      
+      .collapsed .fieldset-content {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      
+      .collapse-icon {
+        transition: transform 0.3s ease;
+        display: inline-block;
+      }
+      
+      .collapsed .collapse-icon {
+        transform: rotate(-90deg);
+      }
+      
+      .collapsible-fieldset legend:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+        border-radius: 4px;
+      }
+    </style>
+    
+    <script>
+      // Toggle fieldset collapse/expand
+      function toggleFieldset(button) {
+        const fieldset = button.closest('fieldset');
+        fieldset.classList.toggle('collapsed');
+        
+        // Save collapse state to localStorage
+        const legendText = button.textContent.trim();
+        const isCollapsed = fieldset.classList.contains('collapsed');
+        localStorage.setItem(`fieldset-${legendText}`, isCollapsed ? 'collapsed' : 'expanded');
+      }
+      
+      // Handle keyboard navigation for fieldset buttons
+      function handleFieldsetKeydown(event, button) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          toggleFieldset(button);
+        }
+      }
+      
+      // Toggle diagnostic about link visibility
+      function toggleDiagnosticLink() {
+        const checkbox = document.getElementById('diagnostic-mode');
+        const linkDiv = document.getElementById('diagnostic-about-link');
+        
+        if (checkbox && linkDiv) {
+          linkDiv.style.display = checkbox.checked ? 'block' : 'none';
+        }
+      }
+      
+      // Restore fieldset states on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        const fieldsets = document.querySelectorAll('.collapsible-fieldset');
+        fieldsets.forEach(fieldset => {
+          const button = fieldset.querySelector('legend button');
+          if (button) {
+            const legendText = button.textContent.trim();
+            const savedState = localStorage.getItem(`fieldset-${legendText}`);
+            
+            if (savedState === 'collapsed') {
+              fieldset.classList.add('collapsed');
+            }
+          }
+        });
+        
+        // Initialize mode-based label functionality
+        initializeModeBasedLabels();
+      });
+      
+      // Initialize mode-based label switching
+      function initializeModeBasedLabels() {
+        const practiceTypeInputs = document.querySelectorAll('input[name="practice-type"]');
+        
+        // Set initial labels based on current selection
+        updateOctaveLabelText();
+        if (typeof updateTextualNoteLabel === 'function') {
+          updateTextualNoteLabel();
+        }
+        
+        // Add event listeners for practice type changes
+        practiceTypeInputs.forEach(input => {
+          input.addEventListener('change', function() {
+            updateOctaveLabelText();
+            togglePassageMode();
+            // Update dynamic title when practice type changes
+            if (typeof updateDynamicTitle === 'function') {
+              updateDynamicTitle();
+            }
+            // Update textual note label when practice type changes
+            if (typeof updateTextualNoteLabel === 'function') {
+              updateTextualNoteLabel();
+            }
+            // Update textual display when switching to passages
+            if (typeof updatePassageTextualDisplay === 'function') {
+              updatePassageTextualDisplay();
+            }
+            // Clear staff and re-render when practice type changes
+            if (typeof renderCurrentScale === 'function') {
+              renderCurrentScale();
+            }
+          });
+        });
+      }
+      
+      // Update octave label based on current practice type
+      function updateOctaveLabelText() {
+        const octaveLabel = document.getElementById('octave-label');
+        const isPassageMode = document.querySelector('input[name="practice-type"]:checked').value === 'passages';
+        
+        if (octaveLabel) {
+          octaveLabel.textContent = isPassageMode ? 'Octave Transposition' : 'Starting Octave';
+        }
+      }
+      
+      // Toggle visibility of passage-specific controls
+      function togglePassageMode() {
+        const isPassageMode = document.querySelector('input[name="practice-type"]:checked').value === 'passages';
+        const passageFieldset = document.querySelector('fieldset[data-mode="passages"]');
+        const scaleFieldset = document.querySelector('fieldset[data-mode="scales"]');
+        
+        if (passageFieldset) {
+          passageFieldset.style.display = isPassageMode ? 'block' : 'none';
+        }
+        
+        if (scaleFieldset) {
+          scaleFieldset.style.display = isPassageMode ? 'none' : 'block';
+        }
+      }
+    </script>
+  </body>
+</html>

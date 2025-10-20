@@ -1,0 +1,161 @@
+<!-- Design goals:
+     - Mobile-first, modular layout
+     - Tailwind CSS + daisyUI components only
+     - Audit-safe, semantic structure for Music Tutor Studio
+     - Every page should include header and footer
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preferences</title>
+    <!-- Tailwind CSS CDN (official) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- daisyUI CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.css"
+      rel="stylesheet"
+    />
+    <!-- Google Material Symbols -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <!-- Centralized theme for consistent UI -->
+    <link href="styles/theme.css" rel="stylesheet" />
+  </head>
+  <body class="bg-base-200 flex flex-col min-h-screen">
+    <div id="header-container"></div>
+    <script src="scripts/header-fetch.js"></script>
+    <script>
+      headerFetch();
+    </script>
+    <main class="container mx-auto p-4 flex-1">
+      <div
+        class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatPreferencePages"
+      >
+        <span class="material-symbols-outlined icon">settings</span>
+        <span class="text-2xl">Preferences</span>
+      </div>
+
+      <!-- Instrument selection -->
+      <label for="instrument-select" class="block mb-2 font-semibold">
+        Select Instrument:
+      </label>
+      <select
+        id="instrument-select"
+        class="w-full p-2 border rounded mb-4"
+      ></select>
+      <br />
+
+      <!--
+      Range selection
+      <label for="range-select" class="block mb-2 font-semibold">
+        Select Range:
+      </label>
+      <select id="range-select" class="w-full p-2 border rounded mb-4">
+        <option value="standard">Standard</option>
+        <option value="extended">Extended</option>
+      </select>
+
+      Fingering display option
+      <div class="mb-4">
+        <span class="block mb-2 font-semibold">Fingering Display:</span>
+        <label class="inline-flex items-center mr-4">
+          <input
+            type="radio"
+            name="fingering-alt"
+            value="false"
+            checked
+            class="form-radio"
+          />
+          <span class="ml-2">Standard</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input
+            type="radio"
+            name="fingering-alt"
+            value="true"
+            class="form-radio"
+          />
+          <span class="ml-2">Alternate</span>
+        </label>
+      </div>
+      -->
+
+      <!-- Save button -->
+      <button id="save-btn" class="btn btn-active btn-success">
+        <span class="material-symbols-outlined icon">save</span>
+        Save Preferences
+      </button>
+
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          gap: 1em;
+          max-width: 400px;
+          margin: 2em 0;
+        "
+      >
+        <button
+          class="mtsFomatGlobal"
+          style="
+            border-radius: 9999px;
+            padding: 0.75em 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          <span class="material-symbols-outlined" aria-hidden="true"
+            >cloud_upload</span
+          >
+          Backup Studio Workspace
+        </button>
+        <button
+          class="mtsFomatGlobal"
+          style="
+            border-radius: 9999px;
+            padding: 0.75em 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          <span class="material-symbols-outlined" aria-hidden="true"
+            >cloud_download</span
+          >
+          Restore Studio Workspace
+        </button>
+      </div>
+    </main>
+
+    <script type="module">
+      import {
+        loadInstrumentsAndPopulate,
+        savePreferences,
+        restorePreferences,
+      } from "./features/preferences.js";
+      loadInstrumentsAndPopulate();
+      window.addEventListener("DOMContentLoaded", restorePreferences);
+      document
+        .getElementById("save-btn")
+        .addEventListener("click", savePreferences);
+    </script>
+    <!-- Begin Footer Include -->
+    <div id="footer-container"></div>
+    <script src="scripts/footer-fetch.js"></script>
+    <script>
+      footerFetch();
+    </script>
+    <!-- End Footer Include -->
+  </body>
+</html>

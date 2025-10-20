@@ -1,0 +1,29 @@
+{
+  "name": "euphonium-commands",
+  "displayName": "Euphonium Commands",
+  "description": "Small workspace extension: commands and status-bar button to launch local server and Live Preview.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.50.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onCommand:euphonium.serveAndOpen",
+    "onCommand:euphonium.openPreview",
+    "*"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "euphonium.serveAndOpen",
+        "title": "Euphonium: Serve + Open Live Preview"
+      },
+      {
+        "command": "euphonium.openPreview",
+        "title": "Euphonium: Open Live Preview (browser)"
+      }
+    ]
+  },
+  "scripts": {}
+}
