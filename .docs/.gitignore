@@ -1,0 +1,34 @@
+# Node and Tailwind artifacts
+node_modules/
+tailwind/node_modules/
+tailwind/package-lock.json
+tailwind/dist/
+tailwind/.cache/
+
+# VS Code settings
+.vscode/
+*.code-workspace
+
+# Build and deploy scripts
+*.log
+*.tmp
+*.bak
+deploy.ps1
+*.bat
+
+# Python cache
+__pycache__/
+*.pyc
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Optional: exclude generated docs or snapshots
+.docs/directory-tree.txt
+public/planned-alpha-directory-tree.txt
+public/preAlpha-directory-tree.txt
+
+# Optional: exclude experimental or transfer logs
+Xfer.txt

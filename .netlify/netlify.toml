@@ -7,7 +7,7 @@ redirects = []
 [functions."*"]
 
 [build]
-publish = "C:\\Users\\dang\\Dropbox\\Code\\MTS_v15C"
+publish = "C:\\Dev\\MusicTutorStudio\\Code"
 publishOrigin = "default"
 
 [build.environment]
