@@ -249,9 +249,10 @@
       <div class="collapse-content">
 
       <!-- Scale Selector Group -->
-      <div class="card bg-gray-50 border border-gray-300 mb-4">
-        <div class="card-title font-bold text-lg px-4 pt-4 pb-2">Scale Selector</div>
-        <div class="card-body flex flex-row gap-8 px-4 pb-4">
+      <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4">
+        <input type="checkbox" class="peer" />
+        <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Scale Selector</div>
+        <div class="collapse-content card-body flex flex-row gap-8 px-4 pb-4">
           <!-- Key -->
           <div class="flex items-center gap-3">
             <label for="root-note" class="font-semibold w-32">Key:</label>
@@ -282,9 +283,10 @@
       </div>
 
       <!-- Scale Range Settings Group -->
-      <div class="card bg-gray-50 border border-gray-300 mb-4">
-        <div class="card-title font-bold text-lg px-4 pt-4 pb-2">Scale Range Settings</div>
-        <div class="card-body flex flex-row gap-8 px-4 pb-4">
+      <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4">
+        <input type="checkbox" class="peer" />
+        <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Scale Range Settings</div>
+        <div class="collapse-content card-body flex flex-row gap-8 px-4 pb-4">
           <!-- Starting Octave with +/- controls -->
           <div class="flex items-center gap-3">
             <label for="starting-octave-label" class="font-semibold w-32">Starting Octave:</label>
@@ -294,9 +296,9 @@
               aria-label="Decrease Octave"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
-            <span id="starting-octave-label" class="px-3 py-1 border rounded bg-white text-gray-800 font-mono">—</span>
-            <button
+            </button>[
+            <span id="starting-octave-label" class="px-3 py-1 border rounded bg-white text-gray-800 font-mono">C4</span>
+            ]<button
               id="octave-increment"
               class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
               aria-label="Increase Octave"
@@ -327,8 +329,10 @@
       </div>
 
 
-<div class="card bg-gray-50 border border-gray-300 mb-4">
-<div class="card-title font-bold text-lg px-4 pt-4 pb-2">Duration & Direction</div>
+ <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+    <input type="checkbox" class="peer" />
+<div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Duration & Direction</div>
+<div class="collapse-content">
 
       <!-- Direction -->
       <div class="flex items-center gap-4 mb-3">
@@ -341,11 +345,11 @@
                     value="Ascending" 
                     class="radio radio-primary" 
                 checked>
-                <span>Ascending</span>
+                <span>▲ Ascending</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="radio" name="direction" value="Descending" class="radio radio-primary">
-              <span>Descending</span>
+              <span>▼ Descending</span>
             </label>
           </div>
       </div>
@@ -372,11 +376,16 @@
           </label>
         </div>
       </div>
-</div>
+    </div>
+
+<!-- Staff Formatting should be outside Duration & Direction -->
 
 
-<div class="card bg-gray-50 border border-gray-300 mb-4">
-<div class="card-title font-bold text-lg px-4 pt-4 pb-2">Staff Formatting</div>
+
+<div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+  <input type="checkbox" class="peer" />
+  <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Staff Formatting</div>
+  <div class="collapse-content">
 
       <!-- Staff Display Options -->
       <div class="mb-4">
@@ -546,11 +555,13 @@
         function updateOctaveCount(val) {
           octaveCount = val;
           label.textContent = octaveCount;
+          // Only update/create hidden input for octave-count, not starting-octave-label
           let hidden = document.getElementById('octave-count');
           if (!hidden) {
             hidden = document.createElement('input');
             hidden.type = 'hidden';
             hidden.id = 'octave-count';
+            // Only append to octave-count-label's parent
             label.parentNode.appendChild(hidden);
           }
           hidden.value = octaveCount;
@@ -580,14 +591,63 @@
         const label = document.getElementById('starting-octave-label');
         const decBtn = document.getElementById('octave-decrement');
         const incBtn = document.getElementById('octave-increment');
+
+        function getRootNote() {
+          const rootNoteSelect = document.getElementById('root-note');
+          if (!rootNoteSelect) return 'C';
+          let note = rootNoteSelect.value || 'C';
+          note = note.replace(/\s*\(.*\)/, '');
+          note = note.split(' ')[0];
+          note = note.replace(/\/.*/, '');
+          return note;
+        }
+
+        function updateStartingOctaveLabel() {
+          // Always set label to note+octave, never just the octave
+          const note = getRootNote();
+          const value = note + startingOctave;
+          // Only update if label is not already correct
+          if (label.textContent !== value) {
+            label.textContent = value;
+            console.log('[Starting Octave Label Updated]', value);
+          }
+        }
+
         function updateStartingOctave(val) {
           startingOctave = val;
-          label.textContent = startingOctave;
-          // Trigger any scale re-render logic if needed
+          updateStartingOctaveLabel();
           if (typeof renderCurrentScale === 'function') {
             renderCurrentScale();
           }
         }
+
+        // Listen for root note changes
+        function attachRootNoteListener() {
+          const rootNoteSelect = document.getElementById('root-note');
+          if (rootNoteSelect && !rootNoteSelect._octaveLabelListenerAttached) {
+            rootNoteSelect.addEventListener('change', updateStartingOctaveLabel);
+            rootNoteSelect._octaveLabelListenerAttached = true;
+          }
+        }
+
+        // Listen for scale type changes
+        const scaleTypeRadios = document.querySelectorAll('input[name="scale-type"]');
+        for (const radio of scaleTypeRadios) {
+          radio.addEventListener('change', updateStartingOctaveLabel);
+        }
+
+        // Listen for instrument changes (dropdown may repopulate root-note)
+        const instrumentSelect = document.getElementById('instrument-select');
+        if (instrumentSelect) {
+          instrumentSelect.addEventListener('change', function() {
+            // Wait for root-note dropdown to be repopulated
+            setTimeout(function() {
+              attachRootNoteListener();
+              updateStartingOctaveLabel();
+            }, 100);
+          });
+        }
+
         decBtn.onclick = function() {
           if (startingOctave > minOctave) {
             updateStartingOctave(startingOctave - 1);
@@ -598,8 +658,26 @@
             updateStartingOctave(startingOctave + 1);
           }
         };
-        // Initialize
-        updateStartingOctave(startingOctave);
+
+        // MutationObserver to detect when root-note select is populated
+        const observer = new MutationObserver(function() {
+          attachRootNoteListener();
+          updateStartingOctaveLabel();
+        });
+        const rootNoteSelect = document.getElementById('root-note');
+        if (rootNoteSelect) {
+          observer.observe(rootNoteSelect, { childList: true, subtree: true });
+        }
+
+        // Initial attach and update
+        attachRootNoteListener();
+        updateStartingOctaveLabel();
+
+        // Also update after any async dropdown population
+        setTimeout(function() {
+          attachRootNoteListener();
+          updateStartingOctaveLabel();
+        }, 200);
       });
     </script>
     <script>

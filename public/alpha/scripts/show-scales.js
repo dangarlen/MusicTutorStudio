@@ -386,7 +386,18 @@ function initializeStartingOctaveControls(entry) {
 }
 
 function updateOctaveLabel() {
-  document.getElementById("starting-octave-label").textContent = startingOctave;
+  // Always show note+octave, not just octave
+  const rootNoteSelect = document.getElementById("root-note");
+  let note = rootNoteSelect ? rootNoteSelect.value : "C";
+  note = note.replace(/\s*\(.*\)/, "");
+  note = note.split(" ")[0];
+  note = note.replace(/\/.*/, "");
+  document.getElementById("starting-octave-label").textContent =
+    note + startingOctave;
+  console.log(
+    "[Starting Octave Label Updated - show-scales.js]",
+    note + startingOctave
+  );
 }
 
 ///// Populate Root Note Dropdown ///////
@@ -881,33 +892,75 @@ function getKeySignaturePreference(rootNote) {
 // Convert note to preferred accidental family
 function convertToAccidentalFamily(note, preferredFamily) {
   // Extract note name and octave
-  const match = note.match(/^([A-G][#b]?)(\d*)$/);
+  const match = note.match(/^([A-G][#b]{0,2})(\d+)$/);
   if (!match) return note;
 
-  const [, noteName, octave] = match;
+  const [, noteName, octaveStr] = match;
+  const octave = parseInt(octaveStr, 10);
 
+  // Helper to adjust octave if needed
+  function adjustOctave(orig, enh, octave) {
+    // If converting B# to C, increment octave
+    if ((orig === "B#" || orig === "B##") && enh.startsWith("C"))
+      return octave + 1;
+    // If converting Cb to B, decrement octave
+    if ((orig === "Cb" || orig === "Cbb") && enh.startsWith("B"))
+      return octave - 1;
+    return octave;
+  }
   if (preferredFamily === "flats") {
     const sharpToFlat = {
       "C#": "Db",
+      "C##": "D",
+      "B#": "C",
+      "B##": "C#",
       "D#": "Eb",
+      "D##": "E",
+      "E#": "F",
+      "E##": "F#",
       "F#": "Gb",
+      "F##": "G",
       "G#": "Ab",
+      "G##": "A",
       "A#": "Bb",
-      // Note: E# and B# are preserved when they appear in theoretical scales
-      // as they maintain proper scale degree relationships
+      "A##": "B",
     };
-    return (sharpToFlat[noteName] || noteName) + octave;
+    const doubleFlat = {
+      Cb: "B",
+      Fb: "E",
+      Ebb: "D",
+      Bbb: "A",
+    };
+    const enh = sharpToFlat[noteName] || doubleFlat[noteName] || noteName;
+    const adjOctave = adjustOctave(noteName, enh, octave);
+    return enh + adjOctave;
   } else if (preferredFamily === "sharps") {
     const flatToSharp = {
       Db: "C#",
+      Dbb: "C",
       Eb: "D#",
+      Ebb: "D",
+      Fb: "E",
       Gb: "F#",
+      Gbb: "F",
       Ab: "G#",
+      Abb: "G",
       Bb: "A#",
-      // Note: Cb and Fb are preserved when they appear in theoretical scales
-      // as they maintain proper scale degree relationships
+      Bbb: "A",
+      Cb: "B",
+      "E#": "F",
+      "B#": "C",
     };
-    return (flatToSharp[noteName] || noteName) + octave;
+    const doubleSharp = {
+      "C##": "D",
+      "D##": "E",
+      "F##": "G",
+      "G##": "A",
+      "A##": "B",
+    };
+    const enh = flatToSharp[noteName] || doubleSharp[noteName] || noteName;
+    const adjOctave = adjustOctave(noteName, enh, octave);
+    return enh + adjOctave;
   }
   return note;
 }
@@ -974,6 +1027,11 @@ function generateScaleNotesForDisplay(
     console.log(
       `🎵 Auto-key determined family: ${preferredFamily} for root ${rootNote}`
     );
+  } else if (accidentalFamily === "auto-direction") {
+    preferredFamily = direction === "Descending" ? "flats" : "sharps";
+    console.log(
+      `🎵 Auto-direction determined family: ${preferredFamily} for direction: ${direction}`
+    );
   } else if (accidentalFamily === "force-sharps") {
     preferredFamily = "sharps";
   } else if (accidentalFamily === "force-flats") {
@@ -981,24 +1039,28 @@ function generateScaleNotesForDisplay(
   }
 
   console.log(`🎵 Using accidental family: ${preferredFamily}`);
-
-  // Only convert accidental family for chromatic scales or when forcing a specific family
-  // For diatonic scales, trust the theoretical pattern which already has correct enharmonics
-  if (scaleType === "chromatic" || accidentalFamily.startsWith("force-")) {
-    // Convert notes to preferred accidental family
+  // Always convert accidental family for both chromatic and diatonic scales if auto-direction is selected
+  if (
+    accidentalFamily === "auto-direction" ||
+    scaleType === "chromatic" ||
+    accidentalFamily.startsWith("force-")
+  ) {
+    if (direction === "Descending") {
+      finalNotes.reverse();
+      console.log("🎵 Reversed for descending direction");
+    }
     finalNotes = finalNotes.map((note) =>
       convertToAccidentalFamily(note, preferredFamily)
     );
     console.log("🎵 Applied accidental family conversion to notes");
   } else {
+    if (direction === "Descending") {
+      finalNotes.reverse();
+      console.log("🎵 Reversed for descending direction");
+    }
     console.log(
       "🎵 Skipped accidental family conversion - using theoretical pattern"
     );
-  }
-
-  if (direction === "Descending") {
-    finalNotes.reverse();
-    console.log("🎵 Reversed for descending direction");
   }
 
   console.log("🎵 FINAL SCALE NOTES:", finalNotes);
