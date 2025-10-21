@@ -1,0 +1,95 @@
+<!--
+  play-scales.html
+  ----------------
+  Title: Play Scales
+
+  🔧 Toolset Used:
+  - VexFlow (v3.0.9): Renders musical notation as SVG on a treble staff
+  - Tone.js (v14.8.39): Synthesizes audio playback of each note
+  - Tailwind CSS: Layout and styling
+  - JavaScript: Playback loop, toggle logic, timestamp
+
+  🎯 Feature Set:
+  - Renders a treble staff with notes from C4 to C5
+  - Plays each note in sequence with synchronized glow highlighting
+  - Play button toggles between play and stop with visual feedback
+  - Timestamped header for freshness tracking
+  - Modular layout with Home navigation
+
+  📅 Last Updated: Sat, Sep 20, 2025
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Play Scales</title>
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      #vf svg {
+        border: 1px solid #ccc;
+        margin-top: 20px;
+      }
+      .note-highlight {
+        fill: orange !important;
+        stroke: orange !important;
+        filter: drop-shadow(0 0 6px orange);
+        transition: all 0.2s ease;
+      }
+      .playing {
+        animation: pulse 0.6s infinite;
+        background-color: #38a169 !important;
+        box-shadow: 0 0 10px #38a169;
+        cursor: wait;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body class="p-6 bg-gray-100 font-sans">
+    <!-- Modular header container -->
+    <div id="header-container"></div>
+
+    <!-- Page title -->
+    <h1 class="text-2xl font-bold mb-2">🎼 Play Scales: C4 to C5</h1>
+
+    <!-- VexFlow staff container -->
+    <div id="vf"></div>
+
+    <!-- Play button below staff -->
+    <div class="mt-4">
+      <button
+        id="play"
+        class="px-4 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 transition"
+      >
+        ▶️ Play Scale
+      </button>
+    </div>
+
+    <!-- Home button at bottom -->
+    <div class="mt-12 text-center">
+      <a
+        href="index.html"
+        class="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition"
+      >
+        ⬅ Home
+      </a>
+    </div>
+
+    <!-- External logic and fragments -->
+    <script src="scripts/play-scales.js"></script>
+    <script src="scripts/global.js"></script>
+    <script src="scripts/load-header.js"></script>
+  </body>
+</html>

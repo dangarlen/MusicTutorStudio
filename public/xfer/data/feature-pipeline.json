@@ -1,0 +1,102 @@
+{
+  "version": "1.1",
+  "lastUpdated": "2025-10-07",
+  "features": [
+    {
+      "title": "Note Numbering",
+      "description": "Allow for optional numbering of notes for easier reference and practice.",
+      "status": "Planned"
+    },
+    {
+      "title": "Note Coloring",
+      "description": "Allow user to toggle note colors for easier distinction and practice.",
+      "status": "Planned"
+    },
+    {
+      "title": "Note Notes",
+      "description": "Allow user to add notes referance by note number.",
+      "status": "Planned"
+    },
+    {
+      "title": "Note tooltip select",
+      "description": "Add Practice Overlays Checkbox to enable/disable note tooltip feature.",
+      "status": "Active"
+    },
+    {
+      "title": "Note tooltip",
+      "description": "Optionally show note Practice Overlays via tooltip on hover.",
+      "status": "Active"
+    },
+
+    {
+      "title": "Practice Passage Support Infrastructure",
+      "description": "Create passages.json data structure, implement passage loading and selection functionality, add passage upload page, and integrate passage rendering with existing VexFlow notation system. Includes octave transposition controls specific to passage mode.",
+      "status": "Planned"
+    },
+    {
+      "title": "Enhanced Playback Controls Integration",
+      "description": "Integrate full playback functionality from play-scales.html into the new wireframe UI including play/pause/restart/rewind/loop controls, tempo slider, current note highlighting, and synchronized audio-visual feedback.",
+      "status": "Planned"
+    },
+    {
+      "title": "URL Parameter Scale Selection for show-scales.html",
+      "description": "Allow optional URL parameter to set the scale (e.g., Cmaj or Aminor) while preserving all other defaults from cookies. Example: show-scales.html?scale=Cmaj or show-scales.html?scale=Aminor",
+      "status": "Planned"
+    },
+    {
+      "title": "Copy Play functionality from play-scales.html to show-scales.html",
+      "description": "Add audio playback capabilities to the show-scales page by integrating the play functionality currently available in play-scales.html",
+      "status": "Planned"
+    },
+    {
+      "title": "Interactive Fingering Chart",
+      "description": "Tap any note to reveal correct euphonium fingering with visual feedback and valve animation.",
+      "status": "Planned"
+    },
+    {
+      "title": "Audio Feedback with Tone.js",
+      "description": "Capture and playback user input to assess pitch accuracy and tonal quality in real time.",
+      "status": "In Progress"
+    },
+    {
+      "title": "Progress Tracker",
+      "description": "Track practice streaks, session duration, and improvement metrics with visual charts.",
+      "status": "Planned"
+    },
+    {
+      "title": "User Login",
+      "description": "User Login page which would facilitate server-side user data storage such as User uploads .mxl → Netlify Function extracts & parses → Save .json to Netlify Blobs → Serve to frontend",
+      "status": "Planned"
+    },
+    {
+      "title": "Onboarding Flow with Video Tutorials",
+      "description": "Step-by-step onboarding using curated videos and interactive guidance for new users.",
+      "status": "Planned"
+    },
+    {
+      "title": "SpeechSynthesis Integration",
+      "description": "Enable spoken instructions and feedback using browser-native speech synthesis.",
+      "status": "Planned"
+    },
+    {
+      "title": "getUserMedia Microphone Input",
+      "description": "Allow live audio capture for pitch detection and real-time feedback.",
+      "status": "Planned"
+    },
+    {
+      "title": "Modular Extension Tracker",
+      "description": "Display installed and planned modules with status indicators and versioning.",
+      "status": "Planned"
+    },
+    {
+      "title": "MusicTutor.Studio Domain Integration",
+      "description": "Successfully migrated site to MusicTutor.Studio domain. All URLs and deployment scripts updated to use new domain infrastructure.",
+      "status": "Completed"
+    },
+    {
+      "title": "Allow user to name and save current formatted scale or passage for subsequent retrieval or to be added to lesson plan",
+      "description": "Implement functionality to allow users to save their currently configured scales or practice passages with custom names. Saved items can be retrieved later for practice or incorporated into structured lesson plans for organized learning progression.",
+      "status": "Planned"
+    }
+  ]
+}

@@ -1,0 +1,530 @@
+footer<!-- Design goals:
+     - Mobile-first, modular layout
+     - Tailwind CSS + daisyUI components only
+     - Audit-safe, semantic structure for Music Tutor Studio
+     - Every page should include header and footer
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Scales</title>
+    <!-- Tailwind CSS CDN (official) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- daisyUI CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.css"
+      rel="stylesheet"
+    />
+    <!-- Google Material Symbols -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <!-- Centralized theme for consistent UI -->
+    <link href="styles/theme.css" rel="stylesheet" />
+  </head>
+
+  <body class="bg-base-200 flex flex-col min-h-screen">
+    <div id="header-container"></div>
+    <script src="scripts/header-fetch.js"></script>
+    <script>
+      headerFetch();
+    </script>
+
+    <div
+      class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatCreatorPages"
+    >
+      <span class="material-symbols-outlined">edit_square</span>
+      <span id="dynamic-create-title" class="text-2xl">Create Scales</span>
+    </div>
+
+    <!-- DaisyUI Collapse Block for Scale Display (moved to top, closed by default) -->
+    <div class="collapse bg-base-100 shadow mb-8" id="scale-display-block">
+      <input type="checkbox" class="peer" id="scale-display-toggle" />
+      <div class="collapse-title text-lg font-semibold">🎼 Scale Display</div>
+      <div class="collapse-content flex flex-col gap-4">
+        <!-- Textual Note Output -->
+        <div id="textual-note-output" class="mb-4" style="display: none">
+          <h3 class="font-semibold text-gray-700 mb-2">Textual Note Output</h3>
+          <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+            <div
+              id="textual-note-label"
+              class="font-semibold text-blue-800 mb-2"
+            >
+              🎵 Current Scale:
+            </div>
+            <div
+              id="scale-notes-display"
+              class="text-sm text-blue-700 font-mono break-words whitespace-pre-line"
+            >
+              Select scale parameters to see notes...
+            </div>
+            <div class="text-xs text-gray-600 mt-2">
+              → SPN, MIDI, note names, fingering, etc.
+            </div>
+          </div>
+        </div>
+        <!-- Staff Notation Area -->
+        <div class="mb-4">
+          <h3 class="font-semibold text-gray-700 mb-2">Staff Notation Area</h3>
+          <div
+            id="vf"
+            class="border border-gray-300 rounded p-4 bg-gray-50 min-h-[200px]"
+          ></div>
+          <div class="text-xs text-gray-600 mt-2">
+            → Visual rendering of scale or practice passage
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DaisyUI Collapse Block for Scale Configuration -->
+    <div class="collapse bg-base-100 shadow mb-8">
+      <input type="checkbox" class="peer" checked />
+      <div class="collapse-title text-lg font-semibold">
+        🎚 Scale Configuration
+      </div>
+      <div class="collapse-content flex flex-col gap-4">
+        <div class="mb-4">
+          <h3 class="font-semibold text-gray-700 mb-2">Scale Selector</h3>
+          <div id="scale-name-label" class="mb-2 text-blue-700 font-semibold">
+            Scale Name: ---
+          </div>
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+              <label for="key-select" class="font-semibold">Key</label>
+              <select
+                id="key-select"
+                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Key</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <label for="scale-type-select" class="font-semibold"
+                >Scale Type</label
+              >
+              <select
+                id="scale-type-select"
+                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Scale Type</option>
+              </select>
+            </div>
+          </div>
+          <script>
+            // Update Scale Name label dynamically
+            function updateScaleNameLabel() {
+              const key = document.getElementById("key-select")?.value || "";
+              const scaleType =
+                document.getElementById("scale-type-select")?.value || "";
+              // Remove accidental info from key (e.g., "A (3 sharps)" -> "A")
+              const keyClean = key.replace(/\s*\(.*\)/, "");
+              const label =
+                keyClean && scaleType
+                  ? `Scale Name: ${keyClean} ${
+                      scaleType.charAt(0).toUpperCase() + scaleType.slice(1)
+                    }`
+                  : "Scale Name: ---";
+              document.getElementById("scale-name-label").textContent = label;
+            }
+            document.addEventListener("DOMContentLoaded", function () {
+              updateScaleNameLabel();
+              document
+                .getElementById("key-select")
+                ?.addEventListener("change", updateScaleNameLabel);
+              document
+                .getElementById("scale-type-select")
+                ?.addEventListener("change", updateScaleNameLabel);
+            });
+          </script>
+        </div>
+
+        <!-- Scale Range Settings Group -->
+        <div class="mb-4 p-4 rounded bg-base-100 border border-base-300 shadow">
+          <h4 class="font-semibold text-gray-700 mb-2">Scale Range Settings</h4>
+          <div class="flex flex-col md:flex-row gap-4 items-center">
+            <div class="flex-1 flex items-center gap-2">
+              <label for="octave-count" class="font-semibold"
+                >Number of Octaves</label
+              >
+              <button
+                id="octave-minus"
+                type="button"
+                class="btn btn-xs btn-outline"
+              >
+                -
+              </button>
+              <span
+                id="octave-value"
+                class="px-3 py-1 rounded bg-base-200 border"
+                >2</span
+              >
+              <button
+                id="octave-plus"
+                type="button"
+                class="btn btn-xs btn-outline"
+              >
+                +
+              </button>
+            </div>
+            <div class="flex-1 flex items-center gap-4">
+              <label for="starting-octave" class="font-semibold"
+                >Starting Octave</label
+              >
+              <select
+                id="starting-octave"
+                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <!-- Options will be populated dynamically -->
+              </select>
+            </div>
+          </div>
+        </div>
+        <script>
+          // Octaves stepper logic
+          document.addEventListener("DOMContentLoaded", function () {
+            const minOctaves = 1;
+            const maxOctaves = 5;
+            const octaveValue = document.getElementById("octave-value");
+            const minusBtn = document.getElementById("octave-minus");
+            const plusBtn = document.getElementById("octave-plus");
+            let octaves = 2;
+            function updateOctaveDisplay() {
+              octaveValue.textContent = octaves;
+            }
+            function triggerScaleUpdate() {
+              if (globalThis.updateAllScaleOutputs)
+                globalThis.updateAllScaleOutputs();
+            }
+            globalThis.getNumberOfOctaves = function () {
+              return octaves;
+            };
+            minusBtn.addEventListener("click", function () {
+              if (octaves > minOctaves) {
+                octaves--;
+                updateOctaveDisplay();
+                triggerScaleUpdate();
+              }
+            });
+            plusBtn.addEventListener("click", function () {
+              if (octaves < maxOctaves) {
+                octaves++;
+                updateOctaveDisplay();
+                triggerScaleUpdate();
+              }
+            });
+            updateOctaveDisplay();
+            if (globalThis.updateAllScaleOutputs)
+              globalThis.updateAllScaleOutputs();
+          });
+
+          // Starting Octave dropdown logic (example: F#2 to C6)
+          document.addEventListener("DOMContentLoaded", function () {
+            const startingOctaveSelect =
+              document.getElementById("starting-octave");
+            // Example: derive from instruments.json, here hardcoded for demo
+            const rangeStart = "F#2";
+            const rangeEnd = "C6";
+            // Generate octave options from F#2 to C6
+            const notes = [
+              "C",
+              "C#",
+              "D",
+              "D#",
+              "E",
+              "F",
+              "F#",
+              "G",
+              "G#",
+              "A",
+              "A#",
+              "B",
+            ];
+            function getOctave(spn) {
+              const m = spn.match(/([A-G]#?)(\d+)/);
+              return m ? parseInt(m[2], 10) : 2;
+            }
+            const startOctave = getOctave(rangeStart);
+            const endOctave = getOctave(rangeEnd);
+            for (let oct = startOctave; oct <= endOctave; oct++) {
+              for (const note of notes) {
+                const spn = `${note}${oct}`;
+                startingOctaveSelect.appendChild(new Option(spn, spn));
+                if (spn === rangeStart.replace(/\//, "")) {
+                  startingOctaveSelect.value = spn;
+                }
+                if (spn === rangeEnd.replace(/\//, "")) break;
+              }
+            }
+          });
+        </script>
+
+        <!-- Timing & Trajectory Group -->
+        <div class="mb-4 p-4 rounded bg-base-100 border border-base-300 shadow">
+          <h4 class="font-semibold text-gray-700 mb-2">
+            Timing &amp; Trajectory
+          </h4>
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 flex items-center gap-4">
+              <label for="direction" class="font-semibold">Direction</label>
+              <select
+                id="direction"
+                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Ascending" selected>Ascending</option>
+                <option value="Descending">Descending</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <div class="font-semibold mb-2">Note Duration</div>
+              <div class="flex flex-wrap gap-4 text-sm">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="note-duration" value="eighth" />
+                  Eighth Notes
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="note-duration"
+                    value="quarter"
+                    checked
+                  />
+                  Quarter Notes
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="note-duration" value="half" />
+                  Half Notes
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="note-duration" value="whole" />
+                  Whole Notes
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accidentals -->
+        <div class="mb-3">
+          <div class="font-semibold mb-2">Accidentals</div>
+          <div class="flex flex-wrap gap-4 text-sm">
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="accidental-family"
+                value="auto-key"
+                checked
+              />
+              Auto: Based on Key
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="accidental-family"
+                value="auto-direction"
+              />
+              Auto: Based on Asc/Desc
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="accidental-family"
+                value="force-sharps"
+              />
+              Force: Sharps
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="radio"
+                name="accidental-family"
+                value="force-flats"
+              />
+              Force: Flats
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diagnostics DaisyUI Collapse Block -->
+    <div class="collapse bg-base-100 shadow mb-8">
+      <input type="checkbox" class="peer" checked />
+      <div class="collapse-title text-lg font-semibold">
+        🧪 Diagnostics: Behind the Curtain
+      </div>
+      <div class="collapse-content flex flex-col gap-2">
+        <div class="font-semibold">Arguments sent to buildScaleFromUI:</div>
+        <pre
+          id="diagnostics-args"
+          class="bg-gray-100 p-2 rounded text-xs"
+        ></pre>
+        <div class="font-semibold mt-2">Notes scale returned:</div>
+        <pre
+          id="diagnostics-scale"
+          class="bg-gray-100 p-2 rounded text-xs"
+        ></pre>
+        <div class="font-semibold mt-2 flex items-center justify-between">
+          <span>Log:</span>
+          <button
+            id="clear-log-btn"
+            class="btn btn-xs btn-outline ml-2"
+            type="button"
+          >
+            Clear Log
+          </button>
+        </div>
+        <pre
+          id="diagnostics-log"
+          style="max-height: 180px; overflow-y: auto"
+          class="bg-gray-100 p-2 rounded text-xs"
+        ></pre>
+        <script>
+          // Clear Log button functionality
+          document.addEventListener("DOMContentLoaded", function () {
+            const clearBtn = document.getElementById("clear-log-btn");
+            const logEl = document.getElementById("diagnostics-log");
+            if (clearBtn && logEl) {
+              clearBtn.addEventListener("click", function () {
+                logEl.textContent = "";
+              });
+            }
+          });
+        </script>
+      </div>
+    </div>
+
+    <!-- Back button: Return to Creator (moved to bottom) -->
+    <div style="max-width: 400px; margin: 2em auto">
+      <a href="creator.html" class="mtsFormatCreatorButtons">
+        <span
+          class="material-symbols-outlined align-middle mr-2"
+          aria-hidden="true"
+          >edit_square</span
+        >
+        Return to Creator
+      </a>
+    </div>
+    <div id="footer-container"></div>
+    <script src="scripts/footer-fetch.js"></script>
+    <script type="module">
+      import { initScaleConfiguration } from "./scripts/ui/create-scales.js";
+      import {
+        setupDynamicCreateTitle,
+        setupScaleDisplay,
+      } from "./scripts/ui/scales.js";
+      import { buildScaleFromUI } from "./scripts/utils/buildScaleFromUI.js";
+
+      function getScaleConfigFromUI() {
+        return {
+          key: document.getElementById("key-select")?.value || "C",
+          scaleType:
+            document.getElementById("scale-type-select")?.value || "major",
+          octaves: globalThis.getNumberOfOctaves
+            ? globalThis.getNumberOfOctaves()
+            : 2,
+          direction:
+            document.getElementById("direction")?.value?.toLowerCase() ||
+            "ascending",
+          noteDuration:
+            document.querySelector('input[name="note-duration"]:checked')
+              ?.value || "quarter",
+          accidentals:
+            document.querySelector('input[name="accidental-family"]:checked')
+              ?.value || "auto-key",
+        };
+      }
+
+      // Unified update: diagnostics and staff display
+      function updateAllScaleOutputs() {
+        const config = getScaleConfigFromUI();
+        const result = buildScaleFromUI(config);
+        document.getElementById("diagnostics-args").textContent =
+          JSON.stringify(result.args, null, 2);
+        document.getElementById("diagnostics-scale").textContent =
+          JSON.stringify(result.scaleNotes, null, 2);
+
+        // Add a log entry for this change
+        const logEl = document.getElementById("diagnostics-log");
+        const now = new Date();
+        const prettyConfig = JSON.stringify(config, null, 2).replaceAll(
+          "\n",
+          "\n    "
+        );
+        const logEntry = `[${now.toLocaleTimeString()}] Config changed:\n    ${prettyConfig}`;
+        let prevLog = logEl.textContent ? logEl.textContent.split("\n") : [];
+        prevLog.push(logEntry);
+        // Optionally keep only the last 50 entries
+        if (prevLog.length > 50) prevLog = prevLog.slice(-50);
+        logEl.textContent = prevLog.join("\n");
+
+        // Also update staff and note display
+        import("./scripts/ui/scales.js").then(({ renderVexflowStaff }) => {
+          const vfDiv = document.getElementById("vf");
+          renderVexflowStaff(vfDiv, result.scaleNotes);
+          const notesDisplay = document.getElementById("scale-notes-display");
+          if (notesDisplay) {
+            notesDisplay.textContent = result.scaleNotes.join(", ");
+          }
+        });
+      }
+
+      function wireScaleConfigEvents() {
+        for (const id of ["key-select", "scale-type-select", "direction"]) {
+          const el = document.getElementById(id);
+          if (el) el.addEventListener("change", updateAllScaleOutputs);
+        }
+        // Wire up octave stepper
+        const minusBtn = document.getElementById("octave-minus");
+        const plusBtn = document.getElementById("octave-plus");
+        if (minusBtn) minusBtn.addEventListener("click", updateAllScaleOutputs);
+        if (plusBtn) plusBtn.addEventListener("click", updateAllScaleOutputs);
+        for (const el of document.querySelectorAll(
+          'input[name="note-duration"]'
+        )) {
+          el.addEventListener("change", updateAllScaleOutputs);
+        }
+        for (const el of document.querySelectorAll(
+          'input[name="accidental-family"]'
+        )) {
+          el.addEventListener("change", updateAllScaleOutputs);
+        }
+      }
+
+      // Load pitch-class.json and assign to globalThis.pitchClassData before initializing UI
+      fetch("../prototype/data/pitch-class.json")
+        .then((res) => res.json())
+        .then((pitchClassData) => {
+          globalThis.pitchClassData = pitchClassData;
+          // Now load scales.json and initialize UI
+          fetch("./data/scales.json")
+            .then((res) => res.json())
+            .then((data) => {
+              initScaleConfiguration({
+                keys: data.keys,
+                scaleTypes: data.scaleTypes,
+              });
+              setupDynamicCreateTitle();
+              setupScaleDisplay();
+              wireScaleConfigEvents();
+              updateAllScaleOutputs();
+            });
+        });
+      // Load VexFlow from CDN if not already present
+      if (!globalThis.Vex) {
+        const script = document.createElement("script");
+        script.src =
+          "https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js";
+        script.onload = () => {
+          // VexFlow loaded
+        };
+        document.head.appendChild(script);
+      }
+    </script>
+    <script>
+      footerFetch();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preferences | Euphonium Tutor App</title>
+
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Cookie utility for saving preferences -->
+    <script src="scripts/cookies.js"></script>
+
+    <!-- Optional: favicon and theme color -->
+    <link rel="icon" href="favicon.ico" />
+    <meta name="theme-color" content="#1e40af" />
+  </head>
+  <body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Main container -->
+    <div class="max-w-xl mx-auto p-6">
+      <h1 class="text-2xl font-bold mb-6">🎛 Instrument Preferences</h1>
+
+      <!-- Instrument selection -->
+      <label for="instrument-select" class="block mb-2 font-semibold"
+        >Select Instrument:</label
+      >
+      <select
+        id="instrument-select"
+        class="w-full p-2 border rounded mb-4"
+      ></select>
+
+      <!-- Save button -->
+      <button
+        onclick="savePreferences()"
+        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        Save Preferences
+      </button>
+
+      <!-- Navigation -->
+      <div class="text-center mt-12">
+        <a
+          href="index.html"
+          class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
+        >
+          ⬅ Home
+        </a>
+      </div>
+    </div>
+
+    <!-- External logic and fragments -->
+    <script src="scripts/preferences.js"></script>
+  </body>
+</html>

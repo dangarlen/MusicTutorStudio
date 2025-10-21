@@ -2,53 +2,31 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
-
-
-<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Scales</title>
+    <title>Show Scale | Euphonium Tutor App</title>
 
-  <!-- VexFlow for music notation -->
+    <!-- VexFlow for music notation -->
     <script src="https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js"></script>
 
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Cookie utility -->
     <script src="scripts/cookies.js"></script>
 
-
-    <!-- Tailwind CSS CDN (official) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- daisyUI CDN -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.css"
-      rel="stylesheet"
-    />
-    <!-- Google Material Symbols -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      rel="stylesheet"
-    />
-    <!-- Centralized theme for consistent UI -->
-    <link href="styles/theme.css" rel="stylesheet" />
+    <!-- Optional: favicon and theme color -->
+    <link rel="icon" href="favicon.ico" />
+    <meta name="theme-color" content="#1e40af" />
   </head>
 
- <body class="bg-base-200 flex flex-col min-h-screen">
+  <body class="p-6 bg-gray-100 font-sans">
+    <!-- Header fragment -->
     <div id="header-container"></div>
-    <script src="scripts/header-fetch.js"></script>
-    <script>
-      headerFetch();
-    </script>
-
-    <div
-      class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatCreatorPages"
-    >
-      <span class="material-symbols-outlined">edit_square</span>
-      <span id="dynamic-create-title" class="text-2xl">Create Scales</span>
+    <div id="return-to-lessons-container" class="flex justify-end items-center mt-2 mb-2" style="display:none;">
+      <button id="return-to-lessons-btn" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition text-sm font-semibold">Return to Lessons</button>
     </div>
-
     <script>
       // Show Return to Lessons button if user arrived from lessons.html
       document.addEventListener('DOMContentLoaded', function() {
@@ -106,12 +84,17 @@
         }
       });
     </script>
-    <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-      <input type="checkbox" class="peer" />
-      <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        🎚 Title / Instrument Selection
-      </div>
-      <div class="collapse-content">
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎚 Title / Instrument Selection
+        </button>
+      </legend>
+      
+      <div class="fieldset-content">
         <!-- Dynamic Title -->
         <h1 id="dynamic-title" class="text-2xl font-bold mb-4 text-left">
           🎼 Show Scale
@@ -131,16 +114,20 @@
           >
         </div>
       </div>
-    </div>
+    </fieldset>
 
     <!-- Music Display -->
-  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎼 Music Display
+        </button>
+      </legend>
 
-    <input type="checkbox" class="peer" />
-      <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        🎼 Music Display
-      </div>
-      <div class="collapse-content">
+      <div class="fieldset-content">
 
       <!-- Textual Note Output -->
       <div id="textual-note-output" class="mb-4" style="display: none;">
@@ -176,12 +163,15 @@
 
 
     <!-- Select Practice Passage (Hidden by default) -->
-    <div class="collapse collapse-arrow bg-white mb-6" style="display: none">
-      <input type="checkbox" class="peer" />
-      <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        📁 Select Practice Passage
-      </div>
-      <div class="collapse-content space-y-3">
+    <fieldset
+      data-persistence="session"
+      data-mode="passages"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white"
+      style="display: none"
+    >
+      <legend class="px-2 font-bold text-lg">📁 Select Practice Passage</legend>
+
+      <div class="space-y-3">
         <div class="flex items-center gap-4">
           <label for="passage-select" class="font-semibold w-32">Passage</label>
           <select
@@ -235,15 +225,20 @@
       });
     </script>
       </div>
-    </div>
+    </fieldset>
 
     <!-- Display Settings -->
-  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-      <input type="checkbox" class="peer" />
-      <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        🎚 Display Settings
-      </div>
-      <div class="collapse-content">
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎚 Display Settings
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
 
       <!-- Staff Display Options -->
       <div class="mb-4">
@@ -307,12 +302,18 @@
     </fieldset>
 
     <!-- Scale Configuration -->
-  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-      <input type="checkbox" class="peer" />
-      <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        🎼 Scale Configuration
-      </div>
-      <div class="collapse-content">
+    <fieldset
+      data-persistence="session"
+      data-mode="scales"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🎼 Scale Configuration
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
 
       <!-- Key -->
       <div class="flex items-center gap-4 mb-3">
@@ -432,16 +433,21 @@
         </div>
       </div>
 
-    </div>
-  </div>
+        </div>
+    </fieldset>
 
     <!-- Octave Controls -->
-  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-      <input type="checkbox" class="peer" />
-      <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        🔢 Octave Controls
-      </div>
-      <div class="collapse-content">
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🔢 Octave Controls
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
         <div class="flex items-center gap-4">
           <button
             id="octave-decrement"
@@ -468,38 +474,36 @@
           </button>
         </div>
       </div>
-      </div>
-    </div>
-    </div>
+    </fieldset>
 
       <!-- Snapshot Save/Recall UI -->
-
- <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-        <input type="checkbox" class="peer" />
-  <div class="collapse-title font-bold text-lg flex items-center gap-2">
+      <div id="snapshot-controls" class="mb-6 p-4 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 flex flex-col gap-3">
+        <div class="font-bold text-blue-800 text-lg flex items-center gap-2">
           <span>💾</span> Save/Recall Workspace Snapshot
         </div>
-  <div class="collapse-content">
-          <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
-            <button id="save-snapshot-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save Snapshot</button>
-            <input type="file" id="load-snapshot-input" accept="application/json" class="hidden" />
-            <button id="load-snapshot-btn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Load Snapshot</button>
-            <span class="text-xs text-gray-600">
-              (Snapshots are saved in your browser storage. You can recall them from this device at any time. No files are downloaded or required.)
-            </span>
-          </div>
-          <div id="snapshot-status" class="text-xs text-blue-700"></div>
+        <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+          <button id="save-snapshot-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save Snapshot</button>
+          <input type="file" id="load-snapshot-input" accept="application/json" class="hidden" />
+          <button id="load-snapshot-btn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Load Snapshot</button>
+          <span class="text-xs text-gray-600">
+            (Snapshots are saved in your browser storage. You can recall them from this device at any time. No files are downloaded or required.)
+          </span>
         </div>
+        <div id="snapshot-status" class="text-xs text-blue-700"></div>
       </div>
 
     <!-- Diagnostics -->
-      
-<div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-        <input type="checkbox" class="peer" />
-        <div class="collapse-title font-bold text-lg flex items-center gap-2">
-          🛠️ Diagnostics
-        </div>
-        <div class="collapse-content">
+    <fieldset
+      data-persistence="persistent"
+      class="mb-6 p-4 border-2 border-gray-300 rounded-lg bg-white collapsible-fieldset"
+    >
+      <legend class="px-2 font-bold text-lg">
+        <button class="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none bg-transparent border-none text-lg font-bold" onclick="toggleFieldset(this)" onkeydown="handleFieldsetKeydown(event, this)">
+          <span class="collapse-icon">▼</span> 🛠️ Diagnostics
+        </button>
+      </legend>
+
+      <div class="fieldset-content">
         <div class="space-y-2">
           <label class="flex items-center gap-2">
             <input type="checkbox" id="diagnostic-mode" onchange="toggleDiagnosticLink()" />
@@ -518,21 +522,7 @@
           </div>
         </div>
       </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Back button: Return to Creator -->
-    <div style="max-width: 400px; margin: 2em auto">
-      <a href="creator.html" class="mtsFormatCreatorButtons">
-        <span
-          class="material-symbols-outlined align-middle mr-2"
-          aria-hidden="true"
-          >edit_square</span
-        >
-        Return to Creator
-      </a>
-    </div>
+    </fieldset>
 
     <!-- Footer fragment -->
     <div id="footer-container"></div>
@@ -545,23 +535,145 @@
     <script src="scripts/render-scale.js"></script>
     <script src="scripts/load-header.js"></script>
     <script src="scripts/load-footer.js"></script>
-    <script>
-      // Return to Creator navigation
-      document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('return-to-creator-btn');
-        if (btn) {
-          btn.onclick = function() {
-            window.location.href = 'creator.html';
-          };
-        }
-      });
-    </script>
     
-
-    <div id="footer-container"></div>
-    <script src="scripts/footer-fetch.js"></script>
+    <!-- Collapsible Fieldsets Functionality -->
+    <style>
+      .fieldset-content {
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+      
+      .collapsed .fieldset-content {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      
+      .collapse-icon {
+        transition: transform 0.3s ease;
+        display: inline-block;
+      }
+      
+      .collapsed .collapse-icon {
+        transform: rotate(-90deg);
+      }
+      
+      .collapsible-fieldset legend:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+        border-radius: 4px;
+      }
+    </style>
+    
     <script>
-      footerFetch();
+      // Toggle fieldset collapse/expand
+      function toggleFieldset(button) {
+        const fieldset = button.closest('fieldset');
+        fieldset.classList.toggle('collapsed');
+        
+        // Save collapse state to localStorage
+        const legendText = button.textContent.trim();
+        const isCollapsed = fieldset.classList.contains('collapsed');
+        localStorage.setItem(`fieldset-${legendText}`, isCollapsed ? 'collapsed' : 'expanded');
+      }
+      
+      // Handle keyboard navigation for fieldset buttons
+      function handleFieldsetKeydown(event, button) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          toggleFieldset(button);
+        }
+      }
+      
+      // Toggle diagnostic about link visibility
+      function toggleDiagnosticLink() {
+        const checkbox = document.getElementById('diagnostic-mode');
+        const linkDiv = document.getElementById('diagnostic-about-link');
+        
+        if (checkbox && linkDiv) {
+          linkDiv.style.display = checkbox.checked ? 'block' : 'none';
+        }
+      }
+      
+      // Restore fieldset states on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        const fieldsets = document.querySelectorAll('.collapsible-fieldset');
+        fieldsets.forEach(fieldset => {
+          const button = fieldset.querySelector('legend button');
+          if (button) {
+            const legendText = button.textContent.trim();
+            const savedState = localStorage.getItem(`fieldset-${legendText}`);
+            
+            if (savedState === 'collapsed') {
+              fieldset.classList.add('collapsed');
+            }
+          }
+        });
+        
+        // Initialize mode-based label functionality
+        initializeModeBasedLabels();
+      });
+      
+      // Initialize mode-based label switching
+      function initializeModeBasedLabels() {
+        const practiceTypeInputs = document.querySelectorAll('input[name="practice-type"]');
+        
+        // Set initial labels based on current selection
+        updateOctaveLabelText();
+        if (typeof updateTextualNoteLabel === 'function') {
+          updateTextualNoteLabel();
+        }
+        
+        // Add event listeners for practice type changes
+        practiceTypeInputs.forEach(input => {
+          input.addEventListener('change', function() {
+            updateOctaveLabelText();
+            togglePassageMode();
+            // Update dynamic title when practice type changes
+            if (typeof updateDynamicTitle === 'function') {
+              updateDynamicTitle();
+            }
+            // Update textual note label when practice type changes
+            if (typeof updateTextualNoteLabel === 'function') {
+              updateTextualNoteLabel();
+            }
+            // Update textual display when switching to passages
+            if (typeof updatePassageTextualDisplay === 'function') {
+              updatePassageTextualDisplay();
+            }
+            // Clear staff and re-render when practice type changes
+            if (typeof renderCurrentScale === 'function') {
+              renderCurrentScale();
+            }
+          });
+        });
+      }
+      
+      // Update octave label based on current practice type
+      function updateOctaveLabelText() {
+        const octaveLabel = document.getElementById('octave-label');
+        const isPassageMode = document.querySelector('input[name="practice-type"]:checked').value === 'passages';
+        
+        if (octaveLabel) {
+          octaveLabel.textContent = isPassageMode ? 'Octave Transposition' : 'Starting Octave';
+        }
+      }
+      
+      // Toggle visibility of passage-specific controls
+      function togglePassageMode() {
+        const isPassageMode = document.querySelector('input[name="practice-type"]:checked').value === 'passages';
+        const passageFieldset = document.querySelector('fieldset[data-mode="passages"]');
+        const scaleFieldset = document.querySelector('fieldset[data-mode="scales"]');
+        
+        if (passageFieldset) {
+          passageFieldset.style.display = isPassageMode ? 'block' : 'none';
+        }
+        
+        if (scaleFieldset) {
+          scaleFieldset.style.display = isPassageMode ? 'none' : 'block';
+        }
+      }
     </script>
   </body>
 </html>
