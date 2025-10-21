@@ -56,9 +56,13 @@ function collectWorkspaceSnapshot() {
   // Collect all relevant UI state
   const instrument = document.getElementById("instrument-select")?.value;
   const rootNote = document.getElementById("root-note")?.value;
-  const scaleType = document.getElementById("scale-type")?.value;
+  const scaleType = document.querySelector(
+    'input[name="scale-type"]:checked'
+  )?.value;
   const octaveCount = document.getElementById("octave-count")?.value;
-  const direction = document.getElementById("direction")?.value;
+  const direction = document.querySelector(
+    'input[name="direction"]:checked'
+  )?.value;
   const noteDuration = document.querySelector(
     'input[name="note-duration"]:checked'
   )?.value;
@@ -120,12 +124,20 @@ function applyWorkspaceSnapshot(snapshot) {
     document.getElementById("instrument-select").value = snapshot.instrument;
   if (snapshot.rootNote)
     document.getElementById("root-note").value = snapshot.rootNote;
-  if (snapshot.scaleType)
-    document.getElementById("scale-type").value = snapshot.scaleType;
+  if (snapshot.scaleType) {
+    const stRadio = document.querySelector(
+      `input[name='scale-type'][value='${snapshot.scaleType}']`
+    );
+    if (stRadio) stRadio.checked = true;
+  }
   if (snapshot.octaveCount)
     document.getElementById("octave-count").value = snapshot.octaveCount;
-  if (snapshot.direction)
-    document.getElementById("direction").value = snapshot.direction;
+  if (snapshot.direction) {
+    const dirRadio = document.querySelector(
+      `input[name='direction'][value='${snapshot.direction}']`
+    );
+    if (dirRadio) dirRadio.checked = true;
+  }
   if (snapshot.noteDuration) {
     const nd = document.querySelector(
       `input[name='note-duration'][value='${snapshot.noteDuration}']`
@@ -657,7 +669,9 @@ function attachEventListeners() {
       renderCurrentScale();
     });
 
-  document.getElementById("scale-type").onchange = renderCurrentScale;
+  document.querySelectorAll('input[name="scale-type"]').forEach((radio) => {
+    radio.addEventListener("change", renderCurrentScale);
+  });
 
   document.getElementById("root-note").addEventListener("change", () => {
     const instrumentName = document.getElementById("instrument-select").value;
@@ -666,7 +680,14 @@ function attachEventListeners() {
     renderCurrentScale();
   });
 
-  document.getElementById("direction").onchange = renderCurrentScale;
+  document.querySelectorAll('input[name="direction"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        setCookie("direction", e.target.value);
+        renderCurrentScale();
+      }
+    });
+  });
 
   document.getElementById("octave-count").addEventListener("change", () => {
     const instrumentName = document.getElementById("instrument-select").value;
@@ -1121,9 +1142,13 @@ window.generateScaleNotesForDisplay = generateScaleNotesForDisplay;
 
 ///// Update Scale Notes Display ///////
 function updateScaleNotesDisplay() {
-  const scaleType = document.getElementById("scale-type").value;
+  const scaleType = document.querySelector(
+    'input[name="scale-type"]:checked'
+  )?.value;
   const rootNote = document.getElementById("root-note").value;
-  const direction = document.getElementById("direction").value;
+  const direction = document.querySelector(
+    'input[name="direction"]:checked'
+  )?.value;
   const octaveCount = parseInt(document.getElementById("octave-count").value);
   const displayElement = document.getElementById("scale-notes-display");
 
@@ -1412,9 +1437,13 @@ function renderCurrentScale() {
   }
 
   // Handle scale rendering (existing logic)
-  const scaleType = document.getElementById("scale-type").value;
+  const scaleType = document.querySelector(
+    'input[name="scale-type"]:checked'
+  )?.value;
   const rootNote = document.getElementById("root-note").value;
-  const direction = document.getElementById("direction").value;
+  const direction = document.querySelector(
+    'input[name="direction"]:checked'
+  )?.value;
   const displayMode = "none"; // Hardcoded to Notes ONLY
   const octaveCount = parseInt(document.getElementById("octave-count").value);
 

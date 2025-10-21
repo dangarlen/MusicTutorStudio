@@ -107,7 +107,7 @@
       });
     </script>
     <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-      <input type="checkbox" class="peer" />
+  <input type="checkbox" class="peer" checked />
       <div class="collapse-title font-bold text-lg flex items-center gap-2">
         🎚 Title / Instrument Selection
       </div>
@@ -136,7 +136,7 @@
     <!-- Music Display -->
   <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
 
-    <input type="checkbox" class="peer" />
+  <input type="checkbox" class="peer" checked />
       <div class="collapse-title font-bold text-lg flex items-center gap-2">
         🎼 Music Display
       </div>
@@ -238,16 +238,149 @@
     </div>
 
     <!-- Display Settings -->
+    <!-- Removed Display Settings wrapper -->
+
+    <!-- Scale Configuration -->
   <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-      <input type="checkbox" class="peer" />
+    <input type="checkbox" class="peer" checked />
       <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        🎚 Display Settings
+        🎼 Scale Configuration
       </div>
       <div class="collapse-content">
 
+      <!-- Scale Selector Group -->
+      <div class="card bg-gray-50 border border-gray-300 mb-4">
+        <div class="card-title font-bold text-lg px-4 pt-4 pb-2">Scale Selector</div>
+        <div class="card-body flex flex-row gap-8 px-4 pb-4">
+          <!-- Key -->
+          <div class="flex items-center gap-3">
+            <label for="root-note" class="font-semibold w-32">Key:</label>
+            <select
+              id="root-note"
+              class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></select>
+          </div>
+          <!-- Scale Type -->
+          <div class="flex items-center gap-3">
+            <span class="font-semibold w-32">Scale Type:</span>
+            <div class="flex gap-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="scale-type" value="major" class="radio radio-primary" checked>
+                <span>Major</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="scale-type" value="minor" class="radio radio-primary">
+                <span>Minor</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="scale-type" value="chromatic" class="radio radio-primary">
+                <span>Chromatic</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scale Range Settings Group -->
+      <div class="card bg-gray-50 border border-gray-300 mb-4">
+        <div class="card-title font-bold text-lg px-4 pt-4 pb-2">Scale Range Settings</div>
+        <div class="card-body flex flex-row gap-8 px-4 pb-4">
+          <!-- Starting Octave with +/- controls -->
+          <div class="flex items-center gap-3">
+            <label for="starting-octave-label" class="font-semibold w-32">Starting Octave:</label>
+            <button
+              id="octave-decrement"
+              class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+              aria-label="Decrease Octave"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <span id="starting-octave-label" class="px-3 py-1 border rounded bg-white text-gray-800 font-mono">—</span>
+            <button
+              id="octave-increment"
+              class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+              aria-label="Increase Octave"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19" stroke-width="2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <!-- Number of Octaves with +/- controls -->
+          <div class="flex items-center gap-3">
+            <label for="octave-count-label" class="font-semibold w-32">Number of Octaves:</label>
+            <button
+              id="octave-count-decrement"
+              class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+              aria-label="Decrease Number of Octaves"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <span id="octave-count-label" class="px-3 py-1 border rounded bg-white text-gray-800 font-mono">1</span>
+            <button
+              id="octave-count-increment"
+              class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+              aria-label="Increase Number of Octaves"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19" stroke-width="2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+<div class="card bg-gray-50 border border-gray-300 mb-4">
+<div class="card-title font-bold text-lg px-4 pt-4 pb-2">Duration & Direction</div>
+
+      <!-- Direction -->
+      <div class="flex items-center gap-4 mb-3">
+          <label class="font-semibold w-32">Direction:</label>
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input 
+                    type="radio" 
+                    name="direction" 
+                    value="Ascending" 
+                    class="radio radio-primary" 
+                checked>
+                <span>Ascending</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="direction" value="Descending" class="radio radio-primary">
+              <span>Descending</span>
+            </label>
+          </div>
+      </div>
+
+      <!-- Note Duration -->
+      <div class="mb-3">
+        <div class="font-semibold mb-2">Note Duration:</div>
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="note-duration" value="eighth" class="radio radio-primary">
+            <span>Eighth Notes</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="note-duration" value="quarter" class="radio radio-primary" checked>
+            <span>Quarter Notes</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="note-duration" value="half" class="radio radio-primary">
+            <span>Half Notes</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="note-duration" value="whole" class="radio radio-primary">
+            <span>Whole Notes</span>
+          </label>
+        </div>
+      </div>
+</div>
+
+
+<div class="card bg-gray-50 border border-gray-300 mb-4">
+<div class="card-title font-bold text-lg px-4 pt-4 pb-2">Staff Formatting</div>
+
       <!-- Staff Display Options -->
       <div class="mb-4">
-        <h3 class="font-semibold text-gray-700 mb-2">Staff Display Options:</h3>
+        <div class="font-semibold mb-2">Staff Display Options:</div>
         <div class="space-y-2 text-sm">
           <label class="flex items-center gap-2">
             <input
@@ -304,175 +437,34 @@
         </div>
       </div>
 
-    </fieldset>
-
-    <!-- Scale Configuration -->
-  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-      <input type="checkbox" class="peer" />
-      <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        🎼 Scale Configuration
-      </div>
-      <div class="collapse-content">
-
-      <!-- Key -->
-      <div class="flex items-center gap-4 mb-3">
-        <label for="root-note" class="font-semibold w-32">Key:</label>
-        <select
-          id="root-note"
-          class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        ></select>
-      </div>
-
-      <!-- Scale Type -->
-      <div class="flex items-center gap-4 mb-3">
-        <label for="scale-type" class="font-semibold w-32">Scale Type:</label>
-        <select id="scale-type" class="flex-1 p-2 border rounded">
-          <option value="major">Major</option>
-          <option value="minor">Minor</option>
-          <option value="chromatic">Chromatic</option>
-        </select>
-      </div>
-
-      <!-- Octaves -->
-      <div class="flex items-center gap-4 mb-3">
-        <label for="octave-count" class="font-semibold w-32">Octaves:</label>
-        <select id="octave-count" class="flex-1 p-2 border rounded">
-          <option value="1" selected>1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-        </select>
-      </div>
-
-      <!-- Direction -->
-      <div class="flex items-center gap-4 mb-3">
-        <label for="direction" class="font-semibold w-32">Direction:</label>
-        <select id="direction" class="flex-1 p-2 border rounded">
-          <option value="Ascending">Ascending</option>
-          <option value="Descending">Descending</option>
-        </select>
-      </div>
-
-      <!-- Note Duration -->
-      <div class="mb-3">
-        <div class="font-semibold mb-2">Note Duration:</div>
-        <div class="flex flex-wrap gap-4 text-sm">
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="note-duration"
-              value="eighth"
-            />
-            Eighth Notes
-          </label>
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="note-duration"
-              value="quarter"
-              checked
-            />
-            Quarter Notes
-          </label>
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="note-duration"
-              value="half"
-            />
-            Half Notes
-          </label>
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="note-duration"
-              value="whole"
-            />
-            Whole Notes
-          </label>
-        </div>
-      </div>
-
       <!-- Accidental Family -->
       <div class="mb-3">
         <div class="font-semibold mb-2">Accidental Family:</div>
-        <div class="flex flex-wrap gap-4 text-sm">
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="accidental-family"
-              value="auto-key"
-              checked
-            />
-            Auto: Based on Key
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="auto-key" class="radio radio-primary" checked>
+            <span>Auto: Based on Key</span>
           </label>
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="accidental-family"
-              value="auto-direction"
-            />
-            Auto: Based on Asc/Desc
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="auto-direction" class="radio radio-primary">
+            <span>Auto: Based on Asc/Desc</span>
           </label>
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="accidental-family"
-              value="force-sharps"
-            />
-            Force: Sharps
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="force-sharps" class="radio radio-primary">
+            <span>Force: Sharps</span>
           </label>
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="accidental-family"
-              value="force-flats"
-            />
-            Force: Flats
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="force-flats" class="radio radio-primary">
+            <span>Force: Flats</span>
           </label>
         </div>
       </div>
 
     </div>
   </div>
+  </div>
 
-    <!-- Octave Controls -->
-  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
-      <input type="checkbox" class="peer" />
-      <div class="collapse-title font-bold text-lg flex items-center gap-2">
-        🔢 Octave Controls
-      </div>
-      <div class="collapse-content">
-        <div class="flex items-center gap-4">
-          <button
-            id="octave-decrement"
-            class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            [–]
-          </button>
-          <div class="text-center">
-            <div id="octave-label" class="font-semibold mb-1">
-              Starting Octave
-            </div>
-            <span
-              id="starting-octave-label"
-              class="px-3 py-1 border rounded bg-white text-gray-800 font-mono"
-            >
-              —
-            </span>
-          </div>
-          <button
-            id="octave-increment"
-            class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            [+]
-          </button>
-        </div>
-      </div>
-      </div>
-    </div>
-    </div>
-
-      <!-- Snapshot Save/Recall UI -->
+    <!-- Snapshot Save/Recall UI -->
 
  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
         <input type="checkbox" class="peer" />
@@ -542,6 +534,86 @@
     <script src="scripts/pitchConverter.js"></script>
     <script src="scripts/cmtConverter.js"></script>
     <script src="scripts/show-scales.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Number of Octaves +/- logic
+        let octaveCount = 1;
+        const minOctaves = 1;
+        const maxOctaves = 3;
+        const label = document.getElementById('octave-count-label');
+        const decBtn = document.getElementById('octave-count-decrement');
+        const incBtn = document.getElementById('octave-count-increment');
+        function updateOctaveCount(val) {
+          octaveCount = val;
+          label.textContent = octaveCount;
+          let hidden = document.getElementById('octave-count');
+          if (!hidden) {
+            hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.id = 'octave-count';
+            label.parentNode.appendChild(hidden);
+          }
+          hidden.value = octaveCount;
+          // Trigger change event for compatibility
+          const event = new Event('change', { bubbles: true });
+          hidden.dispatchEvent(event);
+        }
+        decBtn.onclick = function() {
+          if (octaveCount > minOctaves) {
+            updateOctaveCount(octaveCount - 1);
+          }
+        };
+        incBtn.onclick = function() {
+          if (octaveCount < maxOctaves) {
+            updateOctaveCount(octaveCount + 1);
+          }
+        };
+        // Initialize
+        updateOctaveCount(octaveCount);
+      });
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        let startingOctave = 4;
+        const minOctave = 1;
+        const maxOctave = 8;
+        const label = document.getElementById('starting-octave-label');
+        const decBtn = document.getElementById('octave-decrement');
+        const incBtn = document.getElementById('octave-increment');
+        function updateStartingOctave(val) {
+          startingOctave = val;
+          label.textContent = startingOctave;
+          // Trigger any scale re-render logic if needed
+          if (typeof renderCurrentScale === 'function') {
+            renderCurrentScale();
+          }
+        }
+        decBtn.onclick = function() {
+          if (startingOctave > minOctave) {
+            updateStartingOctave(startingOctave - 1);
+          }
+        };
+        incBtn.onclick = function() {
+          if (startingOctave < maxOctave) {
+            updateStartingOctave(startingOctave + 1);
+          }
+        };
+        // Initialize
+        updateStartingOctave(startingOctave);
+      });
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var keySig = document.getElementById('show-key-signature');
+        if (keySig) {
+          keySig.addEventListener('change', function() {
+            if (typeof renderCurrentScale === 'function') {
+              renderCurrentScale();
+            }
+          });
+        }
+      });
+    </script>
     <script src="scripts/render-scale.js"></script>
     <script src="scripts/load-header.js"></script>
     <script src="scripts/load-footer.js"></script>
