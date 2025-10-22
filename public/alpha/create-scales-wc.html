@@ -25,6 +25,17 @@
     />
     <!-- Centralized theme for consistent UI -->
     <link href="styles/theme.css" rel="stylesheet" />
+
+    <script type="module">
+      import { HtmlFragmentLoader } from "./scripts/loader.js";
+      window.addEventListener("DOMContentLoaded", () => {
+        const loader = new HtmlFragmentLoader(
+          "fragments/fragment-a.html",
+          "fragments/fragment-b.html"
+        );
+        document.getElementById("fragments-container").appendChild(loader);
+      });
+    </script>
   </head>
   <body class="bg-base-200 flex flex-col min-h-screen">
     <div id="header-container"></div>
@@ -43,20 +54,29 @@
     <h1>create-scales-wc.html</h1>
     <br />
 
+    <div id="fragments-container"></div>
+
     <hr />
-    [Staff Notation Area] <br />
+    <!-- [ Staff Notation Area (fragment-staff-notation-area.html) ] -->
+    <br />
     <hr />
-    [Scale Selector] <br />
+    <!-- [ Scale Selector (fragment-scale-selector.html) ] -->
+    <br />
     <hr />
-    [Scale Range Settngs] <br />
+    <!-- [ Scale Range Settings (fragment-scale-range-settings.html) ] -->
+    <br />
     <hr />
-    [Duration & Direction] <br />
+    <!-- [ Duration & Direction (fragment-duration-direction.html) ] -->
+    <br />
     <hr />
-    [Staff Formatting] <br />
+    <!-- [ Staff Formatting (fragment-staff-formatting.html) ] -->
+    <br />
     <hr />
-    [Save/Recall Workspace Snapshop] <br />
+    <!-- [[ Save/Recall Workspace Snapshot (fragment-snapshot.html) ] -->
+    <br />
     <hr />
-    [Dianostics] <br />
+    <!-- [ Diagnostics (fragment-scale-diagnostics.html) ] -->
+    <br />
     <hr />
 
     <!-- Back button: Return to Creator -->

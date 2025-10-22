@@ -32,7 +32,7 @@ export function setupScaleDisplay({
     if (key && scaleType) {
       displayToggle.checked = true;
       // Call buildScaleFromUI and render staff
-      import("../utils/buildScaleFromUI.js").then(({ buildScaleFromUI }) => {
+      import("./buildScaleFromUI.js").then(({ buildScaleFromUI }) => {
         const result = buildScaleFromUI({
           key,
           scaleType,
@@ -99,40 +99,15 @@ export function renderVexflowStaff(container, scaleNotes = []) {
       (n) =>
         new VF.StaveNote({
           clef: "treble",
-          keys: [n.toLowerCase()],
+          keys: [n],
           duration: "q",
         })
     );
     const voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 });
     voice.addTickables(notes);
-    new VF.Formatter().joinVoices([voice]).format([voice], 350);
+    const formatter = new VF.Formatter()
+      .joinVoices([voice])
+      .format([voice], 350);
     voice.draw(context, stave);
   }
-}
-
-export function setupDynamicCreateTitle({
-  titleSelector = "#dynamic-create-title",
-  keySelector = "#key-select",
-  scaleTypeSelector = "#scale-type-select",
-  defaultTitle = "Create Scales",
-  scaleTypeSuffix = "Scale",
-} = {}) {
-  const titleEl = document.querySelector(titleSelector);
-  const keyEl = document.querySelector(keySelector);
-  const scaleTypeEl = document.querySelector(scaleTypeSelector);
-
-  function updateTitle() {
-    const key = keyEl?.value;
-    const scaleType = scaleTypeEl?.value;
-    if (key && scaleType) {
-      // Capitalize first letter of scale type
-      const typeLabel = scaleType.charAt(0).toUpperCase() + scaleType.slice(1);
-      titleEl.textContent = `Create: ${key} ${typeLabel} ${scaleTypeSuffix}`;
-    } else {
-      titleEl.textContent = defaultTitle;
-    }
-  }
-
-  if (keyEl) keyEl.addEventListener("change", updateTitle);
-  if (scaleTypeEl) scaleTypeEl.addEventListener("change", updateTitle);
 }

@@ -80,7 +80,7 @@ export function buildScaleFromUI({
     const m = spn.match(/^([A-G][#b]?)[/](\d+)$/);
     if (!m) return 60;
     const note = m[1];
-    const octave = parseInt(m[2], 10);
+    const octave = Number.parseInt(m[2], 10);
     return (noteMap[note] ?? 0) + (octave + 1) * 12;
   }
   function fallbackMidiToSpn(midi) {
@@ -108,12 +108,7 @@ export function buildScaleFromUI({
 
   let midi = spnToMidi(`${rootNote}/${startOctave}`);
   // For auto-direction, pass 'Ascending' or 'Descending' as expected by pitchUtils
-  const directionForAccidentals =
-    accidentals === "auto-direction"
-      ? direction === "descending"
-        ? "Descending"
-        : "Ascending"
-      : direction;
+  // directionForAccidentals variable removed (was unused)
   for (let o = 0; o < octaves; o++) {
     let octaveMidi = midi + o * 12;
     let currentMidi = octaveMidi;
@@ -155,16 +150,16 @@ export function buildScaleFromUI({
     } else {
       note = convertToAccidentalFamily(note, preferredFamily);
     }
+    let vfDirection = direction;
+    if (accType === "auto-direction") {
+      vfDirection = direction === "descending" ? "Descending" : "Ascending";
+    }
     note = formatVexflowNote(
       note,
       rootNote,
       note.split("/")[1],
       accidentals,
-      accType === "auto-direction"
-        ? direction === "descending"
-          ? "Descending"
-          : "Ascending"
-        : direction
+      vfDirection
     );
     return note;
   });
