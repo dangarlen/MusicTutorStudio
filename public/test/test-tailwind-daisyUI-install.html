@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tailwind + DaisyUI Install Test</title>
+    <!-- Use the locally built Tailwind/DaisyUI CSS -->
+    <link href="../alpha/site.css" rel="stylesheet" />
+    <!-- Documentation: This file demonstrates a working Tailwind CSS + DaisyUI setup using a locally built CSS file. -->
+    <!-- To update your codebase, build site.css using WSL/Node.js: -->
+    <!-- npx tailwindcss -i ./tailwind/input.css -o ./public/alpha/site.css --minify -->
+  </head>
+  <body
+    class="bg-base-200 min-h-screen flex flex-col items-center justify-center"
+  >
+    <main class="w-full max-w-lg p-8 bg-white rounded shadow-lg">
+      <h1 class="text-3xl font-bold mb-6 text-center text-primary">
+        Tailwind + DaisyUI Install Test
+      </h1>
+      <div
+        class="collapse collapse-arrow bg-base-100 mb-6 border border-dashed border-primary"
+      >
+        <input type="checkbox" class="peer" checked />
+        <div class="collapse-title font-bold text-lg flex items-center gap-2">
+          🎨 DaisyUI Collapse Example
+        </div>
+        <div class="collapse-content">
+          <p class="mb-2">
+            This is a DaisyUI collapse component. If you see the arrow and can
+            expand/collapse, DaisyUI is working.
+          </p>
+          <button class="btn btn-primary">DaisyUI Button</button>
+        </div>
+      </div>
+      <div class="mb-6">
+        <label class="form-control w-full max-w-xs">
+          <div class="label">
+            <span class="label-text">Tailwind Input Example</span>
+          </div>
+          <input
+            type="text"
+            placeholder="Type here"
+            class="input input-bordered w-full max-w-xs"
+          />
+        </label>
+      </div>
+      <div class="alert alert-success shadow-lg">
+        <div>
+          <span class="material-symbols-outlined">check_circle</span>
+          <span>Tailwind CSS and DaisyUI are installed and working!</span>
+        </div>
+      </div>
+    </main>
+    <footer class="mt-8 text-center text-xs text-gray-500">
+      <p>
+        Template for verifying Tailwind CSS + DaisyUI installation.<br />
+        <strong>How to use:</strong> Reference your built CSS file, use
+        DaisyUI/Tailwind classes, and test interactive components.<br />
+        <strong>Build command:</strong>
+        <code
+          >npx tailwindcss -i ./tailwind/input.css -o ./public/alpha/site.css
+          --minify</code
+        >
+        (WSL recommended)
+      </p>
+    </footer>
+  </body>
+</html>
