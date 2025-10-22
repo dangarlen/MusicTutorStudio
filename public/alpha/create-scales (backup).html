@@ -1,15 +1,24 @@
-footer<!-- Design goals:
-     - Mobile-first, modular layout
-     - Tailwind CSS + daisyUI components only
-     - Audit-safe, semantic structure for Music Tutor Studio
-     - Every page should include header and footer
--->
+<!-- show-scales.html -->
+
 <!DOCTYPE html>
+<html lang="en">
+
+
+
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create Scales</title>
+
+  <!-- VexFlow for music notation -->
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js"></script>
+
+
+    <!-- Cookie utility -->
+    <script src="scripts/cookies.js"></script>
+
+
     <!-- Tailwind CSS CDN (official) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- daisyUI CDN -->
@@ -26,7 +35,7 @@ footer<!-- Design goals:
     <link href="styles/theme.css" rel="stylesheet" />
   </head>
 
-  <body class="bg-base-200 flex flex-col min-h-screen">
+ <body class="bg-base-200 flex flex-col min-h-screen">
     <div id="header-container"></div>
     <script src="scripts/header-fetch.js"></script>
     <script>
@@ -40,363 +49,481 @@ footer<!-- Design goals:
       <span id="dynamic-create-title" class="text-2xl">Create Scales</span>
     </div>
 
-    <!-- DaisyUI Collapse Block for Scale Display (moved to top, closed by default) -->
-    <div class="collapse bg-base-100 shadow mb-8" id="scale-display-block">
-      <input type="checkbox" class="peer" id="scale-display-toggle" />
-      <div class="collapse-title text-lg font-semibold">🎼 Scale Display</div>
-      <div class="collapse-content flex flex-col gap-4">
-        <!-- Textual Note Output -->
-        <div id="textual-note-output" class="mb-4" style="display: none">
-          <h3 class="font-semibold text-gray-700 mb-2">Textual Note Output</h3>
-          <div class="p-3 bg-blue-50 border border-blue-200 rounded">
-            <div
-              id="textual-note-label"
-              class="font-semibold text-blue-800 mb-2"
-            >
-              🎵 Current Scale:
-            </div>
-            <div
-              id="scale-notes-display"
-              class="text-sm text-blue-700 font-mono break-words whitespace-pre-line"
-            >
-              Select scale parameters to see notes...
-            </div>
-            <div class="text-xs text-gray-600 mt-2">
-              → SPN, MIDI, note names, fingering, etc.
-            </div>
-          </div>
-        </div>
-        <!-- Staff Notation Area -->
-        <div class="mb-4">
-          <h3 class="font-semibold text-gray-700 mb-2">Staff Notation Area</h3>
-          <div
-            id="vf"
-            class="border border-gray-300 rounded p-4 bg-gray-50 min-h-[200px]"
-          ></div>
-          <div class="text-xs text-gray-600 mt-2">
-            → Visual rendering of scale or practice passage
-          </div>
-        </div>
-      </div>
-    </div>
+    <script>
+      // Show Return to Lessons button if user arrived from lessons.html
+      document.addEventListener('DOMContentLoaded', function() {
+        // If sessionStorage flag set by lessons.html, show the button
+        if (sessionStorage.getItem('fromLessons') === '1') {
+          document.getElementById('return-to-lessons-container').style.display = '';
+        }
+        const btn = document.getElementById('return-to-lessons-btn');
+        if (btn) {
+          btn.onclick = function() {
+            window.location.href = 'lessons.html';
+          };
+        }
+      });
+    </script>
 
-    <!-- DaisyUI Collapse Block for Scale Configuration -->
-    <div class="collapse bg-base-100 shadow mb-8">
-      <input type="checkbox" class="peer" checked />
-      <div class="collapse-title text-lg font-semibold">
-        🎚 Scale Configuration
-      </div>
-      <div class="collapse-content flex flex-col gap-4">
-        <div class="mb-4">
-          <h3 class="font-semibold text-gray-700 mb-2">Scale Selector</h3>
-          <div id="scale-name-label" class="mb-2 text-blue-700 font-semibold">
-            Scale Name: ---
-          </div>
-          <div class="flex flex-col md:flex-row gap-4">
-            <div class="flex-1">
-              <label for="key-select" class="font-semibold">Key</label>
-              <select
-                id="key-select"
-                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Key</option>
-              </select>
-            </div>
-            <div class="flex-1">
-              <label for="scale-type-select" class="font-semibold"
-                >Scale Type</label
-              >
-              <select
-                id="scale-type-select"
-                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Scale Type</option>
-              </select>
-            </div>
-          </div>
-          <script>
-            // Update Scale Name label dynamically
-            function updateScaleNameLabel() {
-              const key = document.getElementById("key-select")?.value || "";
-              const scaleType =
-                document.getElementById("scale-type-select")?.value || "";
-              // Remove accidental info from key (e.g., "A (3 sharps)" -> "A")
-              const keyClean = key.replace(/\s*\(.*\)/, "");
-              const label =
-                keyClean && scaleType
-                  ? `Scale Name: ${keyClean} ${
-                      scaleType.charAt(0).toUpperCase() + scaleType.slice(1)
-                    }`
-                  : "Scale Name: ---";
-              document.getElementById("scale-name-label").textContent = label;
+  <!-- Snapshot Load UI -->
+  <div id="snapshot-load-list" class="mb-4"></div>
+  <!-- Title / Instrument Selection -->
+    <script>
+      // Replace file dialog with localStorage snapshot list for Load Snapshot
+      document.addEventListener('DOMContentLoaded', function() {
+        const loadBtn = document.getElementById('load-snapshot-btn');
+        const listDiv = document.getElementById('snapshot-load-list');
+        const statusDiv = document.getElementById('snapshot-status');
+        if (loadBtn && listDiv) {
+          loadBtn.onclick = function() {
+            listDiv.innerHTML = '';
+            let units = JSON.parse(localStorage.getItem('userPracticeUnits') || '[]');
+            if (!units.length) {
+              listDiv.innerHTML = '<span class="text-gray-500">No Practice Units saved.</span>';
+              if (statusDiv) statusDiv.textContent = 'No Practice Units found in browser storage.';
+              return;
             }
-            document.addEventListener("DOMContentLoaded", function () {
-              updateScaleNameLabel();
-              document
-                .getElementById("key-select")
-                ?.addEventListener("change", updateScaleNameLabel);
-              document
-                .getElementById("scale-type-select")
-                ?.addEventListener("change", updateScaleNameLabel);
-            });
-          </script>
-        </div>
-
-        <!-- Scale Range Settings Group -->
-        <div class="mb-4 p-4 rounded bg-base-100 border border-base-300 shadow">
-          <h4 class="font-semibold text-gray-700 mb-2">Scale Range Settings</h4>
-          <div class="flex flex-col md:flex-row gap-4 items-center">
-            <div class="flex-1 flex items-center gap-2">
-              <label for="octave-count" class="font-semibold"
-                >Number of Octaves</label
-              >
-              <button
-                id="octave-minus"
-                type="button"
-                class="btn btn-xs btn-outline"
-              >
-                -
-              </button>
-              <span
-                id="octave-value"
-                class="px-3 py-1 rounded bg-base-200 border"
-                >2</span
-              >
-              <button
-                id="octave-plus"
-                type="button"
-                class="btn btn-xs btn-outline"
-              >
-                +
-              </button>
-            </div>
-            <div class="flex-1 flex items-center gap-4">
-              <label for="starting-octave" class="font-semibold"
-                >Starting Octave</label
-              >
-              <select
-                id="starting-octave"
-                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <!-- Options will be populated dynamically -->
-              </select>
-            </div>
-          </div>
-        </div>
-        <script>
-          // Octaves stepper logic
-          document.addEventListener("DOMContentLoaded", function () {
-            const minOctaves = 1;
-            const maxOctaves = 5;
-            const octaveValue = document.getElementById("octave-value");
-            const minusBtn = document.getElementById("octave-minus");
-            const plusBtn = document.getElementById("octave-plus");
-            let octaves = 2;
-            function updateOctaveDisplay() {
-              octaveValue.textContent = octaves;
-            }
-            function triggerScaleUpdate() {
-              if (globalThis.updateAllScaleOutputs)
-                globalThis.updateAllScaleOutputs();
-            }
-            globalThis.getNumberOfOctaves = function () {
-              return octaves;
-            };
-            minusBtn.addEventListener("click", function () {
-              if (octaves > minOctaves) {
-                octaves--;
-                updateOctaveDisplay();
-                triggerScaleUpdate();
-              }
-            });
-            plusBtn.addEventListener("click", function () {
-              if (octaves < maxOctaves) {
-                octaves++;
-                updateOctaveDisplay();
-                triggerScaleUpdate();
-              }
-            });
-            updateOctaveDisplay();
-            if (globalThis.updateAllScaleOutputs)
-              globalThis.updateAllScaleOutputs();
-          });
-
-          // Starting Octave dropdown logic (example: F#2 to C6)
-          document.addEventListener("DOMContentLoaded", function () {
-            const startingOctaveSelect =
-              document.getElementById("starting-octave");
-            // Example: derive from instruments.json, here hardcoded for demo
-            const rangeStart = "F#2";
-            const rangeEnd = "C6";
-            // Generate octave options from F#2 to C6
-            const notes = [
-              "C",
-              "C#",
-              "D",
-              "D#",
-              "E",
-              "F",
-              "F#",
-              "G",
-              "G#",
-              "A",
-              "A#",
-              "B",
-            ];
-            function getOctave(spn) {
-              const m = spn.match(/([A-G]#?)(\d+)/);
-              return m ? parseInt(m[2], 10) : 2;
-            }
-            const startOctave = getOctave(rangeStart);
-            const endOctave = getOctave(rangeEnd);
-            for (let oct = startOctave; oct <= endOctave; oct++) {
-              for (const note of notes) {
-                const spn = `${note}${oct}`;
-                startingOctaveSelect.appendChild(new Option(spn, spn));
-                if (spn === rangeStart.replace(/\//, "")) {
-                  startingOctaveSelect.value = spn;
+            const ul = document.createElement('ul');
+            ul.className = 'list-disc pl-6';
+            units.forEach((unit, idx) => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = '#';
+              a.className = 'text-blue-700 hover:underline';
+              a.textContent = unit.name || `Practice Unit ${idx+1}`;
+              a.onclick = function(e) {
+                e.preventDefault();
+                if (unit.snapshot) {
+                  window.applyWorkspaceSnapshot(unit.snapshot);
+                  if (statusDiv) statusDiv.textContent = `Snapshot loaded: ${unit.name || idx+1}`;
                 }
-                if (spn === rangeEnd.replace(/\//, "")) break;
-              }
-            }
-          });
-        </script>
-
-        <!-- Timing & Trajectory Group -->
-        <div class="mb-4 p-4 rounded bg-base-100 border border-base-300 shadow">
-          <h4 class="font-semibold text-gray-700 mb-2">
-            Timing &amp; Trajectory
-          </h4>
-          <div class="flex flex-col md:flex-row gap-4">
-            <div class="flex-1 flex items-center gap-4">
-              <label for="direction" class="font-semibold">Direction</label>
-              <select
-                id="direction"
-                class="w-full p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Ascending" selected>Ascending</option>
-                <option value="Descending">Descending</option>
-              </select>
-            </div>
-            <div class="flex-1">
-              <div class="font-semibold mb-2">Note Duration</div>
-              <div class="flex flex-wrap gap-4 text-sm">
-                <label class="flex items-center gap-2">
-                  <input type="radio" name="note-duration" value="eighth" />
-                  Eighth Notes
-                </label>
-                <label class="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="note-duration"
-                    value="quarter"
-                    checked
-                  />
-                  Quarter Notes
-                </label>
-                <label class="flex items-center gap-2">
-                  <input type="radio" name="note-duration" value="half" />
-                  Half Notes
-                </label>
-                <label class="flex items-center gap-2">
-                  <input type="radio" name="note-duration" value="whole" />
-                  Whole Notes
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Accidentals -->
-        <div class="mb-3">
-          <div class="font-semibold mb-2">Accidentals</div>
-          <div class="flex flex-wrap gap-4 text-sm">
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                name="accidental-family"
-                value="auto-key"
-                checked
-              />
-              Auto: Based on Key
-            </label>
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                name="accidental-family"
-                value="auto-direction"
-              />
-              Auto: Based on Asc/Desc
-            </label>
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                name="accidental-family"
-                value="force-sharps"
-              />
-              Force: Sharps
-            </label>
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                name="accidental-family"
-                value="force-flats"
-              />
-              Force: Flats
-            </label>
-          </div>
-        </div>
+              };
+              li.appendChild(a);
+              ul.appendChild(li);
+            });
+            listDiv.appendChild(ul);
+          };
+        }
+      });
+    </script>
+    <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+  <input type="checkbox" class="peer" checked />
+      <div class="collapse-title font-bold text-lg flex items-center gap-2">
+        🎚 Title / Instrument Selection
       </div>
-    </div>
+      <div class="collapse-content">
+        <!-- Dynamic Title -->
+        <h1 id="dynamic-title" class="text-2xl font-bold mb-4 text-left">
+          🎼 Show Scale
+        </h1>
 
-    <!-- Diagnostics DaisyUI Collapse Block -->
-    <div class="collapse bg-base-100 shadow mb-8">
-      <input type="checkbox" class="peer" checked />
-      <div class="collapse-title text-lg font-semibold">
-        🧪 Diagnostics: Behind the Curtain
-      </div>
-      <div class="collapse-content flex flex-col gap-2">
-        <div class="font-semibold">Arguments sent to buildScaleFromUI:</div>
-        <pre
-          id="diagnostics-args"
-          class="bg-gray-100 p-2 rounded text-xs"
-        ></pre>
-        <div class="font-semibold mt-2">Notes scale returned:</div>
-        <pre
-          id="diagnostics-scale"
-          class="bg-gray-100 p-2 rounded text-xs"
-        ></pre>
-        <div class="font-semibold mt-2 flex items-center justify-between">
-          <span>Log:</span>
-          <button
-            id="clear-log-btn"
-            class="btn btn-xs btn-outline ml-2"
-            type="button"
+        <!-- Instrument selection -->
+        <div class="flex items-center gap-4 mb-2">
+          <label for="instrument-select" class="font-semibold w-32"
+            >Instrument</label
           >
-            Clear Log
-          </button>
+          <select
+            id="instrument-select"
+            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></select>
+          <span class="text-sm text-gray-600"
+            >→ Affects fingering, range, and display logic</span
+          >
         </div>
-        <pre
-          id="diagnostics-log"
-          style="max-height: 180px; overflow-y: auto"
-          class="bg-gray-100 p-2 rounded text-xs"
-        ></pre>
-        <script>
-          // Clear Log button functionality
-          document.addEventListener("DOMContentLoaded", function () {
-            const clearBtn = document.getElementById("clear-log-btn");
-            const logEl = document.getElementById("diagnostics-log");
-            if (clearBtn && logEl) {
-              clearBtn.addEventListener("click", function () {
-                logEl.textContent = "";
-              });
-            }
-          });
-        </script>
       </div>
     </div>
 
-    <!-- Back button: Return to Creator (moved to bottom) -->
+    <!-- Music Display -->
+  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+
+  <input type="checkbox" class="peer" checked />
+      <div class="collapse-title font-bold text-lg flex items-center gap-2">
+        🎼 Music Display
+      </div>
+      <div class="collapse-content">
+
+      <!-- Textual Note Output -->
+      <div id="textual-note-output" class="mb-4" style="display: none;">
+        <h3 class="font-semibold text-gray-700 mb-2">Textual Note Output</h3>
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+          <div id="textual-note-label" class="font-semibold text-blue-800 mb-2">🎵 Current Scale:</div>
+          <div
+            id="scale-notes-display"
+            class="text-sm text-blue-700 font-mono break-words whitespace-pre-line"
+          >
+            Select scale parameters to see notes...
+          </div>
+          <div class="text-xs text-gray-600 mt-2">
+            → SPN, MIDI, note names, fingering, etc.
+          </div>
+        </div>
+      </div>
+
+      <!-- Staff Notation Area -->
+      <div class="mb-4">
+        <h3 class="font-semibold text-gray-700 mb-2">Staff Notation Area</h3>
+        <div
+          id="vf"
+          class="border border-gray-300 rounded p-4 bg-gray-50 min-h-[200px]"
+        ></div>
+        <div class="text-xs text-gray-600 mt-2">
+          → Visual rendering of scale or practice passage
+        </div>
+      </div>
+
+      </div>
+
+
+
+    <!-- Select Practice Passage (Hidden by default) -->
+    <div class="collapse collapse-arrow bg-white mb-6" style="display: none">
+      <input type="checkbox" class="peer" />
+      <div class="collapse-title font-bold text-lg flex items-center gap-2">
+        📁 Select Practice Passage
+      </div>
+      <div class="collapse-content space-y-3">
+        <div class="flex items-center gap-4">
+          <label for="passage-select" class="font-semibold w-32">Passage</label>
+          <select
+            id="passage-select"
+            class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select passage...</option>
+          </select>
+        </div>
+        <div class="text-sm text-gray-600 mt-2">
+          Practice Units are now saved and recalled from your browser storage.<br>
+          <button id="recall-practice-unit-btn" class="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Recall Practice Unit</button>
+          <div id="practice-unit-list" class="mt-2"></div>
+        </div>
+    <script>
+      // Practice Unit recall UI
+      document.addEventListener('DOMContentLoaded', function() {
+        const recallBtn = document.getElementById('recall-practice-unit-btn');
+        const listDiv = document.getElementById('practice-unit-list');
+        if (recallBtn && listDiv) {
+          recallBtn.onclick = function() {
+            listDiv.innerHTML = '';
+            let units = JSON.parse(localStorage.getItem('userPracticeUnits') || '[]');
+            if (!units.length) {
+              listDiv.innerHTML = '<span class="text-gray-500">No Practice Units saved.</span>';
+              return;
+            }
+            const ul = document.createElement('ul');
+            ul.className = 'list-disc pl-6';
+            units.forEach((unit, idx) => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = '#';
+              a.className = 'text-blue-700 hover:underline';
+              a.textContent = unit.name || `Practice Unit ${idx+1}`;
+              a.onclick = function(e) {
+                e.preventDefault();
+                // Load and apply this Practice Unit
+                if (unit.snapshot) {
+                  applyWorkspaceSnapshot(unit.snapshot);
+                  const title = document.getElementById('dynamic-title');
+                  if (title) title.textContent = `🎼 Practice Unit: ${unit.name || idx+1}`;
+                }
+              };
+              li.appendChild(a);
+              ul.appendChild(li);
+            });
+            listDiv.appendChild(ul);
+          };
+        }
+      });
+    </script>
+      </div>
+    </div>
+
+    <!-- Display Settings -->
+    <!-- Removed Display Settings wrapper -->
+
+    <!-- Scale Configuration -->
+  <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+    <input type="checkbox" class="peer" checked />
+      <div class="collapse-title font-bold text-lg flex items-center gap-2">
+        🎼 Scale Configuration
+      </div>
+      <div class="collapse-content">
+
+      <!-- Scale Selector Group -->
+      <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4">
+        <input type="checkbox" class="peer" />
+        <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Scale Selector</div>
+        <div class="collapse-content card-body flex flex-row gap-8 px-4 pb-4">
+          <!-- Key -->
+          <div class="flex items-center gap-3">
+            <label for="root-note" class="font-semibold w-32">Key:</label>
+            <select
+              id="root-note"
+              class="flex-1 p-2 border rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></select>
+          </div>
+          <!-- Scale Type -->
+          <div class="flex items-center gap-3">
+            <span class="font-semibold w-32">Scale Type:</span>
+            <div class="flex gap-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="scale-type" value="major" class="radio radio-primary" checked>
+                <span>Major</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="scale-type" value="minor" class="radio radio-primary">
+                <span>Minor</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="scale-type" value="chromatic" class="radio radio-primary">
+                <span>Chromatic</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scale Range Settings Group -->
+      <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4">
+        <input type="checkbox" class="peer" />
+        <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Scale Range Settings</div>
+        <div class="collapse-content card-body flex flex-row gap-8 px-4 pb-4">
+          <!-- Starting Octave with +/- controls -->
+          <div class="flex items-center gap-3">
+            <label for="starting-octave-label" class="font-semibold w-32">Starting Octave:</label>
+            <button
+              id="octave-decrement"
+              class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+              aria-label="Decrease Octave"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>[
+            <span id="starting-octave-label" class="px-3 py-1 border rounded bg-white text-gray-800 font-mono">C4</span>
+            ]<button
+              id="octave-increment"
+              class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+              aria-label="Increase Octave"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19" stroke-width="2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <!-- Number of Octaves with +/- controls -->
+          <div class="flex items-center gap-3">
+            <label for="octave-count-label" class="font-semibold w-32">Number of Octaves:</label>
+            <button
+              id="octave-count-decrement"
+              class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+              aria-label="Decrease Number of Octaves"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <span id="octave-count-label" class="px-3 py-1 border rounded bg-white text-gray-800 font-mono">1</span>
+            <button
+              id="octave-count-increment"
+              class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+              aria-label="Increase Number of Octaves"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19" stroke-width="2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+ <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+    <input type="checkbox" class="peer" />
+<div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Duration & Direction</div>
+<div class="collapse-content">
+
+      <!-- Direction -->
+      <div class="flex items-center gap-4 mb-3">
+          <label class="font-semibold w-32">Direction:</label>
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input 
+                    type="radio" 
+                    name="direction" 
+                    value="Ascending" 
+                    class="radio radio-primary" 
+                checked>
+                <span>▲ Ascending</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="direction" value="Descending" class="radio radio-primary">
+              <span>▼ Descending</span>
+            </label>
+          </div>
+      </div>
+
+      <!-- Note Duration -->
+      <div class="mb-3">
+        <div class="font-semibold mb-2">Note Duration:</div>
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="note-duration" value="eighth" class="radio radio-primary">
+            <span>Eighth Notes</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="note-duration" value="quarter" class="radio radio-primary" checked>
+            <span>Quarter Notes</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="note-duration" value="half" class="radio radio-primary">
+            <span>Half Notes</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="note-duration" value="whole" class="radio radio-primary">
+            <span>Whole Notes</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+<!-- Staff Formatting should be outside Duration & Direction -->
+
+
+
+<div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+  <input type="checkbox" class="peer" />
+  <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Staff Formatting</div>
+  <div class="collapse-content">
+
+      <!-- Staff Display Options -->
+      <div class="mb-4">
+        <div class="font-semibold mb-2">Staff Display Options:</div>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-key-signature"
+              checked
+            />
+            Key Signature
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows the key signature at the beginning of the staff"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-accidentals"
+              checked
+            />
+            Accidentals
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows individual accidentals next to notes"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-bar-lines"
+              checked
+            />
+            Bar Lines
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows bar lines to separate measures"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-time-signature"
+              checked
+            />
+            Time Signature
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows the time signature at the beginning of the staff"
+              >ⓘ</span
+            >
+          </label>
+        </div>
+      </div>
+
+      <!-- Accidental Family -->
+      <div class="mb-3">
+        <div class="font-semibold mb-2">Accidental Family:</div>
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="auto-key" class="radio radio-primary" checked>
+            <span>Auto: Based on Key</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="auto-direction" class="radio radio-primary">
+            <span>Auto: Based on Asc/Desc</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="force-sharps" class="radio radio-primary">
+            <span>Force: Sharps</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="force-flats" class="radio radio-primary">
+            <span>Force: Flats</span>
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </div>
+
+    <!-- Snapshot Save/Recall UI -->
+
+ <div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+        <input type="checkbox" class="peer" />
+  <div class="collapse-title font-bold text-lg flex items-center gap-2">
+          <span>💾</span> Save/Recall Workspace Snapshot
+        </div>
+  <div class="collapse-content">
+          <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+            <button id="save-snapshot-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save Snapshot</button>
+            <input type="file" id="load-snapshot-input" accept="application/json" class="hidden" />
+            <button id="load-snapshot-btn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Load Snapshot</button>
+            <span class="text-xs text-gray-600">
+              (Snapshots are saved in your browser storage. You can recall them from this device at any time. No files are downloaded or required.)
+            </span>
+          </div>
+          <div id="snapshot-status" class="text-xs text-blue-700"></div>
+        </div>
+      </div>
+
+    <!-- Diagnostics -->
+      
+<div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+        <input type="checkbox" class="peer" />
+        <div class="collapse-title font-bold text-lg flex items-center gap-2">
+          🛠️ Diagnostics
+        </div>
+        <div class="collapse-content">
+        <div class="space-y-2">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="diagnostic-mode" onchange="toggleDiagnosticLink()" />
+            Enable Diagnostic Mode
+          </label>
+          <div class="text-xs text-gray-600">
+            → Reveals note mapping, MATCH overlays, and trace logs
+          </div>
+          <div id="diagnostic-about-link" class="mt-3 pt-2 border-t border-gray-200" style="display: none;">
+            <a
+              href="about.html"
+              class="text-sm text-blue-600 hover:text-blue-800 underline"
+            >
+              📄 About This Application
+            </a>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back button: Return to Creator -->
     <div style="max-width: 400px; margin: 2em auto">
       <a href="creator.html" class="mtsFormatCreatorButtons">
         <span
@@ -407,122 +534,182 @@ footer<!-- Design goals:
         Return to Creator
       </a>
     </div>
+
+    <!-- Footer fragment -->
+    <div id="footer-container"></div>
+
+    <!-- External logic and fragments -->
+    <script src="scripts/pitchUtils.js"></script>
+    <script src="scripts/pitchConverter.js"></script>
+    <script src="scripts/cmtConverter.js"></script>
+    <script src="scripts/show-scales.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Number of Octaves +/- logic
+        let octaveCount = 1;
+        const minOctaves = 1;
+        const maxOctaves = 3;
+        const label = document.getElementById('octave-count-label');
+        const decBtn = document.getElementById('octave-count-decrement');
+        const incBtn = document.getElementById('octave-count-increment');
+        function updateOctaveCount(val) {
+          octaveCount = val;
+          label.textContent = octaveCount;
+          // Only update/create hidden input for octave-count, not starting-octave-label
+          let hidden = document.getElementById('octave-count');
+          if (!hidden) {
+            hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.id = 'octave-count';
+            // Only append to octave-count-label's parent
+            label.parentNode.appendChild(hidden);
+          }
+          hidden.value = octaveCount;
+          // Trigger change event for compatibility
+          const event = new Event('change', { bubbles: true });
+          hidden.dispatchEvent(event);
+        }
+        decBtn.onclick = function() {
+          if (octaveCount > minOctaves) {
+            updateOctaveCount(octaveCount - 1);
+          }
+        };
+        incBtn.onclick = function() {
+          if (octaveCount < maxOctaves) {
+            updateOctaveCount(octaveCount + 1);
+          }
+        };
+        // Initialize
+        updateOctaveCount(octaveCount);
+      });
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        let startingOctave = 4;
+        const minOctave = 1;
+        const maxOctave = 8;
+        const label = document.getElementById('starting-octave-label');
+        const decBtn = document.getElementById('octave-decrement');
+        const incBtn = document.getElementById('octave-increment');
+
+        function getRootNote() {
+          const rootNoteSelect = document.getElementById('root-note');
+          if (!rootNoteSelect) return 'C';
+          let note = rootNoteSelect.value || 'C';
+          note = note.replace(/\s*\(.*\)/, '');
+          note = note.split(' ')[0];
+          note = note.replace(/\/.*/, '');
+          return note;
+        }
+
+        function updateStartingOctaveLabel() {
+          // Always set label to note+octave, never just the octave
+          const note = getRootNote();
+          const value = note + startingOctave;
+          // Only update if label is not already correct
+          if (label.textContent !== value) {
+            label.textContent = value;
+            console.log('[Starting Octave Label Updated]', value);
+          }
+        }
+
+        function updateStartingOctave(val) {
+          startingOctave = val;
+          updateStartingOctaveLabel();
+          if (typeof renderCurrentScale === 'function') {
+            renderCurrentScale();
+          }
+        }
+
+        // Listen for root note changes
+        function attachRootNoteListener() {
+          const rootNoteSelect = document.getElementById('root-note');
+          if (rootNoteSelect && !rootNoteSelect._octaveLabelListenerAttached) {
+            rootNoteSelect.addEventListener('change', updateStartingOctaveLabel);
+            rootNoteSelect._octaveLabelListenerAttached = true;
+          }
+        }
+
+        // Listen for scale type changes
+        const scaleTypeRadios = document.querySelectorAll('input[name="scale-type"]');
+        for (const radio of scaleTypeRadios) {
+          radio.addEventListener('change', updateStartingOctaveLabel);
+        }
+
+        // Listen for instrument changes (dropdown may repopulate root-note)
+        const instrumentSelect = document.getElementById('instrument-select');
+        if (instrumentSelect) {
+          instrumentSelect.addEventListener('change', function() {
+            // Wait for root-note dropdown to be repopulated
+            setTimeout(function() {
+              attachRootNoteListener();
+              updateStartingOctaveLabel();
+            }, 100);
+          });
+        }
+
+        decBtn.onclick = function() {
+          if (startingOctave > minOctave) {
+            updateStartingOctave(startingOctave - 1);
+          }
+        };
+        incBtn.onclick = function() {
+          if (startingOctave < maxOctave) {
+            updateStartingOctave(startingOctave + 1);
+          }
+        };
+
+        // MutationObserver to detect when root-note select is populated
+        const observer = new MutationObserver(function() {
+          attachRootNoteListener();
+          updateStartingOctaveLabel();
+        });
+        const rootNoteSelect = document.getElementById('root-note');
+        if (rootNoteSelect) {
+          observer.observe(rootNoteSelect, { childList: true, subtree: true });
+        }
+
+        // Initial attach and update
+        attachRootNoteListener();
+        updateStartingOctaveLabel();
+
+        // Also update after any async dropdown population
+        setTimeout(function() {
+          attachRootNoteListener();
+          updateStartingOctaveLabel();
+        }, 200);
+      });
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var keySig = document.getElementById('show-key-signature');
+        if (keySig) {
+          keySig.addEventListener('change', function() {
+            if (typeof renderCurrentScale === 'function') {
+              renderCurrentScale();
+            }
+          });
+        }
+      });
+    </script>
+    <script src="scripts/render-scale.js"></script>
+    <script src="scripts/load-header.js"></script>
+    <script src="scripts/load-footer.js"></script>
+    <script>
+      // Return to Creator navigation
+      document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('return-to-creator-btn');
+        if (btn) {
+          btn.onclick = function() {
+            window.location.href = 'creator.html';
+          };
+        }
+      });
+    </script>
+    
+
     <div id="footer-container"></div>
     <script src="scripts/footer-fetch.js"></script>
-    <script type="module">
-      import { initScaleConfiguration } from "./scripts/ui/create-scales.js";
-      import {
-        setupDynamicCreateTitle,
-        setupScaleDisplay,
-      } from "./scripts/ui/scales.js";
-      import { buildScaleFromUI } from "./scripts/utils/buildScaleFromUI.js";
-
-      function getScaleConfigFromUI() {
-        return {
-          key: document.getElementById("key-select")?.value || "C",
-          scaleType:
-            document.getElementById("scale-type-select")?.value || "major",
-          octaves: globalThis.getNumberOfOctaves
-            ? globalThis.getNumberOfOctaves()
-            : 2,
-          direction:
-            document.getElementById("direction")?.value?.toLowerCase() ||
-            "ascending",
-          noteDuration:
-            document.querySelector('input[name="note-duration"]:checked')
-              ?.value || "quarter",
-          accidentals:
-            document.querySelector('input[name="accidental-family"]:checked')
-              ?.value || "auto-key",
-        };
-      }
-
-      // Unified update: diagnostics and staff display
-      function updateAllScaleOutputs() {
-        const config = getScaleConfigFromUI();
-        const result = buildScaleFromUI(config);
-        document.getElementById("diagnostics-args").textContent =
-          JSON.stringify(result.args, null, 2);
-        document.getElementById("diagnostics-scale").textContent =
-          JSON.stringify(result.scaleNotes, null, 2);
-
-        // Add a log entry for this change
-        const logEl = document.getElementById("diagnostics-log");
-        const now = new Date();
-        const prettyConfig = JSON.stringify(config, null, 2).replaceAll(
-          "\n",
-          "\n    "
-        );
-        const logEntry = `[${now.toLocaleTimeString()}] Config changed:\n    ${prettyConfig}`;
-        let prevLog = logEl.textContent ? logEl.textContent.split("\n") : [];
-        prevLog.push(logEntry);
-        // Optionally keep only the last 50 entries
-        if (prevLog.length > 50) prevLog = prevLog.slice(-50);
-        logEl.textContent = prevLog.join("\n");
-
-        // Also update staff and note display
-        import("./scripts/ui/scales.js").then(({ renderVexflowStaff }) => {
-          const vfDiv = document.getElementById("vf");
-          renderVexflowStaff(vfDiv, result.scaleNotes);
-          const notesDisplay = document.getElementById("scale-notes-display");
-          if (notesDisplay) {
-            notesDisplay.textContent = result.scaleNotes.join(", ");
-          }
-        });
-      }
-
-      function wireScaleConfigEvents() {
-        for (const id of ["key-select", "scale-type-select", "direction"]) {
-          const el = document.getElementById(id);
-          if (el) el.addEventListener("change", updateAllScaleOutputs);
-        }
-        // Wire up octave stepper
-        const minusBtn = document.getElementById("octave-minus");
-        const plusBtn = document.getElementById("octave-plus");
-        if (minusBtn) minusBtn.addEventListener("click", updateAllScaleOutputs);
-        if (plusBtn) plusBtn.addEventListener("click", updateAllScaleOutputs);
-        for (const el of document.querySelectorAll(
-          'input[name="note-duration"]'
-        )) {
-          el.addEventListener("change", updateAllScaleOutputs);
-        }
-        for (const el of document.querySelectorAll(
-          'input[name="accidental-family"]'
-        )) {
-          el.addEventListener("change", updateAllScaleOutputs);
-        }
-      }
-
-      // Load pitch-class.json and assign to globalThis.pitchClassData before initializing UI
-      fetch("../prototype/data/pitch-class.json")
-        .then((res) => res.json())
-        .then((pitchClassData) => {
-          globalThis.pitchClassData = pitchClassData;
-          // Now load scales.json and initialize UI
-          fetch("./data/scales.json")
-            .then((res) => res.json())
-            .then((data) => {
-              initScaleConfiguration({
-                keys: data.keys,
-                scaleTypes: data.scaleTypes,
-              });
-              setupDynamicCreateTitle();
-              setupScaleDisplay();
-              wireScaleConfigEvents();
-              updateAllScaleOutputs();
-            });
-        });
-      // Load VexFlow from CDN if not already present
-      if (!globalThis.Vex) {
-        const script = document.createElement("script");
-        script.src =
-          "https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js";
-        script.onload = () => {
-          // VexFlow loaded
-        };
-        document.head.appendChild(script);
-      }
-    </script>
     <script>
       footerFetch();
     </script>
