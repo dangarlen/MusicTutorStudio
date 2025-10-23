@@ -1,4 +1,93 @@
 <section>
   <!-- fragment-staff-formatting.html -->
-  [ Staff Formatting ]
+<div class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400">
+  <input type="checkbox" class="peer" />
+  <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Staff Formatting</div>
+  <div class="collapse-content">
+
+      <!-- Staff Display Options -->
+      <div class="mb-4">
+        <div class="font-semibold mb-2">Staff Display Options:</div>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-key-signature"
+              checked
+            />
+            Key Signature
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows the key signature at the beginning of the staff"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-accidentals"
+              checked
+            />
+            Accidentals
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows individual accidentals next to notes"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-bar-lines"
+              checked
+            />
+            Bar Lines
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows bar lines to separate measures"
+              >ⓘ</span
+            >
+          </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="show-time-signature"
+              checked
+            />
+            Time Signature
+            <span
+              class="text-blue-600 cursor-help"
+              title="Shows the time signature at the beginning of the staff"
+              >ⓘ</span
+            >
+          </label>
+        </div>
+      </div>
+
+      <!-- Accidental Family -->
+      <div class="mb-3">
+        <div class="font-semibold mb-2">Accidental Family:</div>
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="auto-key" class="radio radio-primary" checked>
+            <span>Auto: Based on Key</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="auto-direction" class="radio radio-primary">
+            <span>Auto: Based on Asc/Desc</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="force-sharps" class="radio radio-primary">
+            <span>Force: Sharps</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="accidental-family" value="force-flats" class="radio radio-primary">
+            <span>Force: Flats</span>
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </div>
 </section>

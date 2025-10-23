@@ -343,8 +343,22 @@ function setCookie(name, value, days = 365) {
 }
 
 function initializeStartingOctaveControls(entry) {
-  const rootNote = document.getElementById("root-note").value;
-  const octaveCount = parseInt(document.getElementById("octave-count").value);
+  const rootNoteSelect = document.getElementById("root-note");
+  const octaveCountInput = document.getElementById("octave-count");
+  if (!rootNoteSelect) {
+    console.error(
+      "[Starting Octave Diagnostic] #root-note not found in DOM when initializing controls"
+    );
+    return;
+  }
+  if (!octaveCountInput) {
+    console.error(
+      "[Starting Octave Diagnostic] #octave-count not found in DOM when initializing controls"
+    );
+    return;
+  }
+  const rootNote = rootNoteSelect.value;
+  const octaveCount = parseInt(octaveCountInput.value);
 
   const range = getUsableOctaveRange(entry, rootNote, octaveCount);
   usableOctaveRange = range;
@@ -356,6 +370,18 @@ function initializeStartingOctaveControls(entry) {
   // Clamp to usable range
   startingOctave = Math.min(Math.max(proposed, range.min), range.max);
 
+  console.log(
+    "[Starting Octave Diagnostic] rootNote:",
+    rootNote,
+    "octaveCount:",
+    octaveCount,
+    "usableRange:",
+    range,
+    "proposed:",
+    proposed,
+    "final:",
+    startingOctave
+  );
   updateOctaveLabel();
 
   // Remove existing event listeners to prevent duplicates

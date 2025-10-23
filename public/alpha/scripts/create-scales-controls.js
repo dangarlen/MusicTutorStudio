@@ -57,11 +57,8 @@ export function setupStartingOctaveControls() {
 
   function updateStartingOctaveLabel() {
     const note = getRootNote();
-    const value = note + startingOctave;
-    if (label.textContent !== value) {
-      label.textContent = value;
-      console.log("[Starting Octave Label Updated]", value);
-    }
+    label.textContent = note + startingOctave;
+    console.log("[Starting Octave Label Updated]", note + startingOctave);
   }
 
   function updateStartingOctave(val) {
@@ -72,19 +69,39 @@ export function setupStartingOctaveControls() {
     }
   }
 
+  function onRootNoteChange() {
+    updateStartingOctaveLabel();
+  }
+
   function attachRootNoteListener() {
     const rootNoteSelect = document.getElementById("root-note");
     if (rootNoteSelect && !rootNoteSelect._octaveLabelListenerAttached) {
-      rootNoteSelect.addEventListener("change", updateStartingOctaveLabel);
+      rootNoteSelect.addEventListener("change", onRootNoteChange);
       rootNoteSelect._octaveLabelListenerAttached = true;
     }
   }
 
-  const scaleTypeRadios = document.querySelectorAll('input[name="scale-type"]');
-  for (const radio of scaleTypeRadios) {
-    radio.addEventListener("change", updateStartingOctaveLabel);
-  }
+  decBtn.onclick = function () {
+    if (startingOctave > minOctave) {
+      startingOctave--;
+      updateStartingOctaveLabel();
+      if (typeof window.renderCurrentScale === "function") {
+        window.renderCurrentScale();
+      }
+    }
+  };
+  incBtn.onclick = function () {
+    if (startingOctave < maxOctave) {
+      startingOctave++;
+      updateStartingOctaveLabel();
+      if (typeof window.renderCurrentScale === "function") {
+        window.renderCurrentScale();
+      }
+    }
+  };
 
+  // Listen for Key and instrument changes
+  attachRootNoteListener();
   const instrumentSelect = document.getElementById("instrument-select");
   if (instrumentSelect) {
     instrumentSelect.addEventListener("change", function () {
@@ -95,17 +112,13 @@ export function setupStartingOctaveControls() {
     });
   }
 
-  decBtn.onclick = function () {
-    if (startingOctave > minOctave) {
-      updateStartingOctave(startingOctave - 1);
-    }
-  };
-  incBtn.onclick = function () {
-    if (startingOctave < maxOctave) {
-      updateStartingOctave(startingOctave + 1);
-    }
-  };
+  // Listen for scale type changes
+  const scaleTypeRadios = document.querySelectorAll('input[name="scale-type"]');
+  for (const radio of scaleTypeRadios) {
+    radio.addEventListener("change", updateStartingOctaveLabel);
+  }
 
+  // Observe root note select for dynamic changes
   const observer = new MutationObserver(function () {
     attachRootNoteListener();
     updateStartingOctaveLabel();
@@ -115,12 +128,8 @@ export function setupStartingOctaveControls() {
     observer.observe(rootNoteSelect, { childList: true, subtree: true });
   }
 
-  attachRootNoteListener();
+  // Initial label update
   updateStartingOctaveLabel();
-  setTimeout(function () {
-    attachRootNoteListener();
-    updateStartingOctaveLabel();
-  }, 200);
 }
 
 // Key signature change logic
