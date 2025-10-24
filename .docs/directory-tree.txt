@@ -1,142 +1,203 @@
 
 
 
-.docs/ (0 procs, 8 refs)
-	directory-tree.txt (0 procs, 0 refs)
-	FEATURE-SPEC-NOTE-TOOLTIPS.md (0 procs, 0 refs)
-	KEYBINDING-PLANNING.md (0 procs, 0 refs)
-	menuTree.md (0 procs, 0 refs)
-	migration-outline.md (0 procs, 0 refs)
-	preAlpha-html-listing.txt (0 procs, 0 refs)
-	ShortCuts.txt (0 procs, 0 refs)
-	TTD.txt (0 procs, 0 refs)
-.github/ (0 procs, 1 refs)
-	copilot-instructions.md (0 procs, 0 refs)
-.vscode/ (0 procs, 4 refs)
-	extension/ (0 procs, 3 refs)
-		extension.js (0 procs, 0 refs)
-		package.json (0 procs, 0 refs)
-		README.md (0 procs, 0 refs)
-	keybindings.json (0 procs, 0 refs)
-	settings.json (0 procs, 0 refs)
-	tasks.json (0 procs, 0 refs)
-deploy.ps1 (0 procs, 0 refs)
-finder.bat (0 procs, 0 refs)
-finder.py (0 procs, 0 refs)
-orphans.bat (0 procs, 0 refs)
-partials/ (0 procs, 1 refs)
-	header-fragment.html (0 procs, 0 refs)
-public/ (0 procs, 7 refs)
-	alpha/ (0 procs, 21 refs)
-	about.html (Calls 2 JS functions)
-		components/ (0 procs, 0 refs)
-	create-exercises.html (Calls 2 JS functions)
-	create-lessons.html (Calls 2 JS functions)
-	create-scales.html (Calls 7 JS functions)
-		creator.html (0 procs, 0 refs)
-		data/ (0 procs, 2 refs)
-			instruments.json (0 procs, 0 refs)
-			scales.json (0 procs, 0 refs)
-		features/ (0 procs, 1 refs)
-			preferences.js (Defines 7 functions)
-		fragments/ (0 procs, 3 refs)
-			footer.html (0 procs, 0 refs)
-			footer.json (0 procs, 0 refs)
-			header.html (0 procs, 0 refs)
-	index.html (Calls 2 JS functions)
-		lessons-create.html (0 procs, 0 refs)
-		lessons-manage-practice-units.html (0 procs, 0 refs)
-		lessons-manage.html (0 procs, 0 refs)
-		lessons-start.html (0 procs, 0 refs)
-	lessons.html (Calls 2 JS functions)
-	practice-exercises.html (Calls 2 JS functions)
-	practice-scales.html (Calls 2 JS functions)
-	practice.html (Calls 2 JS functions)
-	preferences.html (Calls 7 JS functions)
-		scripts/ (0 procs, 7 refs)
-			audio/ (0 procs, 0 refs)
-			features/ (0 procs, 0 refs)
-			footer-fetch.js (Defines 1 function)
-			header-fetch.js (Defines 1 function)
-			notation/ (0 procs, 0 refs)
-			ui/ (0 procs, 2 refs)
-				create-scales.js (Defines 1 function)
-				scales.js (Defines 5 functions)
-			utils/ (0 procs, 0 refs)
-		site.css (0 procs, 0 refs)
-		styles/ (0 procs, 1 refs)
-			theme.css (0 procs, 0 refs)
-		test-header.html (0 procs, 0 refs)
-	beta/ (0 procs, 1 refs)
-		index.html (0 procs, 0 refs)
-	daisy/ (0 procs, 0 refs)
-	favicon.ico (0 procs, 0 refs)
-	file-refactor-targets.md (0 procs, 0 refs)
-	index.html (0 procs, 0 refs)
-	planned-alpha-directory-tree.txt (0 procs, 0 refs)
-	preAlpha-directory-tree.txt (0 procs, 0 refs)
-	prototype/ (0 procs, 18 refs)
-		about.html (0 procs, 0 refs)
-		assets/ (0 procs, 1 refs)
-			double-bell-euphonium.png (0 procs, 0 refs)
-		cmtDocs.html (0 procs, 0 refs)
-		data/ (0 procs, 11 refs)
-			ack.json (0 procs, 0 refs)
-			change-log.json (0 procs, 0 refs)
-			clef.json (0 procs, 0 refs)
-			feature-pipeline.json (0 procs, 0 refs)
-			instruments.json (0 procs, 0 refs)
-			noteColors.json (0 procs, 0 refs)
-			notesAscending.json (0 procs, 0 refs)
-			pitch-class.json (0 procs, 0 refs)
-			show-scales copy.json (0 procs, 0 refs)
-			show-scales.json (0 procs, 0 refs)
-			version.json (0 procs, 0 refs)
-		favicon.ico (0 procs, 0 refs)
-		footer.html (0 procs, 0 refs)
-		fragments/ (0 procs, 2 refs)
-			footer.html (0 procs, 0 refs)
-			header.html (0 procs, 0 refs)
-		hear-notes.html (0 procs, 0 refs)
-		index.html (0 procs, 0 refs)
-		lessons.html (0 procs, 0 refs)
-		play-scales.html (0 procs, 0 refs)
-		practice-passages-info.html (0 procs, 0 refs)
-		practicePassages/ (0 procs, 3 refs)
-			danny-boy.json (0 procs, 0 refs)
-			king-of-the-road.json (0 procs, 0 refs)
-			twinkle-twinkle-little-star.json (0 procs, 0 refs)
-		preferences.html (0 procs, 0 refs)
-		say-notes.html (0 procs, 0 refs)
-		scripts/ (0 procs, 12 refs)
-			about.js (Defines 0 functions)
-			cmtConverter.js (Defines 0 functions)
-			cookies.js (Defines 0 functions)
-			global.js (Defines 0 functions)
-			load-footer.js (Defines 0 functions)
-			load-header.js (Defines 0 functions)
-			pitchConverter.js (Defines 0 functions)
-			pitchUtils.js (Defines 0 functions)
-			play-scales.js (Defines 0 functions)
-			preferences.js (Defines 0 functions)
-			render-scale.js (Defines 0 functions)
-			show-scales (old).js (Defines 40+ functions)
-			show-scales.js (Defines 40+ functions)
-		show-scales.html (0 procs, 0 refs)
-tailwind/ (0 procs, 6 refs)
-	input.css (0 procs, 0 refs)
-	node_modules/ (0 procs, 0 refs)
-	package-lock.json (0 procs, 0 refs)
-	package.json (0 procs, 0 refs)
-	postcss.config.js (0 procs, 0 refs)
-	tailwind.config.js (0 procs, 0 refs)
-tools/ (0 procs, 7 refs)
-	clone-repo.ps1 (0 procs, 0 refs)
-	flats-to-sharps-no-slash.js (Defines 5 functions)
-	migrate-instruments.js (Defines 6 functions)
-	normalize-instruments.js (Defines 5 functions)
-	remove-slash-instruments.js (Defines 4 functions)
-	sync-vscode-ui.ps1 (0 procs, 0 refs)
-	uprev.ps1 (0 procs, 0 refs)
-vscode-extensions.txt (0 procs, 0 refs)
-Xfer.txt (0 procs, 0 refs)
+.docs/ (8 files)
+
+MusicTutorStudio Project Directory Tree
+
+├── .docs/
+│   ├── CONTRIBUTING.md
+│   ├── directory-tree.md
+│   ├── directory-tree.txt
+│   ├── FEATURE-SPEC-NOTE-TOOLTIPS.md
+│   ├── KEYBINDING-PLANNING.md
+│   ├── menuTree.md
+│   ├── migration-outline.md
+│   ├── preAlpha-html-listing.txt
+│   ├── README.md
+│   ├── scriptTransfer-xfer-alpha.md
+│   ├── ShortCuts.txt
+│   ├── show-scales-trace.md
+│   ├── tailwind-daisyUI-installation-notes.md
+│   ├── TTD.txt
+│   ├── xfer-vs-alpha-diff.md
+├── .github/
+│   └── copilot-instructions.md
+├── .vscode/
+│   ├── extension/
+│   │   ├── extension.js
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── keybindings.json
+│   ├── settings.json
+│   └── tasks.json
+├── .External_References/
+├── .git/
+├── .gitignore
+├── .netlify/
+├── .notes/
+├── .tbd/
+├── deploy.ps1
+├── finder.bat
+├── finder.py
+├── index.html
+├── node_modules/
+├── orphans.bat
+├── package-lock.json
+├── package.json
+├── partials/
+│   └── header-fragment.html
+├── public/
+│   ├── alpha/
+│   │   ├── about.html
+│   │   ├── assets/
+│   │   │   └── double-bell-euphonium.png
+│   │   ├── components/
+│   │   ├── create-exercises.html
+│   │   ├── create-lessons.html
+│   │   ├── create-scales (backup).html
+│   │   ├── create-scales-wc.html
+│   │   ├── create-scales.html
+│   │   ├── creator.html
+│   │   ├── data/
+│   │   │   ├── instruments.json
+│   │   │   ├── pitch-class.json
+│   │   │   ├── scales.json
+│   │   │   └── show-scales.json
+│   │   ├── features/
+│   │   │   └── preferences.js
+│   │   ├── fragments/
+│   │   │   ├── footer.html
+│   │   │   ├── footer.json
+│   │   │   ├── fragment-a.html
+│   │   │   ├── fragment-b.html
+│   │   │   ├── fragment-c.html
+│   │   │   ├── fragment-duration-direction.html
+│   │   │   ├── fragment-scale-diagnostics.html
+│   │   │   ├── fragment-scale-range-settings.html
+│   │   │   ├── fragment-scale-selector.html
+│   │   │   ├── fragment-snapshot.html
+│   │   │   ├── fragment-staff-formatting.html
+│   │   │   ├── fragment-staff-notation-area.html
+│   │   │   ├── fragment-title-instrument.html
+│   │   │   └── header.html
+│   │   ├── index.html
+│   │   ├── lessons-create.html
+│   │   ├── lessons-manage-practice-units.html
+│   │   ├── lessons-manage.html
+│   │   ├── lessons-start.html
+│   │   ├── lessons.html
+│   │   ├── practice-exercises.html
+│   │   ├── practice-scales.html
+│   │   ├── practice.html
+│   │   ├── preferences.html
+│   │   ├── scripts/
+│   │   │   ├── buildScaleFromUI.js
+│   │   │   ├── cmtConverter.js
+│   │   │   ├── cmtToken.js
+│   │   │   ├── cookies.js
+│   │   │   ├── create-scales-controls.js
+│   │   │   ├── create-scales.js
+│   │   │   ├── footer-fetch.js
+│   │   │   ├── header-fetch.js
+│   │   │   ├── load-footer.js
+│   │   │   ├── load-header.js
+│   │   │   ├── loader.js
+│   │   │   ├── pitchConverter.js
+│   │   │   ├── pitchUtils.js
+│   │   │   ├── render-scale.js
+│   │   │   ├── scales.js
+│   │   │   ├── scriptTransfer-xfer-alpha.md
+│   │   │   ├── show-scales.js
+│   │   ├── site.css
+│   │   ├── styles/
+│   │   │   └── theme.css
+│   │   ├── test-header.html
+│   │   ├── test-wc.html
+│   ├── beta/
+│   │   └── index.html
+│   ├── daisy/
+│   ├── favicon.ico
+│   ├── file-refactor-targets.md
+│   ├── index.html
+│   ├── planned-alpha-directory-tree.txt
+│   ├── preAlpha-directory-tree.txt
+│   ├── prototype/
+│   │   ├── about.html
+│   │   ├── assets/
+│   │   │   └── double-bell-euphonium.png
+│   │   ├── cmtDocs.html
+│   │   ├── data/
+│   │   │   ├── ack.json
+│   │   │   ├── change-log.json
+│   │   │   ├── clef.json
+│   │   │   ├── feature-pipeline.json
+│   │   │   ├── instruments.json
+│   │   │   ├── noteColors.json
+│   │   │   ├── notesAscending.json
+│   │   │   ├── pitch-class.json
+│   │   │   ├── show-scales copy.json
+│   │   │   ├── show-scales.json
+│   │   │   └── version.json
+│   │   ├── favicon.ico
+│   │   ├── footer.html
+│   │   ├── fragments/
+│   │   │   ├── footer.html
+│   │   │   └── header.html
+│   │   ├── hear-notes.html
+│   │   ├── index.html
+│   │   ├── lessons.html
+│   │   ├── play-scales.html
+│   │   ├── practice-passages-info.html
+│   │   ├── practicePassages/
+│   │   │   ├── danny-boy.json
+│   │   │   ├── king-of-the-road.json
+│   │   │   └── twinkle-twinkle-little-star.json
+│   │   ├── preferences.html
+│   │   ├── say-notes.html
+│   │   ├── scripts/
+│   │   │   ├── about.js
+│   │   │   ├── cmtConverter.js
+│   │   │   ├── cmtToken.js
+│   │   │   ├── cookies.js
+│   │   │   ├── global.js
+│   │   │   ├── load-footer.js
+│   │   │   ├── load-header.js
+│   │   │   ├── pitchConverter.js
+│   │   │   ├── pitchUtils.js
+│   │   │   ├── play-scales.js
+│   │   │   ├── preferences.js
+│   │   │   ├── render-scale.js
+│   │   │   ├── show-scales (old).js
+│   │   │   └── show-scales.js
+│   │   ├── show-scales.html
+│   ├── release-notes.md
+│   ├── roadMap.md
+│   ├── scripts/
+│   ├── test/
+│   │   ├── fragment-a.html
+│   │   ├── fragment-b.html
+│   │   ├── fragment-c.html
+│   │   ├── index.html
+│   │   ├── loader.js
+│   │   ├── readme.txt
+│   │   └── test-tailwind-daisyUI-install.html
+├── scan-orphans.py
+├── ShortCuts.json
+├── tailwind/
+│   ├── input.css
+│   ├── node_modules/
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   └── tailwind.config.js
+├── tools/
+│   ├── clone-repo.ps1
+│   ├── flats-to-sharps-no-slash.js
+│   ├── migrate-instruments.js
+│   ├── normalize-instruments.js
+│   ├── remove-slash-instruments.js
+│   ├── sync-vscode-ui.ps1
+│   └── uprev.ps1
+├── vscode-extensions.txt
+└── Xfer.txt

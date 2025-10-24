@@ -1,3 +1,30 @@
+Remove Outside Scale Configuration Wrapper
+Move Staff Formatting Outside of Duration & Direction 
+
+Here’s a list of the inline <script> blocks 
+in create-scales.html that could be exported to .js files:
+Line 41: <script> (after header-fetch.js)
+Line 52: <script>
+Line 71: <script>
+Line 200: <script>
+Line 519: <script>
+Line 559: <script>
+Line 656: <script>
+Line 671: <script>
+Line 686: <script>
+
+==================
+Move inline scripts to external .js files: As discussed, this keeps your HTML focused on structure and content.
+Organize with clear HTML comments: Mark major sections (header, controls, main content, footer) for easy navigation.
+Group related elements: Use <section>, <div>, or <fieldset> to visually and semantically group controls and UI blocks.
+Consistent indentation and formatting: Use a formatter (like VS Code’s built-in HTML formatter) for readability.
+Remove unused code: Delete commented-out or obsolete markup/scripts.
+Minimize inline styles: Move styles to your CSS files (site.css, etc.) for maintainability.
+Use semantic HTML tags: Prefer <main>, <nav>, <section>, <article>, etc., for better accessibility and structure.
+Add a “table of contents” comment at the top: List major sections and their line numbers for quick reference.
+Consolidate repeated markup: If you see repeated blocks, consider making them into reusable components (even if just copy-paste for now).
+Check for broken or duplicate IDs: Ensure all id attributes are unique and match your JS selectors.
+==================
 using best practices as defined in migration-outline.md 
 add the following content to create-scales.html
 Add a "Scale Configuration"
