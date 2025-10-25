@@ -15,8 +15,9 @@ function footerFetch(includeHomeButton = true) {
         : "";
       let homeButton = "";
       if (includeHomeButton) {
+        // Use Vue Router navigation if available
         homeButton = `
-        <a href="../alpha/index.html" class="btn btn-circle btn-primary shadow" title="Home">
+        <a href="/" class="btn btn-circle btn-primary shadow" title="Home">
           <span class="material-symbols-outlined text-2xl">home</span>
         </a>`;
       }

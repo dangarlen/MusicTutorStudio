@@ -120,7 +120,8 @@
       "type": "shell",
       "command": "npm",
       "args": ["run", "dev"],
-      "group": "none"
+      "group": "none",
+      "problemMatcher": []
     }
   ]
 }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Practice</title>
+    <link href="./site.css" rel="stylesheet" />
+    <link href="styles/theme.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-base-200 flex flex-col min-h-screen">
+    <div id="header-container"></div>
+    <script src="scripts/header-fetch.js"></script>
+    <script>
+      headerFetch();
+    </script>
+
+    <div
+      class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatPracticePages"
+    >
+      <span class="material-symbols-outlined">music_note</span>
+      <span class="text-2xl font-bold">Practice</span>
+    </div>
+    <br />
+    <div class="flex flex-col gap-4 max-w-xs mx-auto mt-8">
+      <a href="practice-exercises.html" class="mtsFormatPracticeButtons">
+        <span class="material-symbols-outlined align-middle mr-2"
+          >play_arrow</span
+        >
+        Practice Exercises
+      </a>
+      <a href="practice-scales.html" class="mtsFormatPracticeButtons">
+        <span class="material-symbols-outlined align-middle mr-2"
+          >play_circle</span
+        >
+        Practice Scales
+      </a>
+    </div>
+    <br />
+    <div id="footer-container"></div>
+    <script src="scripts/footer-fetch.js"></script>
+    <script>
+      footerFetch(true);
+    </script>
+  </body>
+</html>
