@@ -2,6 +2,19 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Dev Server (npm run dev)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": [],
+      "key": "ctrl+alt+d"
+    },
+    {
       "label": "Serve public (Python http.server)",
       "type": "shell",
       "command": "powershell",
@@ -101,6 +114,13 @@
       "dependsOn": ["Serve public (npx serve)", "Open Live Preview (browser)"],
       "dependsOrder": "sequence",
       "problemMatcher": []
+    },
+    {
+      "label": "Dev Server (npm run dev)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "group": "none"
     }
   ]
 }

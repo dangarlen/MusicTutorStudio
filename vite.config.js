@@ -2,15 +2,15 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
-  root: "public/vue/refactor-alpha",
+  root: "public/alpha-vue",
   plugins: [vue()],
   build: {
-    outDir: "../dist",
+    outDir: "dist",
     emptyOutDir: true,
   },
   resolve: {
     alias: {
-      "@": "/public/vue/refactor-alpha",
+      "@": "/public/alpha-vue",
     },
   },
   server: {

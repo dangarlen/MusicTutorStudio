@@ -1,0 +1,40 @@
+<section>
+  <!-- fragment-snapshot.html -->
+  <!-- Snapshot Save/Recall UI -->
+
+  <div
+    class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400"
+  >
+    <input type="checkbox" class="peer" />
+    <div class="collapse-title font-bold text-lg flex items-center gap-2">
+      <span>💾</span> Save/Recall Workspace Snapshot
+    </div>
+    <div class="collapse-content">
+      <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+        <button
+          id="save-snapshot-btn"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Save Snapshot
+        </button>
+        <input
+          type="file"
+          id="load-snapshot-input"
+          accept="application/json"
+          class="hidden"
+        />
+        <button
+          id="load-snapshot-btn"
+          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          Load Snapshot
+        </button>
+        <span class="text-xs text-gray-600">
+          (Snapshots are saved in your browser storage. You can recall them from
+          this device at any time. No files are downloaded or required.)
+        </span>
+      </div>
+      <div id="snapshot-status" class="text-xs text-blue-700"></div>
+    </div>
+  </div>
+</section>

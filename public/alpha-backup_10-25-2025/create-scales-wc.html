@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Scales</title>
+
+    <!-- VexFlow for music notation -->
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js"></script>
+
+    <!-- Cookie utility -->
+    <script src="scripts/cookies.js"></script>
+
+    <!-- Tailwind CSS CDN (official) -->
+    <link href="site.css" rel="stylesheet" />
+    <!-- <script src="https://cdn.tailwindcss.com"></script>-->
+    <!-- daisyUI CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.css"
+      rel="stylesheet"
+    />
+    <!-- Google Material Symbols -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <!-- Centralized theme for consistent UI -->
+    <link href="styles/theme.css" rel="stylesheet" />
+
+    <script type="module">
+      // Light DOM fragment loader: fetch and inject HTML in order, then run setup
+      async function loadFragmentsInOrder(container, fragments, callback) {
+        for (const url of fragments) {
+          const res = await fetch(url);
+          const html = await res.text();
+          const frag = document.createElement("div");
+          frag.innerHTML = html;
+          container.appendChild(frag);
+        }
+        if (typeof callback === "function") callback();
+      }
+      window.addEventListener("DOMContentLoaded", () => {
+        const container = document.getElementById("fragments-container");
+        const fragments = [
+          "fragments/fragment-title-instrument.html",
+          "fragments/fragment-staff-notation-area.html",
+          "fragments/fragment-scale-selector.html",
+          "fragments/fragment-scale-range-settings.html",
+          "fragments/fragment-duration-direction.html",
+          "fragments/fragment-staff-formatting.html",
+          "fragments/fragment-snapshot.html",
+          "fragments/fragment-scale-diagnostics.html",
+        ];
+        loadFragmentsInOrder(container, fragments, () => {
+          // Run ALL setup logic after fragments are loaded
+          // Call show-scales.js setup functions to populate controls and listeners
+          if (typeof populateInstrumentDropdown === "function")
+            populateInstrumentDropdown();
+          if (typeof attachEventListeners === "function")
+            attachEventListeners();
+          if (typeof renderCurrentScale === "function") renderCurrentScale();
+          // Setup controls only after fragments are loaded
+          if (typeof setupOctaveCountControls === "function")
+            setupOctaveCountControls();
+          if (typeof setupStartingOctaveControls === "function")
+            setupStartingOctaveControls();
+          if (typeof setupKeySignatureListener === "function")
+            setupKeySignatureListener();
+          if (typeof setupReturnToCreatorButton === "function")
+            setupReturnToCreatorButton();
+          // Move any other control/event wiring here if needed
+        });
+      });
+    </script>
+  </head>
+  <body class="bg-base-200 flex flex-col min-h-screen">
+    <div id="header-container"></div>
+    <script src="scripts/header-fetch.js"></script>
+    <script>
+      // Ensure Key dropdown defaults to 'C' after options are populated
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+          const rootNoteSelect = document.getElementById("root-note");
+          if (
+            rootNoteSelect &&
+            rootNoteSelect.options.length > 0 &&
+            !rootNoteSelect.value
+          ) {
+            let foundC = false;
+            for (let i = 0; i < rootNoteSelect.options.length; i++) {
+              if (rootNoteSelect.options[i].value === "C") {
+                rootNoteSelect.selectedIndex = i;
+                foundC = true;
+                break;
+              }
+            }
+            if (!foundC) {
+              rootNoteSelect.selectedIndex = 0;
+            }
+            rootNoteSelect.dispatchEvent(
+              new Event("change", { bubbles: true })
+            );
+          }
+        }, 600); // Wait for options to be populated
+      });
+      headerFetch();
+    </script>
+
+    <div
+      class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatCreatorPages"
+    >
+      <span class="material-symbols-outlined">edit_square</span>
+      <span id="dynamic-create-title" class="text-2xl">Create Scales</span>
+    </div>
+
+    <div id="fragments-container"></div>
+
+    <hr />
+
+    <!-- Back button: Return to Creator -->
+    <div style="max-width: 400px; margin: 2em auto">
+      <a href="creator.html" class="mtsFormatCreatorButtons">
+        <span
+          class="material-symbols-outlined align-middle mr-2"
+          aria-hidden="true"
+          >edit_square</span
+        >
+        Return to Creator
+      </a>
+    </div>
+
+    <!-- Footer fragment -->
+    <div id="footer-container"></div>
+
+    <!-- External logic and fragments -->
+    <script src="scripts/pitchUtils.js"></script>
+    <script src="scripts/pitchConverter.js"></script>
+    <script src="scripts/cmtConverter.js"></script>
+    <script src="scripts/show-scales.js"></script>
+    <script type="module">
+      import {
+        setupOctaveCountControls,
+        setupStartingOctaveControls,
+        setupKeySignatureListener,
+        setupReturnToCreatorButton,
+      } from "./scripts/create-scales-controls.js";
+      // Setup logic now runs after fragments are loaded (see above)
+    </script>
+    <script src="scripts/render-scale.js"></script>
+    <script src="scripts/load-header.js"></script>
+    <script src="scripts/load-footer.js"></script>
+    <!-- Navigation logic now handled in create-scales-controls.js -->
+
+    <div id="footer-container"></div>
+    <script src="scripts/footer-fetch.js"></script>
+    <script>
+      footerFetch();
+    </script>
+  </body>
+  <script>
+    // Force populate Key dropdown after fragments and scripts are loaded
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(function () {
+        var select = document.getElementById("root-note");
+        if (select && select.options.length === 0) {
+          fetch("data/show-scales.json")
+            .then((res) => res.json())
+            .then((data) => {
+              data.rootNotes.forEach(function (item) {
+                var opt = document.createElement("option");
+                opt.value = item.value;
+                opt.textContent = item.label;
+                select.appendChild(opt);
+              });
+              // Default to C if present
+              var foundC = false;
+              for (var i = 0; i < select.options.length; i++) {
+                if (select.options[i].value === "C") {
+                  select.selectedIndex = i;
+                  foundC = true;
+                  break;
+                }
+              }
+              if (!foundC) select.selectedIndex = 0;
+              select.dispatchEvent(new Event("change", { bubbles: true }));
+            });
+        }
+      }, 800); // Wait for fragments and scripts to load
+    });
+  </script>
+  <script>
+    // Diagnostic: Check if Key dropdown is present and populated
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(function () {
+        const rootNoteSelect = document.getElementById("root-note");
+        if (!rootNoteSelect) {
+          console.error(
+            "[Key Dropdown Diagnostic] #root-note not found in DOM"
+          );
+        } else if (rootNoteSelect.options.length === 0) {
+          console.error(
+            "[Key Dropdown Diagnostic] #root-note found but has no options"
+          );
+        } else {
+          console.log(
+            `[Key Dropdown Diagnostic] #root-note found with ${rootNoteSelect.options.length} options.`
+          );
+        }
+      }, 1000); // Wait for fragments and scripts to load
+    });
+  </script>
+  <script>
+    // VexFlow render using control values
+    document.addEventListener("DOMContentLoaded", function () {
+      function getSelectedValues() {
+        // Get values from controls, fallback to defaults if missing
+        const rootNote = document.getElementById("root-note")?.value || "C";
+        const startingOctave =
+          document
+            .getElementById("starting-octave-label")
+            ?.textContent?.replace(/[^0-9]/g, "") || "4";
+        const scaleType =
+          document.querySelector('input[name="scale-type"]:checked')?.value ||
+          "major";
+        const octaveCount =
+          document.getElementById("octave-count-label")?.textContent || "1";
+        return { rootNote, startingOctave, scaleType, octaveCount };
+      }
+
+      function renderScaleFromControls() {
+        if (
+          globalThis.Vex &&
+          globalThis.Vex.Flow &&
+          document.getElementById("vf")
+        ) {
+          try {
+            const VF = globalThis.Vex.Flow;
+            const vfDiv = document.getElementById("vf");
+            vfDiv.innerHTML = "";
+            const vf = new VF.Factory({
+              renderer: { elementId: "vf", width: 500, height: 200 },
+            });
+            const score = vf.EasyScore();
+            const system = vf.System();
+            // Build notes from controls (simple major scale for demo)
+            const { rootNote, startingOctave, scaleType, octaveCount } =
+              getSelectedValues();
+            // For demo, just use C major scale notes
+            let notes = `${rootNote}${startingOctave}/q, D${startingOctave}, E${startingOctave}, F${startingOctave}`;
+            if (scaleType === "minor")
+              notes = `${rootNote}${startingOctave}/q, D${startingOctave}, Eb${startingOctave}, F${startingOctave}`;
+            if (scaleType === "chromatic")
+              notes = `${rootNote}${startingOctave}/q, C#${startingOctave}, D${startingOctave}, D#${startingOctave}, E${startingOctave}, F${startingOctave}`;
+            system.addStave({ voices: [score.voice(score.notes(notes))] });
+            vf.draw();
+            console.log("[VexFlow Render] Using controls:", {
+              rootNote,
+              startingOctave,
+              scaleType,
+              octaveCount,
+            });
+          } catch (e) {
+            console.error("[VexFlow Render] Error:", e);
+          }
+        }
+      }
+
+      // Set defaults for controls if not set
+      setTimeout(function () {
+        // Set root note (Key dropdown)
+        const rootNoteSelect = document.getElementById("root-note");
+        if (rootNoteSelect) {
+          // If blank, set to first valid option (prefer 'C')
+          if (!rootNoteSelect.value || rootNoteSelect.selectedIndex === -1) {
+            let foundC = false;
+            for (let i = 0; i < rootNoteSelect.options.length; i++) {
+              if (
+                rootNoteSelect.options[i].value &&
+                rootNoteSelect.options[i].value.toUpperCase().startsWith("C")
+              ) {
+                rootNoteSelect.selectedIndex = i;
+                foundC = true;
+                break;
+              }
+            }
+            if (!foundC && rootNoteSelect.options.length > 0) {
+              // Pick first non-empty option
+              for (let i = 0; i < rootNoteSelect.options.length; i++) {
+                if (rootNoteSelect.options[i].value) {
+                  rootNoteSelect.selectedIndex = i;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        // Set starting octave
+        const startingOctaveLabel = document.getElementById(
+          "starting-octave-label"
+        );
+        if (startingOctaveLabel) {
+          if (
+            !startingOctaveLabel.textContent ||
+            !/^([A-G][b#]?\d)$/.test(startingOctaveLabel.textContent)
+          ) {
+            startingOctaveLabel.textContent = "C4";
+          }
+        }
+        // Set scale type
+        const scaleTypeRadio = document.querySelector(
+          'input[name="scale-type"][value="major"]'
+        );
+        if (scaleTypeRadio) scaleTypeRadio.checked = true;
+        // Set octave count
+        const octaveCountLabel = document.getElementById("octave-count-label");
+        if (octaveCountLabel) {
+          let val = Number.parseInt(octaveCountLabel.textContent);
+          if (Number.isNaN(val) || val < 1) {
+            octaveCountLabel.textContent = "1";
+          }
+          // Add listeners to update rendering on change
+          const decBtn = document.getElementById("octave-count-decrement");
+          const incBtn = document.getElementById("octave-count-increment");
+          decBtn?.addEventListener("click", function () {
+            let val = Number.parseInt(octaveCountLabel.textContent);
+            if (Number.isNaN(val)) val = 1;
+            if (val > 1) {
+              octaveCountLabel.textContent = String(val - 1);
+              octaveCountLabel.dispatchEvent(new Event("DOMSubtreeModified"));
+            }
+          });
+          incBtn?.addEventListener("click", function () {
+            let val = Number.parseInt(octaveCountLabel.textContent);
+            if (Number.isNaN(val)) val = 1;
+            if (val < 3) {
+              octaveCountLabel.textContent = String(val + 1);
+              octaveCountLabel.dispatchEvent(new Event("DOMSubtreeModified"));
+            }
+          });
+        }
+        // Initial render
+        renderScaleFromControls();
+        // Re-render on control changes
+        if (rootNoteSelect)
+          rootNoteSelect.addEventListener("change", renderScaleFromControls);
+        if (startingOctaveLabel)
+          startingOctaveLabel.addEventListener(
+            "DOMSubtreeModified",
+            renderScaleFromControls
+          );
+        document
+          .querySelectorAll('input[name="scale-type"]')
+          .forEach((radio) => {
+            radio.addEventListener("change", renderScaleFromControls);
+          });
+        if (octaveCountLabel)
+          octaveCountLabel.addEventListener(
+            "DOMSubtreeModified",
+            renderScaleFromControls
+          );
+      }, 400);
+    });
+  </script>
+  <script>
+    // Fragment Loader Diagnostic Script (runs after fragments are loaded)
+    document.addEventListener("DOMContentLoaded", function () {
+      function setupFragmentDiagnostic() {
+        const statusDiv = document.getElementById("fragment-loader-status");
+        const btn = document.getElementById("run-fragment-diagnostic");
+        if (!statusDiv || !btn) return;
+        function checkFragments() {
+          let fragments = [
+            { id: "header-container", name: "Header" },
+            { id: "footer-container", name: "Footer" },
+            { id: "instrument-select", name: "Instrument Select" },
+            { id: "root-note", name: "Root Note" },
+            { id: "vf", name: "VexFlow Container" },
+          ];
+          let results = fragments
+            .map((f) => {
+              let el = document.getElementById(f.id);
+              return `<li><b>${f.name}</b>: <span style="color:${
+                el ? "green" : "red"
+              }">${el ? "Loaded" : "Missing"}</span></li>`;
+            })
+            .join("");
+          statusDiv.innerHTML = `<ul class='pl-4'>${results}</ul>`;
+        }
+        btn.onclick = checkFragments;
+        checkFragments();
+      }
+      // Run after a short delay to ensure fragments are loaded
+      setTimeout(setupFragmentDiagnostic, 300);
+    });
+  </script>
+</html>
