@@ -1,5 +1,6 @@
 <template>
   <div class="bg-base-200 flex flex-col min-h-screen">
+    <Header />
     <main class="container mx-auto p-4 flex-1">
       <div class="flex flex-col gap-4 max-w-xs mx-auto">
         <RouterLink to="/creator" class="btn btn-primary shadow-lg">
@@ -8,6 +9,7 @@
           >
           Creator
         </RouterLink>
+
         <RouterLink to="/practice" class="btn btn-secondary shadow-lg">
           <span class="material-symbols-outlined align-middle mr-2"
             >music_note</span
@@ -32,10 +34,12 @@
         </RouterLink>
       </div>
     </main>
-    <!-- Footer is injected by index.html -->
+    <FooterMain />
   </div>
 </template>
 
 <script setup>
 import { RouterLink } from "vue-router";
+import Header from "./Header.vue";
+import FooterMain from "./FooterMain.vue";
 </script>
