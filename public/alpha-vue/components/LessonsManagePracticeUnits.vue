@@ -8,14 +8,7 @@
         <span class="material-symbols-outlined">play_arrow</span>
         <span class="text-2xl font-bold">Manage Practice Units</span>
       </div>
-      <div style="max-width: 400px; margin: 2em auto">
-        <RouterLink to="/lessons" class="mtsFormatLessonButtons">
-          <span class="material-symbols-outlined align-middle mr-2"
-            >menu_book</span
-          >
-          Return to Lessons
-        </RouterLink>
-      </div>
+      <LessonsReturn />
     </main>
     <FooterStandard />
   </div>
@@ -23,4 +16,5 @@
 <script setup>
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
+import LessonsReturn from "./LessonsReturn.vue";
 </script>

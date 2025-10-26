@@ -8,20 +8,11 @@
         <span class="material-symbols-outlined">music_note</span>
         <span class="text-2xl">Practice Scales</span>
       </div>
-      <div style="max-width: 400px; margin: 2em auto">
-        <router-link to="/practice" class="mtsFormatPracticeButtons">
-          <span
-            class="material-symbols-outlined align-middle mr-2"
-            aria-hidden="true"
-            >music_note</span
-          >
-          Return to Practice
-        </router-link>
-      </div>
+      <PracticeReturn />
     </main>
     <div id="footer-container"></div>
   </div>
 </template>
 <script setup>
-// Header and footer are injected by scripts/header-fetch.js and scripts/footer-fetch.js
+import PracticeReturn from "./PracticeReturn.vue";
 </script>

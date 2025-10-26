@@ -8,14 +8,7 @@
         <span class="material-symbols-outlined">add_circle</span>
         <span class="text-2xl font-bold">Create Exercise</span>
       </div>
-      <div style="max-width: 400px; margin: 2em auto">
-        <RouterLink to="/creator" class="mtsFormatCreatorButtons">
-          <span class="material-symbols-outlined align-middle mr-2"
-            >edit_square</span
-          >
-          Return to Creator
-        </RouterLink>
-      </div>
+      <CreatorReturn />
     </main>
     <FooterStandard />
   </div>
@@ -23,4 +16,5 @@
 <script setup>
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
+import CreatorReturn from "./CreatorReturn.vue";
 </script>

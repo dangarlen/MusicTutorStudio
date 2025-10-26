@@ -17,24 +17,37 @@ import About from "../components/About.vue";
 import Preferences from "../components/Preferences.vue";
 
 const routes = [
-  { path: "/", component: Home },
-  { path: "/practice", component: Practice },
-  { path: "/practice-exercises", component: PracticeExercises },
-  { path: "/practice-scales", component: PracticeScales },
-  { path: "/creator", component: Creator },
-  { path: "/lessons", component: Lessons },
-  { path: "/lessons-manage", component: LessonsManage },
+  { path: "/", name: "home", component: Home },
+  { path: "/practice", name: "practice", component: Practice },
+  {
+    path: "/practice-exercises",
+    name: "practice-exercises",
+    component: PracticeExercises,
+  },
+  {
+    path: "/practice-scales",
+    name: "practice-scales",
+    component: PracticeScales,
+  },
+  { path: "/creator", name: "creator", component: Creator },
+  { path: "/lessons", name: "lessons", component: Lessons },
+  { path: "/lessons-manage", name: "lessons-manage", component: LessonsManage },
   {
     path: "/lessons-manage-practice-units",
+    name: "lessons-manage-practice-units",
     component: LessonsManagePracticeUnits,
   },
-  { path: "/lessons-create", component: LessonsCreate },
-  { path: "/lessons-start", component: LessonsStart },
-  { path: "/preferences", component: Preferences },
-  { path: "/create-scales", component: CreateScale },
-  { path: "/create-exercises", component: CreateExercise },
-  { path: "/create-lessons", component: CreateLessons },
-  { path: "/about", component: About },
+  { path: "/lessons-create", name: "lessons-create", component: LessonsCreate },
+  { path: "/lessons-start", name: "lessons-start", component: LessonsStart },
+  { path: "/preferences", name: "preferences", component: Preferences },
+  { path: "/create-scales", name: "create-scales", component: CreateScale },
+  {
+    path: "/create-exercises",
+    name: "create-exercises",
+    component: CreateExercise,
+  },
+  { path: "/create-lessons", name: "create-lessons", component: CreateLessons },
+  { path: "/about", name: "about", component: About },
 ];
 
 const router = createRouter({
