@@ -69,6 +69,12 @@
   color: #111827;
 }
 
+/* VexFlow staff container: light grey background */
+.mtsFormatVexFlowContainer {
+  background-color: #f3f4f6; /* Tailwind gray-100 */
+  color: #111827;
+}
+
 /* Creator page highlight (matches Lessons Teal-400) */
 .mtsFormatLessonPages {
   background-color: #5fd1c7;

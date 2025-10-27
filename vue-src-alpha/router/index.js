@@ -16,6 +16,10 @@ import CreateLessons from "../components/CreateLessons.vue";
 import About from "../components/About.vue";
 import Preferences from "../components/Preferences.vue";
 
+import CreateTestStaffNoteBuilder from "../components/CreateTestStaffNoteBuilder.vue";
+import CreateTestStaffNoteDisplay from "../components/CreateTestStaffNoteDisplay.vue";
+import CreateTestStaffNoteData from "../components/CreateTestStaffNoteData.vue";
+
 const routes = [
   { path: "/", name: "home", component: Home },
   { path: "/practice", name: "practice", component: Practice },
@@ -48,6 +52,21 @@ const routes = [
   },
   { path: "/create-lessons", name: "create-lessons", component: CreateLessons },
   { path: "/about", name: "about", component: About },
+  {
+    path: "/create-test-staff-note-builder",
+    name: "create-test-staff-note-builder",
+    component: CreateTestStaffNoteBuilder,
+  },
+  {
+    path: "/create-test-staff-note-display",
+    name: "create-test-staff-note-display",
+    component: CreateTestStaffNoteDisplay,
+  },
+  {
+    path: "/create-test-staff-note-data",
+    name: "create-test-staff-note-data",
+    component: CreateTestStaffNoteData,
+  },
 ];
 
 const router = createRouter({

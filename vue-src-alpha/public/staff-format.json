@@ -1,0 +1,19 @@
+{
+  "staff": {
+    "x": 10,
+    "y": 40,
+    "width": 380,
+    "height": 200,
+    "clef": "treble",
+    "backgroundColor": "#f3f4f6",
+    "containerPadding": 10,
+    "containerBorderRadius": 12,
+    "containerShadow": "0 2px 8px 0 rgba(0,0,0,0.07)",
+    "verticalCenter": false,
+    "ledgerLines": {
+      "above": 3,
+      "below": 3
+    }
+  },
+  "noteColors": ["black", "blue", "orange", "green"]
+}
