@@ -14,11 +14,25 @@
         <h2 class="text-lg font-semibold mb-2">Raw Pinia Note Data</h2>
         <div class="bg-base-300 p-2 rounded">
           <div v-if="isEditing">
-            <div v-for="(note, idx) in editableNotes" :key="idx" class="flex items-center gap-2 mb-2">
-              <input v-model="editableNotes[idx].key" class="input input-bordered input-sm w-32" />
-              <input v-model="editableNotes[idx].duration" class="input input-bordered input-sm w-24" />
-              <span class="text-xs text-gray-500">{{ JSON.stringify(note) }}</span>
-              <button class="btn btn-xs btn-error" @click="removeNote(idx)">Remove</button>
+            <div
+              v-for="(note, idx) in editableNotes"
+              :key="idx"
+              class="flex items-center gap-2 mb-2"
+            >
+              <input
+                v-model="editableNotes[idx].key"
+                class="input input-bordered input-sm w-32"
+              />
+              <input
+                v-model="editableNotes[idx].duration"
+                class="input input-bordered input-sm w-24"
+              />
+              <span class="text-xs text-gray-500">{{
+                JSON.stringify(note)
+              }}</span>
+              <button class="btn btn-xs btn-error" @click="removeNote(idx)">
+                Remove
+              </button>
             </div>
           </div>
           <div v-else>
@@ -28,17 +42,18 @@
           </div>
         </div>
         <div class="flex gap-4 mt-4">
-          <button class="btn btn-secondary" @click="startEdit" v-if="!isEditing">
+          <button
+            class="btn btn-secondary"
+            @click="startEdit"
+            v-if="!isEditing"
+          >
             Edit Notes
           </button>
           <button class="btn btn-primary" @click="saveNotes" v-if="isEditing">
             Update/Save Notes
           </button>
         </div>
-        <button
-          class="btn btn-primary mt-4"
-          @click="addTestNote"
-        >
+        <button class="btn btn-primary mt-4" @click="addTestNote">
           Add Test Note
         </button>
       </div>
@@ -58,7 +73,7 @@ const isEditing = ref(false);
 const editableNotes = ref([]);
 
 function startEdit() {
-  editableNotes.value = store.notes.map(n => ({ ...n }));
+  editableNotes.value = store.notes.map((n) => ({ ...n }));
   isEditing.value = true;
 }
 

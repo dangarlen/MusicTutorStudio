@@ -19,6 +19,8 @@ import Preferences from "../components/Preferences.vue";
 import CreateTestStaffNoteBuilder from "../components/CreateTestStaffNoteBuilder.vue";
 import CreateTestStaffNoteDisplay from "../components/CreateTestStaffNoteDisplay.vue";
 import CreateTestStaffNoteData from "../components/CreateTestStaffNoteData.vue";
+import CreateScaleView from "../components/CreateScaleView.vue";
+import CreateExerciseView from "../components/CreateExerciseView.vue";
 
 const routes = [
   { path: "/", name: "home", component: Home },
@@ -66,6 +68,16 @@ const routes = [
     path: "/create-test-staff-note-data",
     name: "create-test-staff-note-data",
     component: CreateTestStaffNoteData,
+  },
+  {
+    path: "/create-scale-view",
+    name: "create-scale-view",
+    component: CreateScaleView,
+  },
+  {
+    path: "/create-exercise-view",
+    name: "create-exercise-view",
+    component: CreateExerciseView,
   },
 ];
 
