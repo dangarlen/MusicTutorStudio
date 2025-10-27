@@ -4,5 +4,17 @@
     "description": "Open the VS Code GitHub dialog to commit changes (Source Control pane)",
     "action": "Show Source Control (Git) pane in VS Code",
     "shortcut": "Ctrl+Shift+G"
+  },
+  {
+    "name": "Vue View (Dev Server)",
+    "description": "Run Vue dev server for local development (hot reload)",
+    "action": "Run tools/vueView.ps1 (npm run dev)",
+    "shortcut": "Ctrl+Shift+P → Tasks: Run Task → Vue View (Dev Server)"
+  },
+  {
+    "name": "Vue Deploy SPA (Build & Copy)",
+    "description": "Build Vue SPA and copy files to public/alpha-vue-SPA for static hosting",
+    "action": "Run tools/vueDeploySPA.ps1 (npm run build & copy)",
+    "shortcut": "Ctrl+Shift+P → Tasks: Run Task → Vue Deploy SPA (Build & Copy)"
   }
 ]
