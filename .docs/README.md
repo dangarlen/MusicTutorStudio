@@ -1,5 +1,9 @@
 # Music Tutor Studio: Project Overview
 
+Practice Units consist of are Scale(s) and/or Practice Passage(s).
+
+Lessons consist of one or more Practice Units
+
 ==========
 Import via import in Vue source (e.g., main.js or a component)
 

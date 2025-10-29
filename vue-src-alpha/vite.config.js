@@ -9,4 +9,5 @@ export default defineConfig({
   },
   base: "/alpha-vue-SPA/", // Use absolute base for deployment subfolder
   root: ".", // Use current directory as root
+  publicDir: resolve(__dirname, "../public"), // Ensure static assets from ../public are available
 });
