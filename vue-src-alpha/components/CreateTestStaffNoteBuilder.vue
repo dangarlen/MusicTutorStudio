@@ -13,6 +13,7 @@
         Populate Notes
       </button>
       <!-- Only build notes, do not display them here -->
+      <PhaseBasedVueTestContainer />
     </main>
     <FooterStandard />
   </div>
@@ -22,6 +23,7 @@ import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import CreatorReturn from "./CreatorReturn.vue";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
+import PhaseBasedVueTestContainer from "./PhaseBasedVueTestContainer.vue";
 
 const store = useTestStaffNoteStore();
 

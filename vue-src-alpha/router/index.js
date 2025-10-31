@@ -21,6 +21,7 @@ import CreateTestStaffNoteDisplay from "../components/CreateTestStaffNoteDisplay
 import CreateTestStaffNoteData from "../components/CreateTestStaffNoteData.vue";
 import CreateScaleView from "../components/CreateScaleView.vue";
 import CreateExerciseView from "../components/CreateExerciseView.vue";
+import PhaseBasedVueTestContainer from "../components/PhaseBasedVueTestContainer.vue";
 
 const routes = [
   { path: "/", name: "home", component: Home },
@@ -78,6 +79,11 @@ const routes = [
     path: "/create-exercise-view",
     name: "create-exercise-view",
     component: CreateExerciseView,
+  },
+  {
+    path: "/phase-test-container",
+    name: "phase-test-container",
+    component: PhaseBasedVueTestContainer,
   },
 ];
 
