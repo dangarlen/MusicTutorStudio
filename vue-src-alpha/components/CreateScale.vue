@@ -87,7 +87,7 @@ const scaleSelections = ref({
     timeSignature: true,
     accidentalFamily: "auto-key",
   },
-  NoteArray: [
+  noteArray: [
     { pitch: "c/4", duration: "q" },
     { pitch: "d/4", duration: "q" },
     { pitch: "e/4", duration: "q" },
@@ -116,7 +116,12 @@ function saveData() {
 watch(
   scaleSelections,
   (val) => {
-    store.notes = [JSON.parse(JSON.stringify(val))];
+    if (Array.isArray(val.noteArray)) {
+      store.noteArray = val.noteArray.map((n) => ({
+        key: n.pitch,
+        duration: n.duration,
+      }));
+    }
   },
   { deep: true }
 );

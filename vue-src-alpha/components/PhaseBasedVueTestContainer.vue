@@ -29,7 +29,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
 import InstrumentDropdown from "./InstrumentDropdown.vue";
 import ScaleBuilder from "./ScaleBuilder.vue";
 import StaffNoteBuilder from "./StaffNoteBuilder.vue";
@@ -37,15 +38,26 @@ import StaffNoteBuilder from "./StaffNoteBuilder.vue";
 const phase = ref(1);
 const selectedInstrument = ref(null);
 const scaleConfig = ref({});
-const noteConfig = ref({});
+const noteConfig = ref({ noteArray: [] });
 const instruments = ref([]);
 const enums = ref({});
 const errorMsg = ref("");
+const store = useTestStaffNoteStore();
+// Sync noteConfig.notes with Pinia store.notes
+watch(
+  () => noteConfig.value.noteArray,
+  (newNotes) => {
+    if (Array.isArray(newNotes)) {
+      store.noteArray = newNotes;
+    }
+  },
+  { deep: true }
+);
 
 const dataBlock = computed(() => ({
   instrument: selectedInstrument.value,
   scale: scaleConfig.value,
-  notes: noteConfig.value,
+  noteArray: noteConfig.value.noteArray,
 }));
 
 function nextPhase() {

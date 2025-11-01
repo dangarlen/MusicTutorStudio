@@ -60,6 +60,14 @@ async function fetchStaffFormat() {
 
 async function renderVexFlow(notes) {
   console.log("[VexFlow] renderVexFlow called with notes:", notes);
+  // Debug: log each note object
+  if (Array.isArray(notes)) {
+    notes.forEach((n, i) => {
+      console.log(`[VexFlow] Note ${i}:`, n);
+    });
+  } else {
+    console.warn("[VexFlow] notes is not an array:", notes);
+  }
   if (!vfContainer.value) {
     console.warn("[VexFlow] vfContainer is not defined");
     return;
@@ -102,9 +110,45 @@ async function renderVexFlow(notes) {
     // Ledger lines: VexFlow draws ledger lines automatically for notes out of staff range
     // To show 3 above/below, ensure your notes include those pitches
 
-    const vfNotes = notes.map(
-      (n) => new VF.StaveNote({ keys: [n.key], duration: n.duration })
-    );
+    const vfNotes = [];
+    // Defensive: check for valid array and valid fields
+    if (!Array.isArray(notes)) {
+      console.warn("[VexFlow] notes is not an array:", notes);
+    }
+    for (const n of Array.isArray(notes)
+      ? notes.filter(
+          (n) => n.noteVisible !== false && n.noteVisible !== "false"
+        )
+      : []) {
+      if (!n.pitch || !n.duration) {
+        console.warn("[VexFlow] Skipping note with missing pitch/duration:", n);
+        continue;
+      }
+      // VexFlow expects keys like 'C/4', 'C#/4', 'Db/5'
+      let key = n.pitch.replace(/([A-G][b#]?)(\d)/, "$1/$2");
+      // Validate key and duration
+      if (!/^([A-G][b#]?\/\d)$/.test(key)) {
+        console.warn(`[VexFlow] Skipping invalid pitch at idx:`, n.pitch);
+        continue;
+      }
+      if (!["q", "h", "w", "e"].includes(n.duration)) {
+        console.warn(`[VexFlow] Skipping invalid duration at idx:`, n.duration);
+        continue;
+      }
+      const note = new VF.StaveNote({ keys: [key], duration: n.duration });
+      if (n.noteColor) {
+        note.setStyle({ fillStyle: n.noteColor, strokeStyle: n.noteColor });
+      }
+      if (n.overlay) {
+        note.addAnnotation(
+          0,
+          new VF.Annotation(n.overlay).setVerticalJustification(
+            VF.Annotation.VerticalJustify.TOP
+          )
+        );
+      }
+      vfNotes.push(note);
+    }
     console.log("[VexFlow] vfNotes:", vfNotes);
 
     if (vfNotes.length > 0) {
@@ -119,17 +163,17 @@ async function renderVexFlow(notes) {
 }
 
 onMounted(() => {
-  renderVexFlow(store.notes);
+  renderVexFlow(store.noteArray);
 });
 
 watch(
-  () => store.notes,
+  () => store.noteArray,
   (newNotes) => {
     renderVexFlow(newNotes);
   }
 );
 
 function loadNoteData() {
-  renderVexFlow(store.notes);
+  renderVexFlow(store.noteArray);
 }
 </script>

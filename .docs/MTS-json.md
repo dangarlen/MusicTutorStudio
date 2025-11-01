@@ -233,10 +233,10 @@ System generates or parses notes, then user optionally edits formatting.
   Values: `"above"`, `"below"`, `"within"`  
   Destination: Runtime validation against instrument range
 
-- **noteColorLegendVisible**  
+- **noteVisible**  
   Type: `boolean`  
   Source: `user-defined`  
-  Destination: UI toggle for legend display
+  Destination: UI toggle for note visibility
 
 ---
 
@@ -302,8 +302,174 @@ System generates or parses notes, then user optionally edits formatting.
 
 - Supported formats: `JSON`, `PDF`, `MusicXML`, `CSV`
 - Empty fields are preserved as blank and handled at read-time
-- `noteColorDesignation` and `noteColorLegendVisible` included in all exports
+- `noteColorDesignation` and `noteVisible` included in all exports
 
 ---
 
-Would you like this scaffolded into a JSON Schema or split into modular Markdown sections for your documentation site? I can also generate a validator or UI mockup based on this structure. Let me know when you're ready to revisit `techniqueFocus` vocabulary.
+```json
+{
+  "practiceUnitType": ["Scale", "Passage", "Exercise"],
+  "scaleType": ["Major", "Minor", "Chromatic"],
+  "direction": ["ascending", "descending"],
+  "duration": ["e", "q", "h", "w"],
+  "noteColor": ["black", "red", "blue", "green", "orange", "gray", "purple"],
+  "exerciseType": ["Articulation", "Dynamics", "Tone", "Rhythm", "Fingering"]
+}
+```
+
+---
+
+````🎶 practiceUnitPassage.json
+{
+  "practiceUnitHeader": {
+    "practiceName": "Bach Suite Excerpt",
+    "practiceUnitId": "z9y8x7w6-v5u4-3210-ts98-rqpo98765432",
+    "lastModified": "2025-11-01T07:03:00Z",
+    "practiceUnitType": "Passage",
+    "tempo": 72,
+    "keySignature": "D Minor",
+    "timeSignature": "3/4",
+    "instrument": {
+      "instrument": "Cello",
+      "clef": "bass",
+      "transposition": "C",
+      "mechanism": "none",
+      "standardRange": { "start": "C2", "end": "C6" },
+      "defaultStartingOctave": "C2",
+      "fingering": {}
+    },
+    "staffDisplayOptions": {
+      "showAccidentals": true,
+      "showOverlays": false
+    },
+    "sourceURL": "https://imslp.org/wiki/Cello_Suite_No.1_(Bach)",
+    "noteColorDesignation": {
+      "orange": "Phrase start",
+      "gray": "Ghosted pickup",
+      "purple": "Dynamic swell"
+    }
+  },
+  "practiceUnitPassage": {
+    "composer": "J.S. Bach",
+    "sourceWork": "Cello Suite No. 1",
+    "passageRange": {
+      "startMeasure": 1,
+      "endMeasure": 4
+    },
+    "instrument": "Cello"
+  },
+  "noteArray": [
+    {
+      "pitch": "D3",
+      "duration": "q",
+      "noteColor": "orange",
+      "overlay": "1-2",
+      "overlayObject": { "fingering": "1-2" },
+      "rangeStatus": "within",
+  "noteVisible": true
+    },
+    {
+      "pitch": "E3",
+      "duration": "q",
+      "noteColor": "gray",
+      "overlay": "",
+      "overlayObject": {},
+      "rangeStatus": "within",
+  "noteVisible": true
+    },
+    {
+      "pitch": "F3",
+      "duration": "q",
+      "noteColor": "purple",
+      "overlay": "2-3",
+      "overlayObject": { "fingering": "2-3" },
+      "rangeStatus": "within",
+      "noteColorLegendVisible": true
+    }
+  ]
+}
+}
+
+```🎼 practiceUnitScale.json
+{
+  "practiceUnitHeader": {
+    "practiceName": "Horn F Major Ascending",
+    "practiceUnitId": "a1b2c3d4-e5f6-7890-gh12-ijkl34567890",
+    "lastModified": "2025-11-01T07:03:00Z",
+    "practiceUnitType": "Scale",
+    "tempo": 80,
+    "keySignature": "F Major",
+    "timeSignature": "4/4",
+    "instrument": {
+      "instrument": "Horn in F, Bass Clef",
+      "clef": "bass",
+      "transposition": "F",
+      "mechanism": "valve",
+      "standardRange": { "start": "F#2", "end": "C6" },
+      "defaultStartingOctave": "C3",
+      "fingering": {
+        "F3": ["0"],
+        "G3": ["1"],
+        "A3": ["2"]
+      }
+    },
+    "staffDisplayOptions": {
+      "showAccidentals": true,
+      "showOverlays": true
+    },
+    "sourceURL": "",
+    "noteColorDesignation": {
+      "red": "Too high — transpose down",
+      "blue": "Alternate fingering",
+      "green": "Correct note",
+      "orange": "Articulation target"
+    }
+  },
+  "practiceUnitScale": {
+    "scaleType": "Major",
+    "scaleRange": {
+      "startingOctave": "C3",
+      "numberOfOctaves": 1
+    },
+    "direction": "ascending"
+  },
+  "noteArray": [
+    {
+      "pitch": "F3",
+      "duration": "q",
+      "noteColor": "green",
+      "overlay": "0",
+      "overlayObject": { "fingering": "0" },
+      "rangeStatus": "within",
+      "noteColorLegendVisible": true
+    },
+    {
+      "pitch": "G3",
+      "duration": "q",
+      "noteColor": "blue",
+      "overlay": "1",
+      "overlayObject": { "fingering": "1" },
+      "rangeStatus": "within",
+      "noteColorLegendVisible": true
+    },
+    {
+      "pitch": "A3",
+      "duration": "q",
+      "noteColor": "red",
+      "overlay": "2",
+      "overlayObject": { "fingering": "2" },
+      "rangeStatus": "above",
+      "noteColorLegendVisible": true
+    }
+  ]
+}
+
+````
+
+```
+
+```
+
+```
+
+```

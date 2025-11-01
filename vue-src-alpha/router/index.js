@@ -10,7 +10,6 @@ import LessonsManage from "../components/LessonsManage.vue";
 import LessonsManagePracticeUnits from "../components/LessonsManagePracticeUnits.vue";
 import LessonsCreate from "../components/LessonsCreate.vue";
 import LessonsStart from "../components/LessonsStart.vue";
-import CreateScale from "../components/CreateScale.vue";
 import CreateExercise from "../components/CreateExercise.vue";
 import CreateLessons from "../components/CreateLessons.vue";
 import About from "../components/About.vue";
@@ -22,6 +21,10 @@ import CreateTestStaffNoteData from "../components/CreateTestStaffNoteData.vue";
 import CreateScaleView from "../components/CreateScaleView.vue";
 import CreateExerciseView from "../components/CreateExerciseView.vue";
 import PhaseBasedVueTestContainer from "../components/PhaseBasedVueTestContainer.vue";
+import SaveToPracticeUnitExport from "../components/SaveToPracticeUnitExport.vue";
+import RecallJsonFromPinia from "../components/RecallJsonFromPinia.vue";
+import ImportPracticeUnitExport from "../components/ImportPracticeUnitExport.vue";
+import EditPracticeUnitScaleInMemory from "../components/EditPracticeUnitScaleInMemory.vue";
 
 const routes = [
   { path: "/", name: "home", component: Home },
@@ -47,7 +50,7 @@ const routes = [
   { path: "/lessons-create", name: "lessons-create", component: LessonsCreate },
   { path: "/lessons-start", name: "lessons-start", component: LessonsStart },
   { path: "/preferences", name: "preferences", component: Preferences },
-  { path: "/create-scales", name: "create-scales", component: CreateScale },
+  { path: "/create-scales", name: "create-scales", component: CreateScaleView },
   {
     path: "/create-exercises",
     name: "create-exercises",
@@ -84,6 +87,26 @@ const routes = [
     path: "/phase-test-container",
     name: "phase-test-container",
     component: PhaseBasedVueTestContainer,
+  },
+  {
+    path: "/save-to-practice-unit-export",
+    name: "save-to-practice-unit-export",
+    component: SaveToPracticeUnitExport,
+  },
+  {
+    path: "/recall-json-from-pinia",
+    name: "recall-json-from-pinia",
+    component: RecallJsonFromPinia,
+  },
+  {
+    path: "/import-practice-unit-export",
+    name: "import-practice-unit-export",
+    component: ImportPracticeUnitExport,
+  },
+  {
+    path: "/edit-practice-unit-scale-in-memory",
+    name: "edit-practice-unit-scale-in-memory",
+    component: EditPracticeUnitScaleInMemory,
   },
 ];
 

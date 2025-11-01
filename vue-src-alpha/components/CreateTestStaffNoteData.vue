@@ -36,7 +36,7 @@
             </div>
           </div>
           <div v-else>
-            <span v-for="(note, idx) in store.notes" :key="idx">
+            <span v-for="(note, idx) in store.noteArray" :key="idx">
               {{ note }}
             </span>
           </div>
@@ -73,15 +73,15 @@ const isEditing = ref(false);
 const editableNotes = ref([]);
 
 function startEdit() {
-  editableNotes.value = store.notes.map((n) => ({ ...n }));
+  editableNotes.value = store.noteArray.map((n) => ({ ...n }));
   isEditing.value = true;
 }
 
 function saveNotes() {
-  store.clearNotes();
-  for (const note of editableNotes.value) {
-    store.addNote({ key: note.key, duration: note.duration });
-  }
+  store.noteArray = editableNotes.value.map((note) => ({
+    key: note.key,
+    duration: note.duration,
+  }));
   isEditing.value = false;
 }
 
@@ -93,7 +93,7 @@ function addTestNote() {
   if (isEditing.value) {
     editableNotes.value.push({ key: "c/4", duration: "q" });
   } else {
-    store.addNote({ key: "c/4", duration: "q" });
+    store.noteArray.push({ key: "c/4", duration: "q" });
   }
 }
 </script>

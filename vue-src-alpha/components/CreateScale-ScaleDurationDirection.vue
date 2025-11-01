@@ -1,10 +1,19 @@
 <template>
   <div
-    class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400"
+    class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
   >
     <input type="checkbox" class="peer" />
-    <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">
-      Duration & Direction
+    <div
+      class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
+    >
+      <span>Duration & Direction</span>
+      <span
+        class="text-right text-base font-normal text-gray-600"
+        v-if="localSelections.direction && localSelections.noteDuration"
+      >
+        {{ localSelections.direction }}
+        {{ durationLabel(localSelections.noteDuration) }} Scale
+      </span>
     </div>
     <div class="collapse-content">
       <!-- Direction -->
@@ -84,6 +93,21 @@
 </template>
 <script setup>
 import { computed } from "vue";
+
+function durationLabel(val) {
+  switch (val) {
+    case "eighth":
+      return "Eighth Note";
+    case "quarter":
+      return "Quarter Note";
+    case "half":
+      return "Half Note";
+    case "whole":
+      return "Whole Note";
+    default:
+      return "";
+  }
+}
 const props = defineProps({
   scaleSelections: {
     type: Object,

@@ -2,18 +2,18 @@ import { defineStore } from "pinia";
 
 export const useTestStaffNoteStore = defineStore("testStaffNote", {
   state: () => ({
-    notes: [], // Array to hold staff notes
+    noteArray: [], // Array to hold staff notes (MTS-json.md compliant)
     selectedNote: null,
   }),
   actions: {
     addNote(note) {
-      this.notes.push(note);
+      this.noteArray.push(note);
     },
     selectNote(note) {
       this.selectedNote = note;
     },
     clearNotes() {
-      this.notes = [];
+      this.noteArray = [];
       this.selectedNote = null;
     },
   },

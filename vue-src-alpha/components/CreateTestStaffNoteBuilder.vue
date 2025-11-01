@@ -12,6 +12,12 @@
       <button class="btn btn-primary mb-4" @click="populateNotes">
         Populate Notes
       </button>
+      <div class="flex gap-4 mb-4">
+        <SaveToPracticeUnitExport />
+        <RecallJsonFromPinia />
+        <ImportPracticeUnitExport />
+        <EditPracticeUnitScaleInMemory />
+      </div>
       <!-- Only build notes, do not display them here -->
       <PhaseBasedVueTestContainer />
     </main>
@@ -24,6 +30,10 @@ import FooterStandard from "./FooterStandard.vue";
 import CreatorReturn from "./CreatorReturn.vue";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
 import PhaseBasedVueTestContainer from "./PhaseBasedVueTestContainer.vue";
+import SaveToPracticeUnitExport from "./SaveToPracticeUnitExport.vue";
+import RecallJsonFromPinia from "./RecallJsonFromPinia.vue";
+import ImportPracticeUnitExport from "./ImportPracticeUnitExport.vue";
+import EditPracticeUnitScaleInMemory from "./EditPracticeUnitScaleInMemory.vue";
 
 const store = useTestStaffNoteStore();
 

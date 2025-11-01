@@ -1,10 +1,50 @@
 <template>
   <div
-    class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400"
+    class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
   >
     <input type="checkbox" class="peer" />
-    <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">
-      Staff Formatting
+    <div
+      class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
+    >
+      <span>Staff Formatting</span>
+      <span
+        class="text-right text-base font-normal text-gray-600"
+        v-if="localSelections.staffOptions"
+      >
+        Options:
+        <span v-if="localSelections.staffOptions.keySignature"
+          >Key Signature,
+        </span>
+        <span v-if="localSelections.staffOptions.barLines">Bar Lines, </span>
+        <span v-if="localSelections.staffOptions.timeSignature"
+          >Time Signature,
+        </span>
+        <span v-if="localSelections.staffOptions.accidentals"
+          >Accidentals.
+        </span>
+        <span
+          v-if="localSelections.staffOptions.accidentalFamily === 'auto-key'"
+          >Auto: Based on Key</span
+        >
+        <span
+          v-else-if="
+            localSelections.staffOptions.accidentalFamily === 'auto-direction'
+          "
+          >Auto: Based on Asc/Desc</span
+        >
+        <span
+          v-else-if="
+            localSelections.staffOptions.accidentalFamily === 'force-sharps'
+          "
+          >Force: Sharps</span
+        >
+        <span
+          v-else-if="
+            localSelections.staffOptions.accidentalFamily === 'force-flats'
+          "
+          >Force: Flats</span
+        >
+      </span>
     </div>
     <div class="collapse-content">
       <!-- Staff Display Options -->
