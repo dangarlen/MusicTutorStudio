@@ -8,44 +8,14 @@
         <span class="material-symbols-outlined icon">settings</span>
         <span class="text-2xl font-bold">Preferences</span>
       </div>
-      <label for="instrument-select" class="block mb-2 font-semibold">
-        Select Instrument:
-      </label>
-      <select id="instrument-select" class="w-full p-2 border rounded mb-4">
-        <option value="">(Instrument list here)</option>
-      </select>
-      <!--
-      <label for="range-select" class="block mb-2 font-semibold">
-        Select Range:
-      </label>
-      <select id="range-select" class="w-full p-2 border rounded mb-4">
-        <option value="standard">Standard</option>
-        <option value="extended">Extended</option>
-      </select>
-      -->
+      <!-- Instrument selector (same component/behavior as Create Scales) -->
       <div class="mb-4">
-        <span class="block mb-2 font-semibold">Fingering Display:</span>
-        <label class="inline-flex items-center mr-4">
-          <input
-            type="radio"
-            name="fingering-alt"
-            value="false"
-            checked
-            class="form-radio"
-          />
-          <span class="ml-2">Standard</span>
-        </label>
-        <label class="inline-flex items-center">
-          <input
-            type="radio"
-            name="fingering-alt"
-            value="true"
-            class="form-radio"
-          />
-          <span class="ml-2">Alternate</span>
-        </label>
+        <InstrumentDropdown
+          :instruments="store.instruments"
+          v-model="store.instrument"
+        />
       </div>
-      <button id="save-btn" class="btn btn-active btn-success">
+      <button id="save-btn" class="btn btn-active btn-success" @click="savePreferences">
         <span class="material-symbols-outlined icon">save</span>
         Save Preferences
       </button>
@@ -103,4 +73,37 @@
 <script setup>
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
+import InstrumentDropdown from "./InstrumentDropdown.vue";
+import { onMounted } from "vue";
+import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
+
+const store = usePracticeUnitScaleStore();
+onMounted(() => {
+  if (!store.instruments || store.instruments.length === 0) {
+    store.loadInstruments();
+  }
+  // Preselect instrument from cookie if present and not already set
+  const cookieInstrument = getCookie("instrument");
+  if (cookieInstrument && !store.instrument && store.instruments?.length) {
+    const match = store.instruments.find((i) => i.instrument === cookieInstrument);
+    if (match) store.instrument = match;
+  }
+});
+
+function savePreferences() {
+  if (!store.instrument) {
+    alert("Please select an instrument before saving.");
+    return;
+  }
+  const name = store.instrument.instrument || "";
+  // Persist for 1 year
+  const maxAge = 60 * 60 * 24 * 365;
+  document.cookie = `instrument=${encodeURIComponent(name)}; path=/; max-age=${maxAge}`;
+  alert(`Preferences saved. Instrument set to: ${name}`);
+}
+
+function getCookie(key) {
+  const match = document.cookie.match(new RegExp("(?:^|; )" + key.replace(/([.$?*|{}()\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)"));
+  return match ? decodeURIComponent(match[1]) : "";
+}
 </script>

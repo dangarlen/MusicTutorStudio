@@ -62,17 +62,6 @@
         </div>
         <div class="collapse-content px-4">
           <div class="flex gap-4 mb-4">
-            <button
-              class="btn btn-success flex items-center gap-2 mt-4"
-              @click="buildScale"
-            >
-              <span
-                class="material-symbols-outlined align-middle mr-2"
-                aria-hidden="true"
-                >auto_mode</span
-              >
-              Build Scale
-            </button>
             <button class="btn btn-warning" @click="saveScale">
               SAVE Scale to MTS-PracticeUnitExport.json
             </button>
@@ -205,6 +194,37 @@ function buildScale() {
   const direction = sel.direction || "Ascending";
   const noteDuration = sel.noteDuration || "quarter";
   const accidentalFamily = sel.staffOptions?.accidentalFamily || "auto-key";
+  // Shared scale patterns for accidentals (major and natural minor)
+  const SCALE_PATTERNS = {
+    // Major scales
+    "F#": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
+    "C#": ["C#", "D#", "E#", "F#", "G#", "A#", "B#"],
+    Gb: ["Gb", "Ab", "Bb", "Cb", "Db", "Eb", "F"],
+    Db: ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C"],
+    Ab: ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
+    Eb: ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
+    Bb: ["Bb", "C", "D", "Eb", "F", "G", "A"],
+    F: ["F", "G", "A", "Bb", "C", "D", "E"],
+    C: ["C", "D", "E", "F", "G", "A", "B"],
+    G: ["G", "A", "B", "C", "D", "E", "F#"],
+    D: ["D", "E", "F#", "G", "A", "B", "C#"],
+    A: ["A", "B", "C#", "D", "E", "F#", "G#"],
+    E: ["E", "F#", "G#", "A", "B", "C#", "D#"],
+    B: ["B", "C#", "D#", "E", "F#", "G#", "A#"],
+    // Natural minor scales
+    C_minor: ["C", "D", "Eb", "F", "G", "Ab", "Bb"],
+    G_minor: ["G", "A", "Bb", "C", "D", "Eb", "F"],
+    D_minor: ["D", "E", "F", "G", "A", "Bb", "C"],
+    A_minor: ["A", "B", "C", "D", "E", "F", "G"],
+    E_minor: ["E", "F#", "G", "A", "B", "C", "D"],
+    B_minor: ["B", "C#", "D", "E", "F#", "G", "A"],
+    "F#_minor": ["F#", "G#", "A", "B", "C#", "D", "E"],
+    "C#_minor": ["C#", "D#", "E", "F#", "G#", "A", "B"],
+    F_minor: ["F", "G", "Ab", "Bb", "C", "Db", "Eb"],
+    Bb_minor: ["Bb", "C", "Db", "Eb", "F", "Gb", "Ab"],
+    Eb_minor: ["Eb", "F", "Gb", "Ab", "Bb", "Cb", "Db"],
+    Ab_minor: ["Ab", "Bb", "Cb", "Db", "Eb", "Fb", "Gb"],
+  };
   // --- Helper functions ---
   function spnToMidi(spn) {
     if (window.spnToMidi) return window.spnToMidi(spn);
@@ -391,23 +411,7 @@ function buildScale() {
     return scaleNotes;
   }
   function getAccidentalForNote(letter, rootNote, degree, keyInfo) {
-    const scalePatterns = {
-      "F#": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
-      "C#": ["C#", "D#", "E#", "F#", "G#", "A#", "B#"],
-      Gb: ["Gb", "Ab", "Bb", "Cb", "Db", "Eb", "F"],
-      Db: ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C"],
-      Ab: ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
-      Eb: ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
-      Bb: ["Bb", "C", "D", "Eb", "F", "G", "A"],
-      F: ["F", "G", "A", "Bb", "C", "D", "E"],
-      C: ["C", "D", "E", "F", "G", "A", "B"],
-      G: ["G", "A", "B", "C", "D", "E", "F#"],
-      D: ["D", "E", "F#", "G", "A", "B", "C#"],
-      A: ["A", "B", "C#", "D", "E", "F#", "G#"],
-      E: ["E", "F#", "G#", "A", "B", "C#", "D#"],
-      B: ["B", "C#", "D#", "E", "F#", "G#", "A#"],
-    };
-    const pattern = scalePatterns[rootNote];
+    const pattern = SCALE_PATTERNS[rootNote];
     const targetNote = pattern?.[degree];
     if (targetNote && targetNote.charAt(0) === letter) {
       return targetNote.substring(1);
@@ -459,10 +463,60 @@ function buildScale() {
     finalNotes.push(
       `C${parseInt(startingOctave.replace(/^[A-G][b#]?/, "")) + octaveCount}`
     );
+  } else if (scaleType === "minor") {
+    // Natural minor scale intervals: W-H-W-W-H-W-W
+    const minorSteps = [2, 1, 2, 2, 1, 2, 2];
+    // Use minor scale pattern for accidentals
+    const minorKey = key + "_minor";
+    function generateMinorScalePattern(
+      rootNote,
+      steps,
+      startingOctave,
+      octaveCount
+    ) {
+      const scaleNotes = [];
+      const pattern = SCALE_PATTERNS[minorKey];
+      const letterNames = ["C", "D", "E", "F", "G", "A", "B"];
+      const rootLetter = rootNote.charAt(0);
+      const rootLetterIndex = letterNames.indexOf(rootLetter);
+      for (let octave = 0; octave < octaveCount; octave++) {
+        const currentOctave =
+          Number.parseInt(startingOctave.replace(/^[A-G][b#]?/, "")) + octave;
+        for (let degree = 0; degree < 7; degree++) {
+          const noteName = pattern
+            ? pattern[degree]
+            : letterNames[(rootLetterIndex + degree) % 7];
+          const degreeLetter = noteName.charAt(0);
+          const degreeLetterIndex = letterNames.indexOf(degreeLetter);
+          let noteOctave = currentOctave;
+          if (degree > 0 && degreeLetterIndex < rootLetterIndex) noteOctave++;
+          scaleNotes.push(noteName + noteOctave);
+        }
+      }
+      // Add final octave note (tonic up one octave)
+      const finalTonic = pattern ? pattern[0] : letterNames[rootLetterIndex];
+      const finalOct =
+        Number.parseInt(startingOctave.replace(/^[A-G][b#]?/, "")) +
+        octaveCount;
+      scaleNotes.push(finalTonic + finalOct);
+      return scaleNotes;
+    }
+    finalNotes = generateMinorScalePattern(
+      key,
+      minorSteps,
+      startingOctave,
+      octaveCount
+    );
+    // end minor
   } else {
-    const steps =
-      scaleType === "major" ? [2, 2, 1, 2, 2, 2, 1] : [2, 1, 2, 2, 1, 2, 2];
-    finalNotes = generateDiatonicScale(key, steps, startingOctave, octaveCount);
+    // Major scale intervals: W-W-H-W-W-W-H
+    const majorSteps = [2, 2, 1, 2, 2, 2, 1];
+    finalNotes = generateDiatonicScale(
+      key,
+      majorSteps,
+      startingOctave,
+      octaveCount
+    );
   }
   // Accidental family logic
   let preferredFamily = "sharps";
