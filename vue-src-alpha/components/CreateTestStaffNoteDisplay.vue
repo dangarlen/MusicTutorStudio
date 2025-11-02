@@ -10,12 +10,12 @@
           ref="vfContainer"
           class="mtsFormatVexFlowContainer border border-gray-300 rounded p-4 min-h-[200px]"
         ></div>
-        <button class="btn btn-primary mt-4" @click="loadNoteData">
-          Load Note Data
+        <button class="btn btn-sm btn-info mt-4" @click="loadNoteData">
+          Refresh Data
         </button>
         <button
           class="mtsFormatCreatorButtons mt-6"
-          @click="$router.push({ name: 'create-test-staff-note-builder' })"
+          @click="$router.push({ name: 'creator' })"
         >
           <span class="material-symbols-outlined">edit_square</span>
           Return to Creator

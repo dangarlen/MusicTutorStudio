@@ -9,6 +9,23 @@
         <span class="material-symbols-outlined">queue_music</span>
         <span class="text-2xl font-bold">{{ store.title }}</span>
       </div>
+      <div
+        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
+      >
+        <input type="checkbox" class="peer" />
+        <div
+          class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
+        >
+          <span>Scale (SPN)</span>
+          <span class="text-right text-base font-normal text-gray-600">
+            {{
+              store.noteArray && store.noteArray.length > 0
+                ? store.noteArray.map((n) => n.pitch).join(", ")
+                : "No scale generated yet."
+            }}
+          </span>
+        </div>
+      </div>
       <div class="mb-4">
         <InstrumentDropdown
           :instruments="store.instruments"
@@ -45,12 +62,38 @@
         </div>
         <div class="collapse-content px-4">
           <div class="flex gap-4 mb-4">
+            <button
+              class="btn btn-success flex items-center gap-2 mt-4"
+              @click="buildScale"
+            >
+              <span
+                class="material-symbols-outlined align-middle mr-2"
+                aria-hidden="true"
+                >auto_mode</span
+              >
+              Build Scale
+            </button>
             <button class="btn btn-warning" @click="saveScale">
               SAVE Scale to MTS-PracticeUnitExport.json
             </button>
-            <button class="btn btn-info" @click="recallScale">
-              RECALL Scale FROM json file
+            <button
+              class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
+              @click="triggerRecallFileDialog"
+            >
+              <span
+                class="material-symbols-outlined align-middle mr-2"
+                aria-hidden="true"
+                >upload_file</span
+              >
+              RECALL (Import JSON)
             </button>
+            <input
+              ref="recallFileInput"
+              type="file"
+              accept="application/json"
+              style="display: none"
+              @change="handleRecallFileChange"
+            />
           </div>
         </div>
       </div>
@@ -92,29 +135,169 @@
         >
         Return to Creator
       </button>
-      <button
-        class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
-        @click="triggerRecallFileDialog"
-      >
-        <span
-          class="material-symbols-outlined align-middle mr-2"
-          aria-hidden="true"
-          >upload_file</span
-        >
-        RECALL (Import JSON)
-      </button>
-      <input
-        ref="recallFileInput"
-        type="file"
-        accept="application/json"
-        style="display: none"
-        @change="handleRecallFileChange"
-      />
     </div>
     <FooterStandard />
   </div>
 </template>
 <script setup>
+import { ref, watch, onMounted, reactive } from "vue";
+import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
+const store = usePracticeUnitScaleStore();
+
+// Defensive: ensure scaleSelections is always initialized before watcher
+if (!store.scaleSelections) {
+  store.scaleSelections = reactive({
+    key: "C",
+    scaleType: "major",
+    startingOctave: "C4",
+    octaveCount: 1,
+    direction: "Ascending",
+    noteDuration: "quarter",
+    staffOptions: {
+      keySignature: true,
+      accidentals: true,
+      barLines: true,
+      timeSignature: true,
+      accidentalFamily: "auto-key",
+    },
+  });
+}
+const scaleLabel = ref("Not yet saved");
+let previousInstrument = null;
+
+function buildScale() {
+  let defaultName = `${store.scaleSelections.key} ${store.scaleSelections.scaleType} Scale`;
+  const name = prompt("Enter scale name:", defaultName);
+  if (!name) return;
+  scaleLabel.value = name;
+  // Generate noteArray (reuse saveScale logic)
+  store.noteArray = [];
+  const testStaffStore = useTestStaffNoteStore();
+  testStaffStore.noteArray = [];
+  const sel = store.scaleSelections;
+  const scaleType = sel.scaleType || "major";
+  const startingOctave = sel.startingOctave || "C4";
+  const octaveCount = sel.octaveCount || 1;
+  const direction = sel.direction || "Ascending";
+  const noteDuration = sel.noteDuration || "quarter";
+  const scaleIntervals = {
+    major: [2, 2, 1, 2, 2, 2, 1],
+    minor: [2, 1, 2, 2, 1, 2, 2],
+    chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  };
+  function spnToMidi(spn) {
+    if (globalThis.spnToMidi) return globalThis.spnToMidi(spn);
+    const match = spn.match(
+      /^([A-G]#?|Bb|A#|C#|D#|E#|F#|G#|Ab|Db|Eb|Gb|Fb|B#|Cb)\/?(\d)$/
+    );
+    if (!match) return 60;
+    const noteMap = {
+      C: 0,
+      "C#": 1,
+      Db: 1,
+      D: 2,
+      "D#": 3,
+      Eb: 3,
+      E: 4,
+      Fb: 4,
+      F: 5,
+      "F#": 6,
+      Gb: 6,
+      G: 7,
+      "G#": 8,
+      Ab: 8,
+      A: 9,
+      "A#": 10,
+      Bb: 10,
+      B: 11,
+      Cb: 11,
+    };
+    const note = match[1];
+    const octave = Number.parseInt(match[2]);
+    return 12 * (octave + 1) + (noteMap[note] ?? 0);
+  }
+  function midiToSpn(midi) {
+    if (globalThis.midiToSpn) return globalThis.midiToSpn(midi);
+    const notes = [
+      "C",
+      "C#",
+      "D",
+      "D#",
+      "E",
+      "F",
+      "F#",
+      "G",
+      "G#",
+      "A",
+      "A#",
+      "B",
+    ];
+    const octave = Math.floor(midi / 12) - 1;
+    const note = notes[midi % 12];
+    return `${note}/${octave}`;
+  }
+  let intervals = scaleIntervals[scaleType] || scaleIntervals["major"];
+  let startMidi = spnToMidi(startingOctave);
+  let scaleNotes = [startMidi];
+  for (let o = 0; o < octaveCount; ++o) {
+    let midi =
+      o === 0
+        ? startMidi
+        : scaleNotes[scaleNotes.length - 1] + intervals[intervals.length - 1];
+    for (let i = 0; i < intervals.length; ++i) {
+      midi += intervals[i];
+      scaleNotes.push(midi);
+    }
+  }
+  scaleNotes = scaleNotes.slice(0, octaveCount * 7 + 1);
+  if (direction.toLowerCase().startsWith("desc"))
+    scaleNotes = scaleNotes.slice().reverse();
+  const durationMap = { quarter: "q", eighth: "e", half: "h", whole: "w" };
+  const generatedNotes = scaleNotes.map((midi) => {
+    const spn = midiToSpn(midi).replace("/", "");
+    return {
+      pitch: spn,
+      duration: durationMap[noteDuration] || "q",
+      noteVisible: true,
+      noteColor: "black",
+      overlay: "",
+      overlayObject: {},
+      rangeStatus: "within",
+    };
+  });
+  store.noteArray = generatedNotes;
+  testStaffStore.noteArray = generatedNotes;
+}
+
+// Reset label to Not yet saved on any control change
+watch(
+  () => [
+    store.scaleSelections.key,
+    store.scaleSelections.scaleType,
+    store.scaleSelections.startingOctave,
+    store.scaleSelections.octaveCount,
+    store.scaleSelections.direction,
+    store.scaleSelections.noteDuration,
+    store.scaleSelections.staffOptions,
+    store.instrument,
+  ],
+  () => {
+    scaleLabel.value = "Not yet saved";
+  }
+);
+
+// Instrument dropdown default to previous selection
+onMounted(() => {
+  if (previousInstrument && !store.instrument) {
+    store.instrument = previousInstrument;
+  }
+});
+watch(
+  () => store.instrument,
+  (newVal) => {
+    if (newVal) previousInstrument = newVal;
+  }
+);
 const recallFileInput = ref(null);
 
 function triggerRecallFileDialog() {
@@ -165,14 +348,11 @@ async function handleRecallFileChange(event) {
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import InstrumentDropdown from "./InstrumentDropdown.vue";
-import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import CreateScaleScaleSelector from "./CreateScale-ScaleSelector.vue";
 import CreateScaleScaleRange from "./CreateScale-ScaleRange.vue";
 import CreateScaleScaleDurationDirection from "./CreateScale-ScaleDurationDirection.vue";
 import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
-import { onMounted, reactive, ref, watch } from "vue";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
-const store = usePracticeUnitScaleStore();
 // Defensive: ensure scaleSelections is always initialized before watcher
 if (!store.scaleSelections) {
   store.scaleSelections = reactive({
