@@ -16,7 +16,7 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>Scale (SPN)</span>
+          <span>Scale Preview</span>
           <span class="text-right text-base font-normal text-gray-600">
             {{
               store.noteArray && store.noteArray.length > 0
@@ -140,6 +140,32 @@
   </div>
 </template>
 <script setup>
+// --- Copy Scale SPN to clipboard ---
+function copyScaleSPN() {
+  console.log("function copyScaleSPN called.");
+  const spnArray =
+    store.noteArray && store.noteArray.length > 0
+      ? store.noteArray.map((n) => n.pitch).join(", ")
+      : "";
+  console.log("[Copy Scale SPN] noteArray:", store.noteArray);
+  console.log("[Copy Scale SPN] spnArray:", spnArray);
+  if (spnArray) {
+    navigator.clipboard
+      .writeText(spnArray)
+      .then(() => {
+        console.log("[Copy Scale SPN] Clipboard write succeeded.");
+        // Removed diagnostic alert
+      })
+      .catch((err) => {
+        console.error("[Copy Scale SPN] Clipboard write failed:", err);
+        alert("Failed to copy scale SPN.");
+      });
+  } else {
+    console.warn("[Copy Scale SPN] No scale generated to copy.");
+    alert("No scale generated to copy.");
+  }
+}
+
 import { ref, watch, onMounted, reactive } from "vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 const store = usePracticeUnitScaleStore();
@@ -166,30 +192,23 @@ const scaleLabel = ref("Not yet saved");
 let previousInstrument = null;
 
 function buildScale() {
-  let defaultName = `${store.scaleSelections.key} ${store.scaleSelections.scaleType} Scale`;
-  const name = prompt("Enter scale name:", defaultName);
-  if (!name) return;
-  scaleLabel.value = name;
-  // Generate noteArray (reuse saveScale logic)
+  scaleLabel.value = `${store.scaleSelections.key} ${store.scaleSelections.scaleType} Scale`;
+  // --- Static alpha logic: full diatonic, chromatic, accidental family, direction, octave handling ---
   store.noteArray = [];
   const testStaffStore = useTestStaffNoteStore();
   testStaffStore.noteArray = [];
   const sel = store.scaleSelections;
   const scaleType = sel.scaleType || "major";
-  const startingOctave = sel.startingOctave || "C4";
+  const key = sel.key || "C";
+  let startingOctave = sel.startingOctave || "C4";
   const octaveCount = sel.octaveCount || 1;
   const direction = sel.direction || "Ascending";
   const noteDuration = sel.noteDuration || "quarter";
-  const scaleIntervals = {
-    major: [2, 2, 1, 2, 2, 2, 1],
-    minor: [2, 1, 2, 2, 1, 2, 2],
-    chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  };
+  const accidentalFamily = sel.staffOptions?.accidentalFamily || "auto-key";
+  // --- Helper functions ---
   function spnToMidi(spn) {
-    if (globalThis.spnToMidi) return globalThis.spnToMidi(spn);
-    const match = spn.match(
-      /^([A-G]#?|Bb|A#|C#|D#|E#|F#|G#|Ab|Db|Eb|Gb|Fb|B#|Cb)\/?(\d)$/
-    );
+    if (window.spnToMidi) return window.spnToMidi(spn);
+    const match = spn.match(/^([A-G][#b]?)(\d)$/);
     if (!match) return 60;
     const noteMap = {
       C: 0,
@@ -213,11 +232,11 @@ function buildScale() {
       Cb: 11,
     };
     const note = match[1];
-    const octave = Number.parseInt(match[2]);
+    const octave = parseInt(match[2]);
     return 12 * (octave + 1) + (noteMap[note] ?? 0);
   }
   function midiToSpn(midi) {
-    if (globalThis.midiToSpn) return globalThis.midiToSpn(midi);
+    if (window.midiToSpn) return window.midiToSpn(midi);
     const notes = [
       "C",
       "C#",
@@ -236,25 +255,245 @@ function buildScale() {
     const note = notes[midi % 12];
     return `${note}/${octave}`;
   }
-  let intervals = scaleIntervals[scaleType] || scaleIntervals["major"];
-  let startMidi = spnToMidi(startingOctave);
-  let scaleNotes = [startMidi];
-  for (let o = 0; o < octaveCount; ++o) {
-    let midi =
-      o === 0
-        ? startMidi
-        : scaleNotes[scaleNotes.length - 1] + intervals[intervals.length - 1];
-    for (let i = 0; i < intervals.length; ++i) {
-      midi += intervals[i];
-      scaleNotes.push(midi);
+  // --- Accidental family helpers ---
+  function getKeySignaturePreference(rootNote) {
+    const sharpKeys = ["C", "G", "D", "A", "E", "B", "F#", "C#"];
+    const flatKeys = ["F", "Bb", "Eb", "Ab", "Db", "Gb", "Cb"];
+    if (flatKeys.includes(rootNote)) return "flats";
+    if (sharpKeys.includes(rootNote)) return "sharps";
+    const enharmonicMap = { "A#": "sharps", "D#": "sharps", "G#": "sharps" };
+    return enharmonicMap[rootNote] || "sharps";
+  }
+  function convertToAccidentalFamily(note, preferredFamily) {
+    const match = note.match(/^([A-G][#b]{0,2})(\d+)$/);
+    if (!match) return note;
+    const [, noteName, octaveStr] = match;
+    const octave = parseInt(octaveStr, 10);
+    function adjustOctave(orig, enh, octave) {
+      if ((orig === "B#" || orig === "B##") && enh.startsWith("C"))
+        return octave + 1;
+      if ((orig === "Cb" || orig === "Cbb") && enh.startsWith("B"))
+        return octave - 1;
+      return octave;
+    }
+    if (preferredFamily === "flats") {
+      const sharpToFlat = {
+        "C#": "Db",
+        "C##": "D",
+        "B#": "C",
+        "B##": "C#",
+        "D#": "Eb",
+        "D##": "E",
+        "E#": "F",
+        "E##": "F#",
+        "F#": "Gb",
+        "F##": "G",
+        "G#": "Ab",
+        "G##": "A",
+        "A#": "Bb",
+        "A##": "B",
+      };
+      const doubleFlat = { Cb: "B", Fb: "E", Ebb: "D", Bbb: "A" };
+      const enh = sharpToFlat[noteName] || doubleFlat[noteName] || noteName;
+      const adjOctave = adjustOctave(noteName, enh, octave);
+      return enh + adjOctave;
+    } else if (preferredFamily === "sharps") {
+      const flatToSharp = {
+        Db: "C#",
+        Dbb: "C",
+        Eb: "D#",
+        Ebb: "D",
+        Fb: "E",
+        Gb: "F#",
+        Gbb: "F",
+        Ab: "G#",
+        Abb: "G",
+        Bb: "A#",
+        Bbb: "A",
+        Cb: "B",
+        "E#": "F",
+        "B#": "C",
+      };
+      const doubleSharp = {
+        "C##": "D",
+        "D##": "E",
+        "F##": "G",
+        "G##": "A",
+        "A##": "B",
+      };
+      const enh = flatToSharp[noteName] || doubleSharp[noteName] || noteName;
+      const adjOctave = adjustOctave(noteName, enh, octave);
+      return enh + adjOctave;
+    }
+    return note;
+  }
+  // --- Diatonic scale generation ---
+  function generateDiatonicScale(rootNote, steps, startingOctave, octaveCount) {
+    const letterNames = ["C", "D", "E", "F", "G", "A", "B"];
+    const rootLetter = rootNote.charAt(0);
+    const rootLetterIndex = letterNames.indexOf(rootLetter);
+    const keySignatures = {
+      C: { sharps: 0, flats: 0, family: "natural" },
+      G: { sharps: 1, flats: 0, family: "sharps" },
+      D: { sharps: 2, flats: 0, family: "sharps" },
+      A: { sharps: 3, flats: 0, family: "sharps" },
+      E: { sharps: 4, flats: 0, family: "sharps" },
+      B: { sharps: 5, flats: 0, family: "sharps" },
+      "F#": { sharps: 6, flats: 0, family: "sharps" },
+      "C#": { sharps: 7, flats: 0, family: "sharps" },
+      F: { sharps: 0, flats: 1, family: "flats" },
+      Bb: { sharps: 0, flats: 2, family: "flats" },
+      Eb: { sharps: 0, flats: 3, family: "flats" },
+      Ab: { sharps: 0, flats: 4, family: "flats" },
+      Db: { sharps: 0, flats: 5, family: "flats" },
+      Gb: { sharps: 0, flats: 6, family: "flats" },
+      Cb: { sharps: 0, flats: 7, family: "flats" },
+    };
+    const keyInfo = keySignatures[rootNote];
+    if (!keyInfo)
+      return generateScaleWithMidi(
+        rootNote,
+        steps,
+        startingOctave,
+        octaveCount
+      );
+    const scaleNotes = [];
+    for (let octave = 0; octave < octaveCount; octave++) {
+      const currentOctave =
+        parseInt(startingOctave.replace(/^[A-G][b#]?/, "")) + octave;
+      for (let degree = 0; degree < 7; degree++) {
+        const letterIndex = (rootLetterIndex + degree) % 7;
+        const letter = letterNames[letterIndex];
+        const accidental = getAccidentalForNote(
+          letter,
+          rootNote,
+          degree,
+          keyInfo
+        );
+        let noteOctave = currentOctave;
+        if (degree > 0 && letterIndex < rootLetterIndex) noteOctave++;
+        const note = letter + accidental + noteOctave;
+        scaleNotes.push(note);
+      }
+    }
+    const finalLetter = letterNames[rootLetterIndex];
+    const finalAccidental = getAccidentalForNote(
+      finalLetter,
+      rootNote,
+      0,
+      keyInfo
+    );
+    scaleNotes.push(
+      finalLetter +
+        finalAccidental +
+        (parseInt(startingOctave.replace(/^[A-G][b#]?/, "")) + octaveCount)
+    );
+    return scaleNotes;
+  }
+  function getAccidentalForNote(letter, rootNote, degree, keyInfo) {
+    const scalePatterns = {
+      "F#": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
+      "C#": ["C#", "D#", "E#", "F#", "G#", "A#", "B#"],
+      Gb: ["Gb", "Ab", "Bb", "Cb", "Db", "Eb", "F"],
+      Db: ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C"],
+      Ab: ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
+      Eb: ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
+      Bb: ["Bb", "C", "D", "Eb", "F", "G", "A"],
+      F: ["F", "G", "A", "Bb", "C", "D", "E"],
+      C: ["C", "D", "E", "F", "G", "A", "B"],
+      G: ["G", "A", "B", "C", "D", "E", "F#"],
+      D: ["D", "E", "F#", "G", "A", "B", "C#"],
+      A: ["A", "B", "C#", "D", "E", "F#", "G#"],
+      E: ["E", "F#", "G#", "A", "B", "C#", "D#"],
+      B: ["B", "C#", "D#", "E", "F#", "G#", "A#"],
+    };
+    const pattern = scalePatterns[rootNote];
+    const targetNote = pattern?.[degree];
+    if (targetNote && targetNote.charAt(0) === letter) {
+      return targetNote.substring(1);
+    }
+    return "";
+  }
+  function generateScaleWithMidi(rootNote, steps, startingOctave, octaveCount) {
+    const rootNormalized = key;
+    let currentMidi = spnToMidi(
+      `${rootNormalized}/${parseInt(startingOctave.replace(/^[A-G][b#]?/, ""))}`
+    );
+    const finalNotes = [];
+    finalNotes.push(
+      `${rootNote}${parseInt(startingOctave.replace(/^[A-G][b#]?/, ""))}`
+    );
+    const totalSteps = octaveCount * steps.length;
+    for (let i = 0; i < totalSteps; i++) {
+      const stepIndex = i % steps.length;
+      currentMidi += steps[stepIndex];
+      const noteSpn = midiToSpn(currentMidi);
+      finalNotes.push(noteSpn.replace("/", ""));
+    }
+    return finalNotes;
+  }
+  // --- Main scale generation ---
+  let finalNotes = [];
+  if (scaleType === "chromatic") {
+    for (let oct = 0; oct < octaveCount; oct++) {
+      const currentOctave =
+        parseInt(startingOctave.replace(/^[A-G][b#]?/, "")) + oct;
+      const chromatic = [
+        "C",
+        "C#",
+        "D",
+        "D#",
+        "E",
+        "F",
+        "F#",
+        "G",
+        "G#",
+        "A",
+        "A#",
+        "B",
+      ];
+      for (const note of chromatic) {
+        finalNotes.push(`${note}${currentOctave}`);
+      }
+    }
+    finalNotes.push(
+      `C${parseInt(startingOctave.replace(/^[A-G][b#]?/, "")) + octaveCount}`
+    );
+  } else {
+    const steps =
+      scaleType === "major" ? [2, 2, 1, 2, 2, 2, 1] : [2, 1, 2, 2, 1, 2, 2];
+    finalNotes = generateDiatonicScale(key, steps, startingOctave, octaveCount);
+  }
+  // Accidental family logic
+  let preferredFamily = "sharps";
+  if (accidentalFamily === "auto-key") {
+    preferredFamily = getKeySignaturePreference(key);
+  } else if (accidentalFamily === "auto-direction") {
+    preferredFamily = direction === "Descending" ? "flats" : "sharps";
+  } else if (accidentalFamily === "force-sharps") {
+    preferredFamily = "sharps";
+  } else if (accidentalFamily === "force-flats") {
+    preferredFamily = "flats";
+  }
+  if (
+    accidentalFamily === "auto-direction" ||
+    scaleType === "chromatic" ||
+    accidentalFamily.startsWith("force-")
+  ) {
+    if (direction === "Descending") {
+      finalNotes.reverse();
+    }
+    finalNotes = finalNotes.map((note) =>
+      convertToAccidentalFamily(note, preferredFamily)
+    );
+  } else {
+    if (direction === "Descending") {
+      finalNotes.reverse();
     }
   }
-  scaleNotes = scaleNotes.slice(0, octaveCount * 7 + 1);
-  if (direction.toLowerCase().startsWith("desc"))
-    scaleNotes = scaleNotes.slice().reverse();
+  // Map to noteArray
   const durationMap = { quarter: "q", eighth: "e", half: "h", whole: "w" };
-  const generatedNotes = scaleNotes.map((midi) => {
-    const spn = midiToSpn(midi).replace("/", "");
+  const generatedNotes = finalNotes.map((spn) => {
     return {
       pitch: spn,
       duration: durationMap[noteDuration] || "q",
@@ -267,6 +506,8 @@ function buildScale() {
   });
   store.noteArray = generatedNotes;
   testStaffStore.noteArray = generatedNotes;
+  // Automatically copy scale SPN to clipboard after building preview
+  copyScaleSPN();
 }
 
 // Reset label to Not yet saved on any control change
@@ -283,7 +524,9 @@ watch(
   ],
   () => {
     scaleLabel.value = "Not yet saved";
-  }
+    buildScale();
+  },
+  { deep: true }
 );
 
 // Instrument dropdown default to previous selection
