@@ -44,6 +44,10 @@
           "
           >Force: Flats</span
         >
+        <span class="mx-2">|</span>
+        <span>Spacing: {{ spacingLabel }}</span>
+        <span class="mx-2">|</span>
+        <span>Ledger: {{ ledgerLabel }}</span>
       </span>
     </div>
     <div class="collapse-content">
@@ -75,6 +79,19 @@
               >ⓘ</span
             >
           </label>
+          <!-- Warning when both Key Signature and Accidentals are off -->
+          <div
+            v-if="
+              localSelections?.staffOptions &&
+              !localSelections.staffOptions.keySignature &&
+              !localSelections.staffOptions.accidentals
+            "
+            class="text-red-600 text-xs pl-6"
+            role="alert"
+          >
+            If neither Key Signature or Accidentals is selected then notes will
+            not indicate sharps or flats.
+          </div>
           <label class="flex items-center gap-2">
             <input
               type="checkbox"
@@ -99,6 +116,19 @@
               >ⓘ</span
             >
           </label>
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              v-model="localSelections.staffOptions.enforceLedgerLimits"
+            />
+            Enforce Ledger Limits
+            <span
+              class="text-blue-600 cursor-help"
+              title="When enabled, notes outside configured ledger line limits will not render. When off, all valid notes render."
+              >ⓘ</span
+            >
+          </label>
+          <!-- Spacing is locked to VexFlow Default; no toggle/select shown -->
         </div>
       </div>
       <!-- Accidental Family -->
@@ -167,6 +197,8 @@ const props = defineProps({
         accidentals: true,
         barLines: true,
         timeSignature: true,
+        measuresPerLineMax: 2,
+        enforceLedgerLimits: false,
         accidentalFamily: "auto-key",
       },
     }),
@@ -178,4 +210,10 @@ const localSelections = computed({
   get: () => props.scaleSelections,
   set: (val) => emit("update:scaleSelections", val),
 });
+
+const spacingLabel = computed(() => "Default");
+
+const ledgerLabel = computed(() =>
+  localSelections.value?.staffOptions?.enforceLedgerLimits ? "Enforced" : "Off"
+);
 </script>

@@ -98,6 +98,15 @@ Includes optional instructional mappings for `noteColorDesignation`.
   Source: `logic engine`  
   Destination: UI toggles for overlays, accidentals
 
+#### Staff Rendering Defaults (non-schema, front-end)
+
+For staff pagination/spacing, the front-end uses a separate `public/staff-format.json` file. Spacing is locked to VexFlow's default formatter; custom spacing fields have been removed.
+
+- `staff.noteSpacing.mode`: `"default"` (locked)
+- Removed fields: `pixelsPerBeat`, `pixelsPerNote`, `justify` (no longer read or exported)
+
+This keeps measure spacing consistent and avoids ambiguity across exports. Practice unit JSON does not carry layout spacing configuration; only display toggles live in `staffDisplayOptions`.
+
 - **sourceURL**  
   Type: `string (URL)`  
   Source: `external reference`  

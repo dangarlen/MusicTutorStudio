@@ -25,6 +25,9 @@
             }}
           </span>
         </div>
+        <div class="collapse-content px-4">
+          <StaffPreview />
+        </div>
       </div>
       <div class="mb-4">
         <InstrumentDropdown
@@ -166,13 +169,17 @@ if (!store.scaleSelections) {
     scaleType: "major",
     startingOctave: "C4",
     octaveCount: 1,
+  maxMeasuresPerLine: 2,
     direction: "Ascending",
     noteDuration: "quarter",
+    timeSignature: "4/4",
     staffOptions: {
       keySignature: true,
       accidentals: true,
       barLines: true,
       timeSignature: true,
+      measuresPerLineMax: 2,
+      enforceLedgerLimits: false,
       accidentalFamily: "auto-key",
     },
   });
@@ -573,6 +580,7 @@ watch(
     store.scaleSelections.octaveCount,
     store.scaleSelections.direction,
     store.scaleSelections.noteDuration,
+    store.scaleSelections.timeSignature,
     store.scaleSelections.staffOptions,
     store.instrument,
   ],
@@ -626,6 +634,7 @@ async function handleRecallFileChange(event) {
         octaveCount: data.practiceUnitScale.scaleRange?.numberOfOctaves || 1,
         direction: data.practiceUnitScale.direction || "Ascending",
         noteDuration: "quarter", // fallback
+        timeSignature: data.practiceUnitHeader.timeSignature || "4/4",
         staffOptions: data.practiceUnitHeader.staffDisplayOptions || {},
       });
       store.noteArray = data.noteArray;
@@ -645,6 +654,7 @@ async function handleRecallFileChange(event) {
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import InstrumentDropdown from "./InstrumentDropdown.vue";
+import StaffPreview from "./StaffPreview.vue";
 import CreateScaleScaleSelector from "./CreateScale-ScaleSelector.vue";
 import CreateScaleScaleRange from "./CreateScale-ScaleRange.vue";
 import CreateScaleScaleDurationDirection from "./CreateScale-ScaleDurationDirection.vue";
@@ -657,13 +667,17 @@ if (!store.scaleSelections) {
     scaleType: "major",
     startingOctave: "C4",
     octaveCount: 1,
+  maxMeasuresPerLine: 2,
     direction: "Ascending",
     noteDuration: "quarter",
+    timeSignature: "4/4",
     staffOptions: {
       keySignature: true,
       accidentals: true,
       barLines: true,
       timeSignature: true,
+      measuresPerLineMax: 2,
+      enforceLedgerLimits: false,
       accidentalFamily: "auto-key",
     },
   });
@@ -692,6 +706,33 @@ function getFirstNoteOfScale(key, scaleType) {
   // Fallback: Bb4 for Bb, C4 for C, etc.
   return key + "4";
 }
+
+// Persist Staff Formatting toggles in localStorage
+const STAFF_OPTS_KEY = "mts.staffOptions";
+onMounted(() => {
+  try {
+    const raw = localStorage.getItem(STAFF_OPTS_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      if (saved && typeof saved === "object") {
+        store.scaleSelections.staffOptions = {
+          ...store.scaleSelections.staffOptions,
+          ...saved,
+        };
+      }
+    }
+  } catch {}
+});
+
+watch(
+  () => store.scaleSelections?.staffOptions,
+  (opts) => {
+    try {
+      localStorage.setItem(STAFF_OPTS_KEY, JSON.stringify(opts || {}));
+    } catch {}
+  },
+  { deep: true }
+);
 
 // Watch for changes to scale or instrument and update startingOctave
 watch(
@@ -725,13 +766,16 @@ if (!store.scaleSelections) {
     scaleType: "major",
     startingOctave: "C4",
     octaveCount: 1,
+  maxMeasuresPerLine: 2,
     direction: "Ascending",
     noteDuration: "quarter",
+    timeSignature: "4/4",
     staffOptions: {
       keySignature: true,
       accidentals: true,
       barLines: true,
       timeSignature: true,
+      measuresPerLineMax: 2,
       accidentalFamily: "auto-key",
     },
   });
@@ -930,9 +974,19 @@ function saveScale() {
       practiceUnitType: "Scale",
       tempo: 120,
       keySignature: store.scaleSelections.key,
-      timeSignature: "4/4",
+      timeSignature: store.scaleSelections.timeSignature || "4/4",
       instrument: store.instrument,
-      staffDisplayOptions: store.scaleSelections.staffOptions,
+      staffDisplayOptions: {
+        ...(store.scaleSelections?.staffOptions &&
+        typeof store.scaleSelections.staffOptions === "object"
+          ? store.scaleSelections.staffOptions
+          : {}),
+        measuresPerLineMax: (() => {
+          const v = Number(store.scaleSelections.maxMeasuresPerLine);
+          if (!Number.isFinite(v)) return 2;
+          return Math.min(4, Math.max(1, v));
+        })(),
+      },
       sourceURL: "",
       noteColorDesignation: {},
     },
@@ -999,7 +1053,31 @@ function recallScale() {
 }
 // Only one onMounted block needed
 
-onMounted(() => {
-  store.loadInstruments();
+function getCookie(key) {
+  const parts = document.cookie.split(";").map((s) => s.trim());
+  const prefix = `${key}=`;
+  for (const p of parts) {
+    if (p.startsWith(prefix)) return decodeURIComponent(p.slice(prefix.length));
+  }
+  return "";
+}
+
+onMounted(async () => {
+  await store.loadInstruments();
+  // If no instrument selected yet, try cookie default
+  try {
+    const cookieInstrument = getCookie("instrument");
+    if (
+      cookieInstrument &&
+      !store.instrument &&
+      Array.isArray(store.instruments) &&
+      store.instruments.length
+    ) {
+      const match = store.instruments.find(
+        (i) => i.instrument === cookieInstrument
+      );
+      if (match) store.instrument = match;
+    }
+  } catch {}
 });
 </script>

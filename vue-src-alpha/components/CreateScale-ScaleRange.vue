@@ -15,72 +15,119 @@
         starting at {{ localSelections.startingOctave }}
       </span>
     </div>
-    <div class="collapse-content flex flex-row gap-8 px-4">
-      <!-- Starting Octave with +/- controls -->
+    <div class="collapse-content flex flex-col gap-6 px-4">
+      <!-- Octave group -->
+      <fieldset class="border border-gray-300 rounded p-4">
+        <legend class="font-semibold px-2">Octave</legend>
+        <div class="flex flex-row gap-8 items-center">
+          <!-- Starting Octave with +/- controls -->
+          <div class="flex items-center gap-3">
+            <label for="starting-octave-label" class="font-semibold w-24"
+              >Start:&nbsp;</label
+            >
+            <button
+              class="btn btn-sm btn-outline btn-primary flex items-center justify-center"
+              aria-label="Decrease Octave"
+              @click="
+                localSelections.startingOctave = decrementOctave(
+                  localSelections.startingOctave
+                )
+              "
+            >
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <span
+              id="starting-octave-label"
+              class="px-4 py-1 border rounded bg-white text-gray-800 font-mono text-xl font-bold"
+              >{{ localSelections.startingOctave }}</span
+            >
+            <button
+              class="btn btn-sm btn-outline btn-primary flex items-center justify-center"
+              aria-label="Increase Octave"
+              @click="
+                localSelections.startingOctave = incrementOctave(
+                  localSelections.startingOctave
+                )
+              "
+            >
+              <span class="material-symbols-outlined">add</span>
+            </button>
+            <span style="display: inline-block; width: 2em"
+              >&nbsp;&nbsp;&nbsp;</span
+            >
+          </div>
+          <!-- Number of Octaves with +/- controls -->
+          <div class="flex items-center gap-3">
+            <label for="octave-count-label" class="font-semibold w-24"
+              >Number:&nbsp;</label
+            >
+            <button
+              class="btn btn-sm btn-outline btn-primary flex items-center justify-center"
+              aria-label="Decrease Number of Octaves"
+              @click="
+                localSelections.octaveCount = Math.max(
+                  1,
+                  localSelections.octaveCount - 1
+                )
+              "
+            >
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <span
+              id="octave-count-label"
+              class="px-4 py-1 border rounded bg-white text-gray-800 font-mono text-xl font-bold"
+              >{{ localSelections.octaveCount }}</span
+            >
+            <button
+              class="btn btn-sm btn-outline btn-primary flex items-center justify-center"
+              aria-label="Increase Number of Octaves"
+              @click="
+                localSelections.octaveCount = localSelections.octaveCount + 1
+              "
+            >
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+        </div>
+      </fieldset>
+      <!-- Single-character vertical spacer after Octave region -->
+      <div style="height: 1ch"></div>
+
+      <!-- Max Measures/Line control (1-4) -->
       <div class="flex items-center gap-3">
-        <label for="starting-octave-label" class="font-semibold w-32"
-          >Starting Octave:</label
+        <label for="max-measures-per-line" class="font-semibold w-60"
+          >Max Measures/Line:&nbsp;</label
         >
         <button
           class="btn btn-sm btn-outline btn-primary flex items-center justify-center"
-          aria-label="Decrease Octave"
+          aria-label="Decrease Max Measures per Line"
           @click="
-            localSelections.startingOctave = decrementOctave(
-              localSelections.startingOctave
-            )
-          "
-        >
-          <span class="material-symbols-outlined">remove</span>
-        </button>
-        <span
-          id="starting-octave-label"
-          class="px-4 py-1 border rounded bg-white text-gray-800 font-mono text-xl font-bold"
-          >{{ localSelections.startingOctave }}</span
-        >
-        <button
-          class="btn btn-sm btn-outline btn-primary flex items-center justify-center"
-          aria-label="Increase Octave"
-          @click="
-            localSelections.startingOctave = incrementOctave(
-              localSelections.startingOctave
-            )
-          "
-        >
-          <span class="material-symbols-outlined">add</span>
-        </button>
-        <span style="display: inline-block; width: 2em"
-          >&nbsp;&nbsp;&nbsp;</span
-        >
-      </div>
-      <!-- Number of Octaves with +/- controls -->
-      <div class="flex items-center gap-3">
-        <label for="octave-count-label" class="font-semibold w-32"
-          >Number of Octaves:</label
-        >
-        <button
-          class="btn btn-sm btn-outline btn-primary flex items-center justify-center"
-          aria-label="Decrease Number of Octaves"
-          @click="
-            localSelections.octaveCount = Math.max(
+            localSelections.maxMeasuresPerLine = Math.max(
               1,
-              localSelections.octaveCount - 1
+              (localSelections.maxMeasuresPerLine || 2) - 1
             )
           "
         >
           <span class="material-symbols-outlined">remove</span>
         </button>
         <span
-          id="octave-count-label"
+          id="max-measures-per-line"
           class="px-4 py-1 border rounded bg-white text-gray-800 font-mono text-xl font-bold"
-          >{{ localSelections.octaveCount }}</span
+          >{{ localSelections.maxMeasuresPerLine || 2 }}</span
         >
         <button
           class="btn btn-sm btn-outline btn-primary flex items-center justify-center"
-          aria-label="Increase Number of Octaves"
-          @click="localSelections.octaveCount = localSelections.octaveCount + 1"
+          aria-label="Increase Max Measures per Line"
+          @click="
+            localSelections.maxMeasuresPerLine = Math.min(
+              4,
+              (localSelections.maxMeasuresPerLine || 2) + 1
+            )
+          "
         >
           <span class="material-symbols-outlined">add</span>
         </button>
+        <span class="text-sm text-gray-600">(1–4)</span>
       </div>
     </div>
   </div>
@@ -95,6 +142,7 @@ const props = defineProps({
       scaleType: "major",
       startingOctave: "C4",
       octaveCount: 1,
+  maxMeasuresPerLine: 2,
       direction: "Ascending",
       noteDuration: "quarter",
       staffOptions: {

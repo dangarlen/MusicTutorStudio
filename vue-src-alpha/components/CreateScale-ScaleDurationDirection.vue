@@ -88,6 +88,26 @@
           </label>
         </div>
       </div>
+      <!-- Time Signature -->
+      <div class="mb-3">
+        <div class="font-semibold mb-2">Time Signature:</div>
+        <div class="flex items-center gap-4">
+          <select
+            class="select select-bordered max-w-xs"
+            v-model="localSelections.timeSignature"
+          >
+            <option value="2/4">2/4</option>
+            <option value="3/4">3/4</option>
+            <option value="4/4">4/4</option>
+            <option value="6/8">6/8</option>
+            <option value="9/8">9/8</option>
+            <option value="12/8">12/8</option>
+          </select>
+          <span class="text-sm text-gray-600"
+            >Used by staff preview and export</span
+          >
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -118,6 +138,7 @@ const props = defineProps({
       octaveCount: 1,
       direction: "Ascending",
       noteDuration: "quarter",
+      timeSignature: "4/4",
       staffOptions: {
         keySignature: true,
         accidentals: true,
