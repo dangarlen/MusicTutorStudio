@@ -15,7 +15,11 @@
           v-model="store.instrument"
         />
       </div>
-      <button id="save-btn" class="btn btn-active btn-success" @click="savePreferences">
+      <button
+        id="save-btn"
+        class="btn btn-active btn-success"
+        @click="savePreferences"
+      >
         <span class="material-symbols-outlined icon">save</span>
         Save Preferences
       </button>
@@ -85,7 +89,9 @@ onMounted(() => {
   // Preselect instrument from cookie if present and not already set
   const cookieInstrument = getCookie("instrument");
   if (cookieInstrument && !store.instrument && store.instruments?.length) {
-    const match = store.instruments.find((i) => i.instrument === cookieInstrument);
+    const match = store.instruments.find(
+      (i) => i.instrument === cookieInstrument
+    );
     if (match) store.instrument = match;
   }
 });
@@ -98,12 +104,18 @@ function savePreferences() {
   const name = store.instrument.instrument || "";
   // Persist for 1 year
   const maxAge = 60 * 60 * 24 * 365;
-  document.cookie = `instrument=${encodeURIComponent(name)}; path=/; max-age=${maxAge}`;
+  document.cookie = `instrument=${encodeURIComponent(
+    name
+  )}; path=/; max-age=${maxAge}`;
   alert(`Preferences saved. Instrument set to: ${name}`);
 }
 
 function getCookie(key) {
-  const match = document.cookie.match(new RegExp("(?:^|; )" + key.replace(/([.$?*|{}()\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)"));
+  const match = document.cookie.match(
+    new RegExp(
+      "(?:^|; )" + key.replace(/([.$?*|{}()\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)"
+    )
+  );
   return match ? decodeURIComponent(match[1]) : "";
 }
 </script>
