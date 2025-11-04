@@ -15,6 +15,31 @@ import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { getStaffFormat } from "../scripts/staffFormat";
 import { composePracticeUnit } from "../scripts/composePracticeUnit";
 
+// Optional practice-mode props to enable overlays and click-to-color without
+// impacting other routes/components that embed StaffPreview.
+const props = defineProps({
+  // Overlay mode to display above notes: 'none' | 'names' | 'pitch' | 'cmt' | 'midi' | 'fingering' | 'fingering-alt'
+  practiceOverlayMode: { type: String, default: "none" },
+  // When true, do not render annotations above notes; instead attach tooltip text.
+  practiceOverlayTooltipOnly: { type: Boolean, default: false },
+  // Enable clicking notes to cycle colors
+  practiceEnableClickToCycle: { type: Boolean, default: false },
+  // Array of CSS color strings to cycle through on click
+  practiceColorCycle: {
+    type: Array,
+    default: () => [
+      "black",
+      "blue",
+      "orange",
+      "green",
+      "purple",
+      "red",
+      "brown",
+      "gray",
+    ],
+  },
+});
+
 const vfContainer = ref(null);
 const notesStore = useTestStaffNoteStore();
 const scaleStore = usePracticeUnitScaleStore();
@@ -61,6 +86,76 @@ function parseAccidental(pitch) {
   const m = pitch.match(/^([A-G])([#b]?)\d$/);
   if (!m) return null;
   return m[2] || null; // '#' | 'b' | null
+}
+
+// Local SPN->MIDI helper for overlay computation (fallback if window.spnToMidi isn't present)
+function spnToMidiLocal(spn) {
+  try {
+    if (
+      typeof globalThis !== "undefined" &&
+      globalThis &&
+      typeof globalThis.spnToMidi === "function"
+    ) {
+      // Accept both "C4" and "C/4"
+      const std = spn.includes("/")
+        ? spn
+        : spn.replace(/([A-G][#b]?)(\d)/, "$1/$2");
+      return globalThis.spnToMidi(std);
+    }
+  } catch {}
+  const m = String(spn).match(/^([A-G])([#b]?)(\d)$/);
+  if (!m) return Number.NaN;
+  const base = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1]] ?? 0;
+  let acc = 0;
+  if (m[2] === "#") acc = 1;
+  else if (m[2] === "b") acc = -1;
+  const octave = Number(m[3]);
+  return 12 * (octave + 1) + base + acc;
+}
+
+function toSPNSlash(pitch) {
+  // Convert "C4" -> "C/4"
+  return String(pitch).replace(/([A-G][#b]?(?=\d))(\d)/, "$1/$2");
+}
+
+function enharmonics(letterAcc) {
+  const map = {
+    "C#": "Db",
+    Db: "C#",
+    "D#": "Eb",
+    Eb: "D#",
+    "F#": "Gb",
+    Gb: "F#",
+    "G#": "Ab",
+    Ab: "G#",
+    "A#": "Bb",
+    Bb: "A#",
+  };
+  return map[letterAcc] || null;
+}
+
+function getFingeringArrayForPitch(pitch) {
+  try {
+    const inst = scaleStore?.instrument;
+    const fing = inst && inst.fingering ? inst.fingering : null;
+    if (!fing) return [];
+    const raw = String(pitch || ""); // e.g., "C4"
+    const keySlash = toSPNSlash(raw); // e.g., "C/4"
+    const keyNoSlash = raw; // as-is
+    const m = raw.match(/^([A-G][#b]?)/);
+    const letterAcc = m ? m[1] : null;
+    const alt = letterAcc ? enharmonics(letterAcc) : null;
+    const keySlashAlt = alt ? keySlash.replace(/^([A-G][#b]?)/, alt) : null;
+    const keyNoSlashAlt = alt ? keyNoSlash.replace(/^([A-G][#b]?)/, alt) : null;
+    // Try all likely key shapes found in instruments.json
+    if (Array.isArray(fing[keyNoSlash])) return fing[keyNoSlash];
+    if (Array.isArray(fing[keySlash])) return fing[keySlash];
+    if (keyNoSlashAlt && Array.isArray(fing[keyNoSlashAlt]))
+      return fing[keyNoSlashAlt];
+    if (keySlashAlt && Array.isArray(fing[keySlashAlt]))
+      return fing[keySlashAlt];
+  } catch {}
+  return [];
 }
 
 // Helpers to calculate ledger line counts relative to staff by clef
@@ -153,9 +248,12 @@ async function renderVexFlow() {
     typeof optEnforce === "boolean"
       ? optEnforce
       : Boolean(staffFormat.staff?.enforceLedgerLimits ?? false);
-  const valid = arr.filter((n) => n?.pitch && n?.duration);
-  const filtered = valid.filter((n) =>
-    withinLedgerLimits(n.pitch, clef, limits)
+  // Keep track of original indices alongside note objects
+  const valid = arr
+    .map((n, i) => ({ n, i }))
+    .filter((x) => x.n?.pitch && x.n?.duration);
+  const filtered = valid.filter((x) =>
+    withinLedgerLimits(x.n.pitch, clef, limits)
   );
   // Decide which notes to render based on enforcement toggle
   const notesToRender = enforceLedger ? filtered : valid;
@@ -168,6 +266,84 @@ async function renderVexFlow() {
     );
   }
 
+  // Compute overlays per note (and persist into store) for practice mode
+  const overlayMode = String(props.practiceOverlayMode || "none");
+  const useAnnotation = !props.practiceOverlayTooltipOnly;
+  function computeOverlayText(note) {
+    try {
+      if (overlayMode === "names") {
+        const m = String(note.pitch || "").match(/^([A-G][#b]?)/);
+        return m ? m[1] : String(note.pitch || "");
+      } else if (overlayMode === "pitch") {
+        return String(note.pitch || "");
+      } else if (overlayMode === "midi") {
+        if (note.midi != null && note.midi !== "") return String(note.midi);
+        const midi = spnToMidiLocal(String(note.pitch || ""));
+        return Number.isFinite(midi) ? String(midi) : "";
+      } else if (overlayMode === "cmt") {
+        if (note.cmt) return String(note.cmt);
+        const d = String(note.duration || "q");
+        // Simple CMT token: SPN + duration letter, e.g., "C4q"
+        return String(note.pitch || "") + d;
+      } else if (
+        overlayMode === "fingering" ||
+        overlayMode === "fingering-alt"
+      ) {
+        // Prefer note-provided fingering data
+        if (
+          overlayMode === "fingering-alt" &&
+          Array.isArray(note.fingeringAlt)
+        ) {
+          return note.fingeringAlt.join("/");
+        }
+        if (Array.isArray(note.fingering)) return note.fingering[0] ?? "";
+        if (typeof note.fingering === "string") return note.fingering;
+        // Fallback: lookup from instrument fingering map
+        const arr = getFingeringArrayForPitch(note.pitch);
+        if (overlayMode === "fingering-alt" && arr.length) return arr.join("/");
+        return arr[0] ?? "";
+      }
+    } catch {}
+    return "";
+  }
+  if (overlayMode && overlayMode !== "none") {
+    for (const { n, i } of valid) {
+      const text = computeOverlayText(n);
+      // Persist overlay text only to the practice store (for JSON) and local note for rendering
+      if ((n.overlay || "") !== text) {
+        try {
+          if (Array.isArray(scaleStore.noteArray) && scaleStore.noteArray[i]) {
+            scaleStore.noteArray[i] = {
+              ...scaleStore.noteArray[i],
+              overlay: text,
+            };
+          }
+        } catch {}
+        // Update the local reference so annotations render this pass
+        try {
+          n.overlay = text;
+        } catch {}
+      }
+    }
+  } else {
+    // When overlays are off, ensure overlay field is cleared (non-destructive if already empty)
+    for (const { n, i } of valid) {
+      if (n.overlay) {
+        try {
+          if (Array.isArray(scaleStore.noteArray) && scaleStore.noteArray[i]) {
+            scaleStore.noteArray[i] = {
+              ...scaleStore.noteArray[i],
+              overlay: "",
+            };
+          }
+        } catch {}
+        try {
+          n.overlay = "";
+        } catch {}
+      }
+    }
+  }
+
   // Helper to create a VexFlow StaveNote for a given note
   function buildVFNote(n) {
     const key = n.pitch.replace(/([A-G][#b]?)(\d)/, "$1/$2");
@@ -178,7 +354,7 @@ async function renderVexFlow() {
     }
     if (n.noteColor)
       note.setStyle({ fillStyle: n.noteColor, strokeStyle: n.noteColor });
-    if (n.overlay) {
+    if (n.overlay && useAnnotation) {
       note.addAnnotation(
         0,
         new VF.Annotation(n.overlay).setVerticalJustification(
@@ -309,6 +485,18 @@ async function renderVexFlow() {
     voice.draw(context, stave);
   }
 
+  // Track original indices for click binding and optional tooltips
+  const allDrawnOriginalIndices = [];
+  const tooltipTextByIndex = new Map();
+  if (overlayMode && overlayMode !== "none") {
+    for (const { n, i } of valid) {
+      const t = props.practiceOverlayTooltipOnly
+        ? computeOverlayText(n)
+        : (n.overlay || "").trim();
+      if (t) tooltipTextByIndex.set(i, String(t));
+    }
+  }
+
   if (!showMeasureBars) {
     // Single long stave without internal barlines
     const stave = new VF.Stave(staveX, staveY, width - staveX * 2);
@@ -326,33 +514,49 @@ async function renderVexFlow() {
       } catch {}
     }
     stave.setContext(context).draw();
-    const vfNotes = notesToRender.map(buildVFNote);
+    const vfNotes = notesToRender.map(({ n, i }) => {
+      allDrawnOriginalIndices.push(i);
+      return buildVFNote(n);
+    });
     layoutAndDraw(stave, vfNotes, width - staveX * 2);
+    // Attach events after draw
+    attachNoteInteractivity(allDrawnOriginalIndices, tooltipTextByIndex);
     return;
   }
 
   // Split notes into measures (by quarter-note capacity)
   const measures = [];
+  const measuresIdx = [];
   let current = [];
+  let currentIdx = [];
   let sumQN = 0;
-  for (const n of notesToRender) {
+  for (const obj of notesToRender) {
+    const n = obj?.n;
     if (!n?.pitch || !n?.duration) continue;
     const qn = durToQN[n.duration] ?? 1;
     const next = sumQN + qn;
     if (next - measureCapacityQN > 1e-6 && current.length) {
       measures.push(current);
+      measuresIdx.push(currentIdx);
       current = [];
+      currentIdx = [];
       sumQN = 0;
     }
     current.push(buildVFNote(n));
+    currentIdx.push(obj.i);
     sumQN += qn;
     if (Math.abs(sumQN - measureCapacityQN) < 1e-6) {
       measures.push(current);
+      measuresIdx.push(currentIdx);
       current = [];
+      currentIdx = [];
       sumQN = 0;
     }
   }
-  if (current.length) measures.push(current);
+  if (current.length) {
+    measures.push(current);
+    measuresIdx.push(currentIdx);
+  }
 
   // Render measures across multiple lines based on maxMeasuresPerLine
   const availableWidth = width - staveX * 2;
@@ -448,8 +652,12 @@ async function renderVexFlow() {
     }
     ms.setContext(context).draw();
     layoutAndDraw(ms, notes, msWidth);
+    // Record original indices in the same draw order
+    const idxs = measuresIdx[idx] || [];
+    for (const ii of idxs) allDrawnOriginalIndices.push(ii);
     x += msWidth;
   }
+  attachNoteInteractivity(allDrawnOriginalIndices, tooltipTextByIndex);
 }
 
 onMounted(() => {
@@ -470,12 +678,70 @@ watch(
     scaleStore?.scaleSelections?.timeSignature,
     scaleStore?.scaleSelections?.maxMeasuresPerLine,
     scaleStore?.instrument?.clef,
+    scaleStore?.instrument, // re-render on instrument change to refresh fingering overlays
     staffFormat.staff.width,
     staffFormat.staff.height,
+    props.practiceOverlayMode,
+    props.practiceOverlayTooltipOnly,
+    props.practiceEnableClickToCycle,
+    props.practiceColorCycle,
   ],
   () => {
     renderVexFlow();
   },
   { deep: true }
 );
+
+// Attach click listeners and optional tooltips to rendered notes
+function attachNoteInteractivity(originalIdxList, tooltipMap) {
+  try {
+    const groups = vfContainer.value.querySelectorAll("g.vf-stavenote");
+    const count = Math.min(groups.length, originalIdxList.length);
+    for (let i = 0; i < count; i++) {
+      const g = groups[i];
+      const origIdx = originalIdxList[i];
+      if (!g) continue;
+      // Tooltip (title attribute) for tooltip-only overlay mode
+      if (props.practiceOverlayTooltipOnly && tooltipMap?.has(origIdx)) {
+        g.setAttribute("title", tooltipMap.get(origIdx));
+      }
+      if (props.practiceEnableClickToCycle) {
+        g.style.cursor = "pointer";
+        g.addEventListener("click", () => onNoteClick(origIdx));
+      }
+    }
+  } catch (e) {
+    console.warn("[StaffPreview] attachNoteInteractivity failed", e);
+  }
+}
+
+function onNoteClick(idx) {
+  try {
+    if (!Array.isArray(notesStore.noteArray) || !notesStore.noteArray[idx])
+      return;
+    const current = notesStore.noteArray[idx];
+    const cycle = Array.isArray(props.practiceColorCycle)
+      ? props.practiceColorCycle.filter((c) => typeof c === "string" && c)
+      : [];
+    if (!cycle.length) return;
+    const cur = (current.noteColor || "").toLowerCase();
+    const normCycle = cycle.map((c) => String(c).toLowerCase());
+    let nextIndex = 0;
+    const found = normCycle.indexOf(cur);
+    if (found >= 0) nextIndex = (found + 1) % normCycle.length;
+    const nextColor = cycle[nextIndex];
+    // Update both stores if possible
+    notesStore.noteArray[idx] = { ...current, noteColor: nextColor };
+    try {
+      if (Array.isArray(scaleStore.noteArray) && scaleStore.noteArray[idx]) {
+        scaleStore.noteArray[idx] = {
+          ...scaleStore.noteArray[idx],
+          noteColor: nextColor,
+        };
+      }
+    } catch {}
+  } catch (e) {
+    console.warn("[StaffPreview] onNoteClick failed", e);
+  }
+}
 </script>

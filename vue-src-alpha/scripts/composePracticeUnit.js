@@ -31,7 +31,18 @@ export function composePracticeUnit({
         })(),
       },
       sourceURL: "",
-      noteColorDesignation: {},
+      noteColorDesignation: (() => {
+        const src = scaleStore?.noteColorDesignation || {};
+        const allowed = ["red", "blue", "green", "orange", "gray", "purple"]; // 'black' excluded
+        const out = {};
+        try {
+          for (const k of allowed) {
+            const v = src[k];
+            if (typeof v === "string" && v.trim().length) out[k] = v.trim();
+          }
+        } catch {}
+        return out;
+      })(),
     },
     practiceUnitScale: {
       scaleType: sel.scaleType || "major",

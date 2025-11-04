@@ -5,30 +5,17 @@
 </template>
 <script setup>
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
-const store = useTestStaffNoteStore();
+import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
+import { composePracticeUnit } from "../scripts/composePracticeUnit";
+const notesStore = useTestStaffNoteStore();
+const scaleStore = usePracticeUnitScaleStore();
 function saveToExport() {
-  // Compose MTS practiceUnit object using Pinia and defaults
-  const practiceUnit = {
-    practiceUnitHeader: {
-      practiceName: "Untitled",
-      practiceUnitId: "guid-placeholder",
-      lastModified: new Date().toISOString(),
-      practiceUnitType: "Scale",
-      tempo: 120,
-      keySignature: "C",
-      timeSignature: "4/4",
-      instrument: {},
-      staffDisplayOptions: {},
-      sourceURL: "",
-      noteColorDesignation: {},
-    },
-    practiceUnitScale: {
-      scaleType: "Major",
-      scaleRange: {},
-      direction: "ascending",
-    },
-    noteArray: store.noteArray || [],
-  };
+  // Compose MTS practiceUnit object using Pinia and current selections (includes noteColorDesignation)
+  const practiceUnit = composePracticeUnit({
+    scaleStore,
+    notesStore,
+    name: scaleStore?.title || "Untitled",
+  });
   const dataStr = JSON.stringify(practiceUnit, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);

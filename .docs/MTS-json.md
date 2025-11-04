@@ -114,7 +114,7 @@ This keeps measure spacing consistent and avoids ambiguity across exports. Pract
 
 ### Instructional Color Mapping (`noteColorDesignation`)
 
-Each field below is optional and user-defined. `"black"` is excluded and always renders as default.
+Each field below is optional and user-defined. `"black"` is excluded and always renders as default. Only the following keys are saved into `practiceUnitHeader.noteColorDesignation`:
 
 - **noteColorDesignation.red** → Meaning of red notes in this unit
 - **noteColorDesignation.blue** → Meaning of blue notes in this unit
@@ -122,6 +122,11 @@ Each field below is optional and user-defined. `"black"` is excluded and always 
 - **noteColorDesignation.orange** → Meaning of orange notes in this unit
 - **noteColorDesignation.gray** → Meaning of gray notes in this unit
 - **noteColorDesignation.purple** → Meaning of purple notes in this unit
+
+Notes:
+
+- Other UI colors (e.g., `brown`) are not exported and serve display-only roles in the SPA.
+- Empty values are omitted from the exported JSON; provide a non-empty string to include a mapping.
 
 ---
 
