@@ -18,17 +18,18 @@
           margin: 2em auto;
         "
       >
-        <RouterLink to="/practice-exercises" class="mtsFormatPracticeButtons">
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >play_arrow</span
-          >
-          Practice Exercises
-        </RouterLink>
         <RouterLink to="/practice-scales" class="mtsFormatPracticeButtons">
           <span class="material-symbols-outlined" aria-hidden="true"
             >play_circle</span
           >
           Practice Scales
+        </RouterLink>
+
+        <RouterLink to="/practice-exercises" class="mtsFormatPracticeButtons">
+          <span class="material-symbols-outlined" aria-hidden="true"
+            >play_arrow</span
+          >
+          Practice Exercises
         </RouterLink>
       </div>
     </main>

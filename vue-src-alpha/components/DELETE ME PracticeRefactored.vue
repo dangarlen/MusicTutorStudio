@@ -9,17 +9,18 @@
         <span class="text-2xl font-bold">Practice</span>
       </div>
       <div class="flex flex-col gap-4 max-w-xs mx-auto mt-8">
-        <router-link to="/practice-exercises" class="mtsFormatPracticeButtons">
-          <span class="material-symbols-outlined align-middle mr-2"
-            >play_arrow</span
-          >
-          Practice Exercises
-        </router-link>
         <router-link to="/practice-scales" class="mtsFormatPracticeButtons">
           <span class="material-symbols-outlined align-middle mr-2"
             >play_circle</span
           >
           Practice Scales
+        </router-link>
+
+        <router-link to="/practice-exercises" class="mtsFormatPracticeButtons">
+          <span class="material-symbols-outlined align-middle mr-2"
+            >play_arrow</span
+          >
+          Practice Exercises
         </router-link>
       </div>
     </main>

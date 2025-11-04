@@ -19,6 +19,7 @@ import CreateTestStaffNoteBuilder from "../components/CreateTestStaffNoteBuilder
 import CreateTestStaffNoteDisplay from "../components/CreateTestStaffNoteDisplay.vue";
 import CreateTestStaffNoteData from "../components/CreateTestStaffNoteData.vue";
 import CreateScaleView from "../components/CreateScaleView.vue";
+import ViewScale from "../components/ViewScale.vue";
 import CreateExerciseView from "../components/CreateExerciseView.vue";
 import PhaseBasedVueTestContainer from "../components/PhaseBasedVueTestContainer.vue";
 import SaveToPracticeUnitExport from "../components/SaveToPracticeUnitExport.vue";
@@ -76,7 +77,7 @@ const routes = [
   {
     path: "/create-scale-view",
     name: "create-scale-view",
-    component: CreateScaleView,
+    component: ViewScale,
   },
   {
     path: "/create-exercise-view",

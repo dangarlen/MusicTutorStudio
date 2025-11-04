@@ -1,6 +1,6 @@
 <template>
   <div class="bg-base-200 flex flex-col min-h-screen">
-    <div id="header-container"></div>
+    <Header />
     <main class="container mx-auto p-4 flex-1">
       <div
         class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatPracticePages"
@@ -10,9 +10,11 @@
       </div>
       <PracticeReturn />
     </main>
-    <div id="footer-container"></div>
+    <FooterStandard />
   </div>
 </template>
 <script setup>
 import PracticeReturn from "./PracticeReturn.vue";
+import Header from "./Header.vue";
+import FooterStandard from "./FooterStandard.vue";
 </script>

@@ -44,10 +44,12 @@
           "
           >Force: Flats</span
         >
-        <span class="mx-2">|</span>
-        <span>Spacing: {{ spacingLabel }}</span>
-        <span class="mx-2">|</span>
-        <span>Ledger: {{ ledgerLabel }}</span>
+        <template v-if="!hideSummaryExtras">
+          <span class="mx-2">|</span>
+          <span>Spacing: {{ spacingLabel }}</span>
+          <span class="mx-2">|</span>
+          <span>Ledger: {{ ledgerLabel }}</span>
+        </template>
       </span>
     </div>
     <div class="collapse-content">
@@ -202,6 +204,10 @@ const props = defineProps({
         accidentalFamily: "auto-key",
       },
     }),
+  },
+  hideSummaryExtras: {
+    type: Boolean,
+    default: false,
   },
 });
 const emit = defineEmits(["update:scaleSelections"]);

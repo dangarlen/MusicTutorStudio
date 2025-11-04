@@ -11,7 +11,8 @@
 defineProps({
   metaText: {
     type: String,
-    default: "Music Tutor Studio © 2024",
+    default:
+      "A Work in Process. Release: vue-src-alpha - Music Tutor Studio © 2025",
   },
 });
 </script>

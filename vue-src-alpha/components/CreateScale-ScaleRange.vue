@@ -142,7 +142,7 @@ const props = defineProps({
       scaleType: "major",
       startingOctave: "C4",
       octaveCount: 1,
-  maxMeasuresPerLine: 2,
+      maxMeasuresPerLine: 2,
       direction: "Ascending",
       noteDuration: "quarter",
       staffOptions: {

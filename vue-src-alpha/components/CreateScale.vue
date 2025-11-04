@@ -6,7 +6,7 @@
         class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatCreatorPages"
       >
         <span class="material-symbols-outlined">queue_music</span>
-        <span class="text-2xl font-bold">Create Scale</span>
+        <span class="text-2xl font-bold">View Scale</span>
       </div>
 
       <!-- Scale Data Collapse -->

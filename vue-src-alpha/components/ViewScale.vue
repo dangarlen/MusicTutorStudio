@@ -1,14 +1,14 @@
+<!-- ViewScale.vue: initially cloned from CreateScaleView.vue to decouple routes -->
 <template>
   <div class="bg-base-200 flex flex-col min-h-screen">
     <Header />
     <main class="container mx-auto p-4 flex-1">
       <div
-        class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatPracticePages"
+        class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatCreatorPages"
       >
-        <span class="material-symbols-outlined">music_note</span>
-        <span class="text-2xl">Practice Scales</span>
+        <span class="material-symbols-outlined">visibility</span>
+        <span class="text-2xl font-bold">View Scale</span>
       </div>
-      <!-- Scale Preview (copied from ViewScale) -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
@@ -29,8 +29,7 @@
           <StaffPreview />
         </div>
       </div>
-
-      <!-- Scale Details (copied from ViewScale) -->
+      <!-- New: Scale Details panel under Scale Preview -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
@@ -54,7 +53,6 @@
         </div>
       </div>
 
-      <!-- Behind the Curtain (copied from ViewScale) -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mt-4 rounded-xl"
       >
@@ -80,25 +78,37 @@
           </pre>
         </div>
       </div>
-
-      <PracticeReturn />
     </main>
+    <div style="max-width: 400px; margin: 2em auto">
+      <button
+        class="mtsFormatCreatorButtons flex items-center gap-2"
+        @click="$router.push('/creator')"
+      >
+        <span
+          class="material-symbols-outlined align-middle mr-2"
+          aria-hidden="true"
+          >edit_square</span
+        >
+        Return to Creator
+      </button>
+    </div>
     <FooterStandard />
   </div>
 </template>
 <script setup>
-import PracticeReturn from "./PracticeReturn.vue";
+import { onMounted, computed } from "vue";
+import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import StaffPreview from "./StaffPreview.vue";
-import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
-import { computed, onMounted } from "vue";
 
 const store = usePracticeUnitScaleStore();
+
 onMounted(async () => {
   await store.loadInstruments();
 });
 
+// ----- Scale Details computed strings -----
 const instrumentName = computed(() => {
   const inst = store.instrument;
   if (!inst) return "Unknown";

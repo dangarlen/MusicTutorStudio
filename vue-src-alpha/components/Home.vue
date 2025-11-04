@@ -3,7 +3,6 @@
     <Header />
     <main class="container mx-auto p-4 flex-1">
       <div class="flex flex-col gap-4 max-w-xs mx-auto">
-        [DRG Debug]
         <RouterLink to="/creator" class="btn btn-primary shadow-lg">
           <span class="material-symbols-outlined align-middle mr-2"
             >edit_square</span
