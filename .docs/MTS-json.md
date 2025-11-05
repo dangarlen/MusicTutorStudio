@@ -295,10 +295,15 @@ System generates or parses notes, then user optionally edits formatting.
 
 ### duration
 
+- `"s"` → Sixteenth note
 - `"e"` → Eighth note
 - `"q"` → Quarter note
 - `"h"` → Half note
 - `"w"` → Whole note
+
+Notes:
+
+- A dotted duration is indicated by appending a trailing dot to the token (e.g., `"q."` = dotted quarter, `"h."` = dotted half). Dotted values count as 1.5× their base duration for layout and rhythm grouping.
 
 ### noteColor
 
@@ -325,7 +330,7 @@ System generates or parses notes, then user optionally edits formatting.
   "practiceUnitType": ["Scale", "Passage", "Exercise"],
   "scaleType": ["Major", "Minor", "Chromatic"],
   "direction": ["ascending", "descending"],
-  "duration": ["e", "q", "h", "w"],
+  "duration": ["s", "e", "q", "h", "w"],
   "noteColor": ["black", "red", "blue", "green", "orange", "gray", "purple"],
   "exerciseType": ["Articulation", "Dynamics", "Tone", "Rhythm", "Fingering"]
 }

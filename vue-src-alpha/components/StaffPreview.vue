@@ -70,9 +70,28 @@ const containerStyle = computed(() => ({
 
 const staffHeight = computed(() => staffFormat.staff.height ?? 160);
 
+function normalizeKeySignature(val) {
+  try {
+    const s = String(val || "C").trim();
+    // Match: Letter + optional accidental + optional mode word (major/minor)
+    const m = s.match(/^([A-Ga-g])([#b♭♯]?)(?:\s*(major|minor))?$/);
+    if (m) {
+      const letter = m[1].toUpperCase();
+      let acc = m[2] || "";
+      if (acc === "♭") acc = "b";
+      if (acc === "♯") acc = "#";
+      const mode = (m[3] || "").toLowerCase();
+      return letter + acc + (mode === "minor" ? "m" : "");
+    }
+    // Already in VexFlow form like "Bb" or "Am"
+    if (/^[A-G][#b]?m?$/i.test(s)) return s;
+  } catch {}
+  return "C";
+}
+
 function getKeySignature() {
-  const key = scaleStore?.scaleSelections?.key || "C";
-  return key;
+  const raw = scaleStore?.scaleSelections?.key || "C";
+  return normalizeKeySignature(raw);
 }
 
 function shouldShow(optionKey, defaultVal = true) {
@@ -236,7 +255,36 @@ async function renderVexFlow() {
   const num = Number(numStr) || 4;
   const den = Number(denStr) || 4;
   const measureCapacityQN = num * (4 / den);
-  const durToQN = { w: 4, h: 2, q: 1, e: 0.5 };
+  function parseDurToken(tok) {
+    const m = String(tok || "").match(/^([whqes])(\.)?$/);
+    return m
+      ? { base: m[1], dotted: Boolean(m[2]) }
+      : { base: "q", dotted: false };
+  }
+  function durationToQN(tok) {
+    const { base, dotted } = parseDurToken(tok);
+    let baseQN = 1;
+    switch (base) {
+      case "w":
+        baseQN = 4;
+        break;
+      case "h":
+        baseQN = 2;
+        break;
+      case "q":
+        baseQN = 1;
+        break;
+      case "e":
+        baseQN = 0.5;
+        break;
+      case "s":
+        baseQN = 0.25;
+        break;
+      default:
+        break;
+    }
+    return dotted ? baseQN * 1.5 : baseQN;
+  }
   const showMeasureBars = shouldShow("barLines", true);
 
   const arr = Array.isArray(notesStore.noteArray) ? notesStore.noteArray : [];
@@ -347,7 +395,28 @@ async function renderVexFlow() {
   // Helper to create a VexFlow StaveNote for a given note
   function buildVFNote(n) {
     const key = n.pitch.replace(/([A-G][#b]?)(\d)/, "$1/$2");
-    const note = new VF.StaveNote({ keys: [key], duration: n.duration, clef });
+    const { base, dotted } = parseDurToken(n.duration);
+    let vexDur;
+    switch (base) {
+      case "e":
+        vexDur = "8";
+        break;
+      case "s":
+        vexDur = "16";
+        break;
+      default:
+        vexDur = base;
+    }
+    const note = new VF.StaveNote({ keys: [key], duration: vexDur, clef });
+    if (dotted) {
+      try {
+        if (typeof note.addDotToAll === "function") note.addDotToAll();
+        else if (VF?.Dot && typeof VF.Dot.buildAndAttach === "function") {
+          VF.Dot.buildAndAttach([note], { all: true });
+        } else if (typeof note.addDot === "function") note.addDot(0);
+      } catch {}
+    }
+    note.__mtsDur = n.duration;
     if (shouldShow("accidentals", true)) {
       const acc = parseAccidental(n.pitch);
       if (acc) note.addModifier(0, new VF.Accidental(acc));
@@ -439,16 +508,41 @@ async function renderVexFlow() {
           : left + Math.max(0, availableWidth - 12);
       const innerWidth = Math.max(10, right - left);
       const beatWidth = innerWidth / Math.max(1, beatsCount);
-      // Map durations to ticks (limited to h,q,e,w set)
-      const durTicks = { w: RES * 4, h: RES * 2, q: RES, e: RES / 2 };
+      // Duration to ticks including dotted and sixteenth
+      function durationToTicks(tok) {
+        const { base, dotted } = parseDurToken(tok);
+        let baseTicks = RES; // quarter by default
+        switch (base) {
+          case "w":
+            baseTicks = RES * 4;
+            break;
+          case "h":
+            baseTicks = RES * 2;
+            break;
+          case "q":
+            baseTicks = RES;
+            break;
+          case "e":
+            baseTicks = RES / 2;
+            break;
+          case "s":
+            baseTicks = RES / 4;
+            break;
+          default:
+            break;
+        }
+        return dotted ? (baseTicks * 3) / 2 : baseTicks;
+      }
       // First pass: assign each note to a beat index by accumulating ticks
       const beatGroups = Array.from({ length: beatsCount }, () => []);
       let accTicks = 0;
       const beatTicks =
         den === 8 && num % 3 === 0 && num >= 6 ? (RES * 3) / 2 : ticksPerDen; // dotted-quarter for compound
       for (const n of vfNotes) {
-        const d = typeof n.getDuration === "function" ? n.getDuration() : "q";
-        const t = durTicks[d] ?? RES;
+        const tok =
+          n.__mtsDur ||
+          (typeof n.getDuration === "function" ? n.getDuration() : "q");
+        const t = durationToTicks(tok);
         const beatIndex = Math.min(
           beatsCount - 1,
           Math.floor(accTicks / beatTicks)
@@ -533,7 +627,7 @@ async function renderVexFlow() {
   for (const obj of notesToRender) {
     const n = obj?.n;
     if (!n?.pitch || !n?.duration) continue;
-    const qn = durToQN[n.duration] ?? 1;
+    const qn = durationToQN(n.duration);
     const next = sumQN + qn;
     if (next - measureCapacityQN > 1e-6 && current.length) {
       measures.push(current);
