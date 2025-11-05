@@ -82,7 +82,11 @@
               />
             </div>
           </div>
-          <button class="btn btn-sm" @click="resetNoteColors">
+          <button
+            class="btn btn-outline btn-error btn-sm flex items-center gap-2"
+            @click="resetColorsAndNotes"
+          >
+            <span class="material-symbols-outlined">restart_alt</span>
             Reset Colors
           </button>
         </div>
@@ -346,6 +350,31 @@ function saveNoteColorMeanings() {
 function resetNoteColors() {
   for (const nc of noteColors) nc.meaning = "";
   saveNoteColorMeanings();
+}
+
+// Clear all color meanings AND set every note's color to black in both stores
+function resetColorsAndNotes() {
+  // 1) Clear meanings and persist localStorage
+  resetNoteColors();
+  // 2) Force schema mapping to clear in header (noteColorDesignation)
+  syncNoteColorDesignationToStore();
+  // 3) Set all note colors to black in both arrays (trigger re-render)
+  try {
+    if (Array.isArray(testStaffStore.noteArray)) {
+      testStaffStore.noteArray = testStaffStore.noteArray.map((n) => ({
+        ...n,
+        noteColor: "black",
+      }));
+    }
+  } catch {}
+  try {
+    if (Array.isArray(store.noteArray)) {
+      store.noteArray = store.noteArray.map((n) => ({
+        ...n,
+        noteColor: "black",
+      }));
+    }
+  } catch {}
 }
 
 loadNoteColorMeanings();
