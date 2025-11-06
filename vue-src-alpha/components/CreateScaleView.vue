@@ -64,9 +64,31 @@
           </span>
         </div>
         <div class="collapse-content px-4">
-          <div class="flex gap-4 mb-4">
+          <!-- User Help Note -->
+          <div
+            class="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm text-gray-700"
+          >
+            <strong class="text-blue-800">Save Options:</strong>
+            <ul class="list-disc list-inside mt-1 space-y-1">
+              <li>
+                <strong>SAVE to Database</strong> – Updates the current practice
+                unit (if it has an ID) or creates a new one (if first save).
+              </li>
+              <li>
+                <strong>SAVE as New</strong> – Always creates a brand new
+                practice unit with a fresh ID, even if the name matches an
+                existing one. Use this to create variations or backups.
+              </li>
+              <li>
+                <strong>Export/Import JSON</strong> – Download or upload
+                practice units as standalone files for sharing or backup outside
+                the database.
+              </li>
+            </ul>
+          </div>
+          <div class="flex gap-4 mb-4 flex-wrap">
             <button class="btn btn-warning" @click="saveScale">
-              Export Practice Unit to JSON file
+              Export to JSON file
             </button>
             <button
               class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
@@ -77,7 +99,7 @@
                 aria-hidden="true"
                 >upload_file</span
               >
-              Import Practice Unit from JSON file
+              Import from JSON file
             </button>
             <input
               ref="recallFileInput"
@@ -86,9 +108,87 @@
               style="display: none"
               @change="handleRecallFileChange"
             />
+            <button class="btn btn-primary mt-4" @click="saveToDatabase">
+              {{ store.practiceUnitHeader?.practiceUnitId ? 'UPDATE in Database' : 'SAVE to Database' }}
+            </button>
+            <button class="btn btn-accent mt-4" @click="saveAsNewToDatabase">
+              SAVE as New
+            </button>
+            <button class="btn btn-outline mt-4" @click="openRecallModal">
+              RECALL from Database
+            </button>
           </div>
         </div>
       </div>
+
+      <!-- Recall Modal -->
+      <div v-if="showRecallModal" class="modal modal-open">
+        <div class="modal-box max-w-2xl">
+          <h3 class="font-bold text-lg mb-3">Select Practice Unit to Recall</h3>
+
+          <div class="form-control mb-3">
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              placeholder="Filter by name, key, type, or instrument..."
+              v-model="recallFilterText"
+            />
+          </div>
+
+          <div v-if="loadingUnits" class="flex justify-center py-8">
+            <span class="loading loading-spinner loading-lg"></span>
+          </div>
+
+          <div
+            v-else-if="availablePracticeUnits.length === 0"
+            class="py-8 text-center text-gray-500"
+          >
+            No saved scales found for your account.
+          </div>
+
+          <div
+            v-else-if="filteredPracticeUnits.length === 0"
+            class="py-8 text-center text-gray-500"
+          >
+            No matches for "{{ recallFilterText }}".
+          </div>
+
+          <div v-else class="space-y-2 max-h-96 overflow-y-auto">
+            <div
+              v-for="unit in filteredPracticeUnits"
+              :key="unit.practice_unit_id"
+              class="card bg-base-100 border hover:border-primary cursor-pointer transition-all"
+              @click="loadSelectedUnit(unit)"
+            >
+              <div class="card-body p-4">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <h4 class="font-semibold">
+                      {{
+                        unit.name && unit.name !== "Scale"
+                          ? unit.name
+                          : describeUnit(unit) || unit.name
+                      }}
+                    </h4>
+                    <p class="text-sm text-gray-500">
+                      {{ describeUnit(unit) }}
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">
+                      {{ formatDate(unit.last_modified) }}
+                    </p>
+                  </div>
+                  <span class="badge badge-primary">{{ unit.type }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-action">
+            <button class="btn" @click="showRecallModal = false">Cancel</button>
+          </div>
+        </div>
+      </div>
+
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mt-4 rounded-xl"
       >
@@ -148,9 +248,68 @@ function copyScaleSPN() {
   }
 }
 
-import { ref, watch, onMounted, reactive } from "vue";
+import { ref, watch, onMounted, reactive, computed } from "vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
+import supabase from "../scripts/supabaseClient.js";
 const store = usePracticeUnitScaleStore();
+
+// State for recall modal
+const showRecallModal = ref(false);
+const availablePracticeUnits = ref([]);
+const loadingUnits = ref(false);
+const recallFilterText = ref("");
+const filteredPracticeUnits = computed(() => {
+  const q = (recallFilterText.value || "").trim().toLowerCase();
+  const items = availablePracticeUnits.value || [];
+  if (!q) return items;
+  return items.filter((u) => {
+    try {
+      const h = u?.unit_json?.practiceUnitHeader || {};
+      const inst = h?.instrument?.instrument || h?.instrument || "";
+      const parts = [
+        u?.name,
+        u?.type,
+        h?.keySignature,
+        h?.contentType,
+        h?.startingOctave,
+        String(h?.numberOfOctaves || ""),
+        h?.direction,
+        inst,
+      ]
+        .filter(Boolean)
+        .map((s) => String(s).toLowerCase());
+      return parts.some((p) => p.includes(q));
+    } catch {
+      return false;
+    }
+  });
+});
+
+// --- Supabase helpers ------------------------------------------------------
+// Direct calls to the default public schema (no fallback needed for this env)
+async function upsertPracticeUnit(row) {
+  const { error } = await supabase
+    .from("practice_units")
+    .upsert(row, { onConflict: "practice_unit_id" });
+  return { error };
+}
+
+async function selectLatestPracticeUnit(sessionUserId) {
+  const { data, error } = await supabase
+    .from("practice_units")
+    .select("unit_json, last_modified")
+    .eq("user_id", sessionUserId)
+    .eq("type", "Scale")
+    .order("last_modified", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return { data, error };
+}
+
+async function insertNewPracticeUnit(row) {
+  const { error } = await supabase.from("practice_units").insert(row);
+  return { error };
+}
 
 // Initialize scaleSelections reactive proxy if needed (for backward compatibility during migration)
 // Preferred approach: access store.practiceUnitHeader directly
@@ -847,6 +1006,27 @@ if (!store.scaleSelections) {
   });
 }
 
+// Keep the scale name synchronized with any scale setting changes
+watch(
+  () => [
+    store.scaleSelections?.key,
+    store.scaleSelections?.scaleType,
+    store.scaleSelections?.startingOctave,
+    store.scaleSelections?.octaveCount,
+    store.scaleSelections?.direction,
+    store.practiceUnitHeader?.instrument,
+  ],
+  () => {
+    const newName = buildDefaultScaleName();
+    scaleName.value = newName;
+    // Also keep header.practiceName in sync so SAVE/RECALL reflect it
+    if (store.practiceUnitHeader) {
+      store.practiceUnitHeader.practiceName = newName;
+    }
+  },
+  { immediate: true, deep: false }
+);
+
 function assembleScaleDescription() {
   // Compose description from all labels
   const inst = store.practiceUnitHeader.instrument;
@@ -899,6 +1079,18 @@ function assembleScaleDescription() {
 function getInstrumentShortName(inst) {
   if (!inst || !inst.instrument) return "Unknown Instrument";
   return inst.instrument.split(",")[0].trim();
+}
+
+// Default, human-friendly name used when the user hasn't provided one yet
+function buildDefaultScaleName() {
+  const inst = store.practiceUnitHeader.instrument;
+  const sel = store.scaleSelections || {};
+  const shortName = getInstrumentShortName(inst);
+  const typeCased = sel.scaleType
+    ? sel.scaleType.charAt(0).toUpperCase() + sel.scaleType.slice(1)
+    : "Major";
+  const key = sel.key || "C";
+  return `${key} ${typeCased} Scale for ${shortName}`;
 }
 
 function saveScale() {
@@ -1118,6 +1310,225 @@ function getCookie(key) {
     if (p.startsWith(prefix)) return decodeURIComponent(p.slice(prefix.length));
   }
   return "";
+}
+
+// SAVE to Database (Supabase)
+async function saveToDatabase() {
+  try {
+    const { data: sessData, error: sessErr } = await supabase.auth.getSession();
+    const session = sessData?.session;
+    if (sessErr || !session?.user?.id) {
+      alert("Please sign in on Preferences before saving to database.");
+      return;
+    }
+    // Ensure header fields
+    const header = store.practiceUnitHeader;
+    if (!header.practiceUnitId) {
+      header.practiceUnitId = crypto.randomUUID
+        ? crypto.randomUUID()
+        : `guid-${Date.now()}`;
+    }
+    header.lastModified = new Date().toISOString();
+    header.practiceUnitType = "Scale";
+    header.User = session.user.id;
+    const unit = store.composePracticeUnit();
+
+    // Ensure we have a human-friendly name; fall back to a composed default
+    const nameToUse =
+      header.practiceName || scaleName.value || buildDefaultScaleName();
+    header.practiceName = header.practiceName || nameToUse;
+
+    const row = {
+      user_id: session.user.id,
+      practice_unit_id: header.practiceUnitId,
+      name: nameToUse,
+      type: header.practiceUnitType,
+      share_music: !!header.shareMusic,
+      unit_json: unit,
+      last_modified: header.lastModified,
+    };
+    const { error } = await upsertPracticeUnit(row);
+    if (error) {
+      console.warn("[CreateScale] saveToDatabase error", error);
+      alert(`Save failed: ${error.message}`);
+      return;
+    }
+    alert("Saved to database.");
+  } catch (e) {
+    console.warn("[CreateScale] saveToDatabase exception", e);
+    alert("Unexpected error while saving to database.");
+  }
+}
+
+// RECALL from Database - open modal to select from list
+async function openRecallModal() {
+  try {
+    const { data: sessData } = await supabase.auth.getSession();
+    const session = sessData?.session;
+    if (!session?.user?.id) {
+      alert("Sign in first to recall from database.");
+      return;
+    }
+
+    loadingUnits.value = true;
+    showRecallModal.value = true;
+
+    const { data, error } = await supabase
+      .from("practice_units")
+      .select("practice_unit_id, name, type, last_modified, unit_json")
+      .eq("user_id", session.user.id)
+      .eq("type", "Scale")
+      .order("last_modified", { ascending: false });
+
+    if (error) {
+      console.warn("[CreateScale] openRecallModal error", error);
+      alert(`Failed to load saved scales: ${error.message}`);
+      showRecallModal.value = false;
+      return;
+    }
+
+    availablePracticeUnits.value = data || [];
+  } catch (e) {
+    console.warn("[CreateScale] openRecallModal exception", e);
+    alert("Unexpected error while loading saved scales.");
+    showRecallModal.value = false;
+  } finally {
+    loadingUnits.value = false;
+  }
+}
+
+// Load the selected practice unit from the modal
+function loadSelectedUnit(unit) {
+  try {
+    if (!unit?.unit_json) {
+      alert("Invalid practice unit data.");
+      return;
+    }
+    store.loadPracticeUnit(unit.unit_json);
+    if (unit.unit_json?.practiceUnitHeader?.practiceName) {
+      scaleName.value = unit.unit_json.practiceUnitHeader.practiceName;
+    }
+    showRecallModal.value = false;
+    alert(`Loaded: ${unit.name}`);
+  } catch (e) {
+    console.warn("[CreateScale] loadSelectedUnit exception", e);
+    alert("Failed to load practice unit.");
+  }
+}
+
+// Format timestamp for display
+function formatDate(timestamp) {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+}
+
+// Compose a compact, descriptive summary for a saved unit
+function describeUnit(unit) {
+  try {
+    const h = unit?.unit_json?.practiceUnitHeader || {};
+    const shortInst = getInstrumentShortName(h.instrument);
+    const ctype = h.contentType
+      ? h.contentType.charAt(0).toUpperCase() + h.contentType.slice(1)
+      : "";
+    const parts = [];
+    if (h.keySignature && ctype) parts.push(`${h.keySignature} ${ctype}`);
+    if (h.startingOctave) parts.push(`start ${h.startingOctave}`);
+    if (h.numberOfOctaves)
+      parts.push(
+        `${h.numberOfOctaves} octave${h.numberOfOctaves > 1 ? "s" : ""}`
+      );
+    if (h.direction)
+      parts.push(
+        typeof h.direction === "string" ? h.direction : String(h.direction)
+      );
+    if (shortInst && shortInst !== "Unknown Instrument")
+      parts.push(`for ${shortInst}`);
+    return parts.filter(Boolean).join(" • ");
+  } catch {
+    return "";
+  }
+}
+
+// RECALL from Database (legacy - kept for backwards compat, fetches most recent)
+async function recallFromDatabase() {
+  try {
+    const { data: sessData } = await supabase.auth.getSession();
+    const session = sessData?.session;
+    if (!session?.user?.id) {
+      alert("Sign in first to recall from database.");
+      return;
+    }
+    const { data, error } = await selectLatestPracticeUnit(session.user.id);
+    if (error) {
+      console.warn("[CreateScale] recallFromDatabase error", error);
+      alert(`Recall failed: ${error.message}`);
+      return;
+    }
+    if (!data?.unit_json) {
+      alert("No saved scale found for this user.");
+      return;
+    }
+    store.loadPracticeUnit(data.unit_json);
+    if (data.unit_json?.practiceUnitHeader?.practiceName) {
+      scaleName.value = data.unit_json.practiceUnitHeader.practiceName;
+    }
+    alert("Recalled latest saved scale from database.");
+  } catch (e) {
+    console.warn("[CreateScale] recallFromDatabase exception", e);
+    alert("Unexpected error while recalling from database.");
+  }
+}
+
+// SAVE as New to Database (always creates a new GUID)
+async function saveAsNewToDatabase() {
+  try {
+    const { data: sessData, error: sessErr } = await supabase.auth.getSession();
+    const session = sessData?.session;
+    if (sessErr || !session?.user?.id) {
+      alert("Please sign in on Preferences before saving to database.");
+      return;
+    }
+    // Compose a fresh copy of the practice unit
+    const unit = store.composePracticeUnit();
+    const header = unit.practiceUnitHeader;
+
+    // Always generate a new GUID
+    header.practiceUnitId = crypto.randomUUID
+      ? crypto.randomUUID()
+      : `guid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    header.lastModified = new Date().toISOString();
+    header.practiceUnitType = "Scale";
+    header.User = session.user.id;
+
+    // Ensure we have a human-friendly name; fall back to a composed default
+    const nameToUse =
+      header.practiceName || scaleName.value || buildDefaultScaleName();
+    header.practiceName = header.practiceName || nameToUse;
+
+    const row = {
+      user_id: session.user.id,
+      practice_unit_id: header.practiceUnitId,
+      name: nameToUse,
+      type: header.practiceUnitType,
+      share_music: !!header.shareMusic,
+      unit_json: unit,
+      last_modified: header.lastModified,
+    };
+    const { error } = await insertNewPracticeUnit(row); // Use insert instead of upsert to ensure new row
+    if (error) {
+      console.warn("[CreateScale] saveAsNewToDatabase error", error);
+      alert(`Save as New failed: ${error.message}`);
+      return;
+    }
+    scaleName.value = header.practiceName || scaleName.value;
+    alert(
+      `Saved as new practice unit to database.\n\nName: ${header.practiceName}\nID: ${header.practiceUnitId}\n\nThis is a brand new unit separate from any previous saves.`
+    );
+  } catch (e) {
+    console.warn("[CreateScale] saveAsNewToDatabase exception", e);
+    alert("Unexpected error while saving as new to database.");
+  }
 }
 
 onMounted(async () => {

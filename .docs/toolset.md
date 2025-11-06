@@ -11,6 +11,7 @@ This document outlines the full development toolset for the Vue.js refactor of M
 
 - **HTML, CSS, JS** – Base technologies
 - **VexFlow** – Music notation rendering
+- **Tone.js** – Web Audio synthesis and playback
 - **Tailwind CSS** – Utility-first styling (installed via CLI)
 - **DaisyUI** – Tailwind component library
 - **Vue.js 3** – Component-based frontend framework
@@ -18,6 +19,7 @@ This document outlines the full development toolset for the Vue.js refactor of M
 - **Vue Router** – Page-level routing
 - **Pinia** – Native Vue state management
 - **VueUse** – Utility composables (e.g. localStorage, lifecycle)
+- **Supabase** – Backend-as-a-Service (Auth, Database, Storage)
 
 </details>
 
@@ -51,7 +53,8 @@ This document outlines the full development toolset for the Vue.js refactor of M
     "pinia": "^2.1.3",
     "vue-router": "^4.2.5",
     "@vueuse/core": "^10.2.0",
-    "daisyui": "^4.0.7"
+    "daisyui": "^4.0.7",
+    "@supabase/supabase-js": "^2.80.0"
   },
   "devDependencies": {
     "vite": "^5.0.0",

@@ -250,9 +250,31 @@
           </span>
         </div>
         <div class="collapse-content px-4">
-          <div class="flex gap-4 mb-4">
+          <!-- User Help Note -->
+          <div
+            class="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm text-gray-700"
+          >
+            <strong class="text-blue-800">Save Options:</strong>
+            <ul class="list-disc list-inside mt-1 space-y-1">
+              <li>
+                <strong>SAVE to Database</strong> – Updates the current exercise
+                (if it has an ID) or creates a new one (if first save).
+              </li>
+              <li>
+                <strong>SAVE as New</strong> – Always creates a brand new
+                exercise with a fresh ID, even if the name matches an existing
+                one. Use this to create variations or backups.
+              </li>
+              <li>
+                <strong>Export/Import JSON</strong> – Download or upload
+                exercises as standalone files for sharing or backup outside the
+                database.
+              </li>
+            </ul>
+          </div>
+          <div class="flex gap-4 mb-4 flex-wrap">
             <button class="btn btn-warning" @click="saveExercise">
-              Export Practice Unit to JSON file
+              Export to JSON file
             </button>
             <button
               class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
@@ -263,7 +285,7 @@
                 aria-hidden="true"
                 >upload_file</span
               >
-              Import Practice Unit from JSON file
+              Import from JSON file
             </button>
             <input
               ref="recallFileInput"
@@ -272,6 +294,70 @@
               style="display: none"
               @change="handleRecallFileChange"
             />
+            <button class="btn btn-primary mt-4" @click="saveToDatabase">
+              {{ currentPracticeUnit?.practiceUnitHeader?.practiceUnitId ? 'UPDATE in Database' : 'SAVE to Database' }}
+            </button>
+            <button class="btn btn-accent mt-4" @click="saveAsNewToDatabase">
+              SAVE as New
+            </button>
+            <button class="btn btn-outline mt-4" @click="recallFromDatabase">
+              RECALL from Database
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Recall Modal -->
+      <div v-if="showRecallModal" class="modal modal-open">
+        <div class="modal-box max-w-2xl">
+          <h3 class="font-bold text-lg mb-3">Select Exercise to Recall</h3>
+          <div class="form-control mb-3">
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              placeholder="Filter by name, key, time, focus, or instrument..."
+              v-model="recallFilterText"
+            />
+          </div>
+          <div v-if="loadingUnits" class="flex justify-center py-8">
+            <span class="loading loading-spinner loading-lg"></span>
+          </div>
+          <div
+            v-else-if="availableExercises.length === 0"
+            class="py-8 text-center text-gray-500"
+          >
+            No saved exercises found for your account.
+          </div>
+          <div
+            v-else-if="filteredExercises.length === 0"
+            class="py-8 text-center text-gray-500"
+          >
+            No matches for "{{ recallFilterText }}".
+          </div>
+          <div v-else class="space-y-2 max-h-96 overflow-y-auto">
+            <div
+              v-for="unit in filteredExercises"
+              :key="unit.practice_unit_id"
+              class="card bg-base-100 border hover:border-primary cursor-pointer transition-all"
+              @click="loadSelectedExercise(unit)"
+            >
+              <div class="card-body p-4">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <h4 class="font-semibold">{{ unit.name }}</h4>
+                    <p class="text-sm text-gray-500">
+                      {{ describeExercise(unit) }}
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">
+                      {{ formatDate(unit.last_modified) }}
+                    </p>
+                  </div>
+                  <span class="badge badge-secondary">{{ unit.type }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-action">
+            <button class="btn" @click="showRecallModal = false">Cancel</button>
           </div>
         </div>
       </div>
@@ -307,6 +393,8 @@ import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.
 import { ref, computed, reactive } from "vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
+import supabase from "../scripts/supabaseClient.js";
+// removed duplicate Vue import
 
 const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
@@ -339,10 +427,65 @@ const importedKey = ref("");
 const importedTime = ref("");
 const importError = ref("");
 const musicXmlFileName = ref("");
+
+// --- Supabase helpers ------------------------------------------------------
+// Direct calls to the default public schema
+async function ex_upsertPracticeUnit(row) {
+  const { error } = await supabase
+    .from("practice_units")
+    .upsert(row, { onConflict: "practice_unit_id" });
+  return { error };
+}
+
+async function ex_selectLatest(userId) {
+  const { data, error } = await supabase
+    .from("practice_units")
+    .select("unit_json, last_modified")
+    .eq("user_id", userId)
+    .eq("type", "Exercise")
+    .order("last_modified", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return { data, error };
+}
+
+async function ex_insertNew(row) {
+  const { error } = await supabase.from("practice_units").insert(row);
+  return { error };
+}
 const exerciseName = ref("");
 const recallFileInput = ref(null);
 const octaveTranspositionCount = ref(0);
 let originalNoteArray = ref([]);
+// Recall modal state (Exercise)
+const showRecallModal = ref(false);
+const availableExercises = ref([]);
+const loadingUnits = ref(false);
+const recallFilterText = ref("");
+const filteredExercises = computed(() => {
+  const q = (recallFilterText.value || "").trim().toLowerCase();
+  const items = availableExercises.value || [];
+  if (!q) return items;
+  return items.filter((u) => {
+    try {
+      const h = u?.unit_json?.practiceUnitHeader || {};
+      const inst = h?.instrument?.instrument || h?.instrument || "";
+      const parts = [
+        u?.name,
+        u?.type,
+        h?.keySignature,
+        h?.timeSignature,
+        (h?.techniqueFocus || []).join(" "),
+        inst,
+      ]
+        .filter(Boolean)
+        .map((s) => String(s).toLowerCase());
+      return parts.some((p) => p.includes(q));
+    } catch {
+      return false;
+    }
+  });
+});
 
 // current practice unit (local to this view)
 const currentPracticeUnit = ref(null);
@@ -690,7 +833,7 @@ function saveExercise() {
 
     // Prompt for practice unit name
     const defaultName = editPracticeName.value || "Exercise";
-    let name = window.prompt("Enter Practice Unit Name:", defaultName);
+    let name = globalThis.prompt("Enter Practice Unit Name:", defaultName);
     if (!name) return;
 
     // Update the practice name in the current unit
@@ -797,5 +940,177 @@ function handleRecallFileChange(ev) {
       }
     })
     .catch(() => alert("Failed to read recall file."));
+}
+
+// SAVE to Database (Supabase)
+async function saveToDatabase() {
+  try {
+    const { data: sessData, error: sessErr } = await supabase.auth.getSession();
+    const session = sessData?.session;
+    if (sessErr || !session?.user?.id) {
+      alert("Please sign in on Preferences before saving to database.");
+      return;
+    }
+    // Ensure we have a unit to save
+    const unit =
+      currentPracticeUnit.value || composePracticeUnit(store.noteArray || []);
+    const header = unit.practiceUnitHeader || (unit.practiceUnitHeader = {});
+    if (!header.practiceUnitId) {
+      header.practiceUnitId = crypto.randomUUID
+        ? crypto.randomUUID()
+        : `guid-${Date.now()}`;
+    }
+    header.lastModified = new Date().toISOString();
+    header.practiceUnitType = "Exercise";
+    header.User = session.user.id;
+
+    const row = {
+      user_id: session.user.id,
+      practice_unit_id: header.practiceUnitId,
+      name: header.practiceName || exerciseName.value || "Exercise",
+      type: header.practiceUnitType,
+      share_music: !!header.shareMusic,
+      unit_json: unit,
+      last_modified: header.lastModified,
+    };
+    const { error } = await ex_upsertPracticeUnit(row);
+    if (error) {
+      console.warn("[CreateExercise] saveToDatabase error", error);
+      alert(`Save failed: ${error.message}`);
+      return;
+    }
+    alert("Saved to database.");
+  } catch (e) {
+    console.warn("[CreateExercise] saveToDatabase exception", e);
+    alert("Unexpected error while saving to database.");
+  }
+}
+
+// RECALL from Database - open modal to select from list
+async function recallFromDatabase() {
+  try {
+    const { data: sessData } = await supabase.auth.getSession();
+    const session = sessData?.session;
+    if (!session?.user?.id) {
+      alert("Sign in first to recall from database.");
+      return;
+    }
+    loadingUnits.value = true;
+    showRecallModal.value = true;
+    const { data, error } = await supabase
+      .from("practice_units")
+      .select("practice_unit_id, name, type, last_modified, unit_json")
+      .eq("user_id", session.user.id)
+      .eq("type", "Exercise")
+      .order("last_modified", { ascending: false });
+    if (error) {
+      console.warn("[CreateExercise] recallFromDatabase error", error);
+      alert(`Failed to load saved exercises: ${error.message}`);
+      showRecallModal.value = false;
+      return;
+    }
+    availableExercises.value = data || [];
+  } catch (e) {
+    console.warn("[CreateExercise] recallFromDatabase exception", e);
+    alert("Unexpected error while loading saved exercises.");
+    showRecallModal.value = false;
+  } finally {
+    loadingUnits.value = false;
+  }
+}
+
+function loadSelectedExercise(unit) {
+  try {
+    if (!unit?.unit_json) {
+      alert("Invalid exercise data.");
+      return;
+    }
+    currentPracticeUnit.value = unit.unit_json;
+    refreshCurrentUnitJson();
+    if (Array.isArray(unit.unit_json?.noteArray)) {
+      store.noteArray = unit.unit_json.noteArray.map((n) => ({ ...n }));
+      testStaffStore.noteArray = unit.unit_json.noteArray.map((n) => ({
+        ...n,
+      }));
+      originalNoteArray.value = unit.unit_json.noteArray.map((n) => ({ ...n }));
+      octaveTranspositionCount.value = 0;
+    }
+    exerciseName.value =
+      unit.unit_json?.practiceUnitHeader?.practiceName || unit.name;
+    showRecallModal.value = false;
+    alert(`Loaded: ${unit.name}`);
+  } catch (e) {
+    console.warn("[CreateExercise] loadSelectedExercise exception", e);
+    alert("Failed to load exercise.");
+  }
+}
+
+function formatDate(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  return d.toLocaleDateString() + " " + d.toLocaleTimeString();
+}
+
+function describeExercise(unit) {
+  try {
+    const h = unit?.unit_json?.practiceUnitHeader || {};
+    const inst = h?.instrument?.instrument || h?.instrument || "";
+    const focus = (h?.techniqueFocus || []).join(", ");
+    const parts = [];
+    if (h.keySignature) parts.push(h.keySignature);
+    if (h.timeSignature) parts.push(h.timeSignature);
+    if (focus) parts.push(focus);
+    if (inst) parts.push(`for ${inst}`);
+    return parts.join(" • ");
+  } catch {
+    return "";
+  }
+}
+
+// SAVE as New to Database (always creates a new GUID)
+async function saveAsNewToDatabase() {
+  try {
+    const { data: sessData, error: sessErr } = await supabase.auth.getSession();
+    const session = sessData?.session;
+    if (sessErr || !session?.user?.id) {
+      alert("Please sign in on Preferences before saving to database.");
+      return;
+    }
+    // Ensure we have a unit to save
+    const unit =
+      currentPracticeUnit.value || composePracticeUnit(store.noteArray || []);
+    const header = unit.practiceUnitHeader || (unit.practiceUnitHeader = {});
+
+    // Always generate a new GUID
+    header.practiceUnitId = crypto.randomUUID
+      ? crypto.randomUUID()
+      : `guid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    header.lastModified = new Date().toISOString();
+    header.practiceUnitType = "Exercise";
+    header.User = session.user.id;
+
+    const row = {
+      user_id: session.user.id,
+      practice_unit_id: header.practiceUnitId,
+      name: header.practiceName || exerciseName.value || "Exercise",
+      type: header.practiceUnitType,
+      share_music: !!header.shareMusic,
+      unit_json: unit,
+      last_modified: header.lastModified,
+    };
+    const { error } = await ex_insertNew(row); // Use insert instead of upsert to ensure new row
+    if (error) {
+      console.warn("[CreateExercise] saveAsNewToDatabase error", error);
+      alert(`Save as New failed: ${error.message}`);
+      return;
+    }
+    exerciseName.value = header.practiceName || exerciseName.value;
+    alert(
+      `Saved as new practice unit to database.\n\nName: ${header.practiceName}\nID: ${header.practiceUnitId}\n\nThis is a brand new unit separate from any previous saves.`
+    );
+  } catch (e) {
+    console.warn("[CreateExercise] saveAsNewToDatabase exception", e);
+    alert("Unexpected error while saving as new to database.");
+  }
 }
 </script>

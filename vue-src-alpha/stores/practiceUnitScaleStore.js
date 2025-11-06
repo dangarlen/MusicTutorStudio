@@ -19,6 +19,9 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
       },
       sourceURL: "",
       noteColorDesignation: {},
+      // User ownership & privacy
+      User: "", // Supabase user id (or other user identifier)
+      shareMusic: false, // true = Share; false = Personal Use ONLY
       // Scale-specific unified fields
       contentType: "Major", // scaleType: Major/Minor/Chromatic
       direction: "ascending",

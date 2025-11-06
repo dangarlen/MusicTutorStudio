@@ -20,7 +20,7 @@ Acceptance criteria:
 <summary><strong>1) Finalize core schemas</strong> (PracticeUnit, Lesson, Library)</summary>
 
 - PracticeUnit (existing; extend for Exercises/Passages)
-  - `practiceUnitHeader`: { practiceUnitId (GUID), lastModified (ISO), practiceUnitType ("Scale"|"Exercise"|"Passage"), practiceName, tempo, keySignature, timeSignature, instrument, staffDisplayOptions, noteColorDesignation, sourceURL }
+  - `practiceUnitHeader`: { practiceUnitId (GUID), lastModified (ISO), practiceUnitType ("Scale"|"Exercise"|"Passage"), practiceName, tempo, keySignature, timeSignature, instrument, staffDisplayOptions, noteColorDesignation, sourceURL, User (string user id), shareMusic (boolean) }
   - Branch object: `practiceUnitScale` | `practiceUnitExercise` | `practiceUnitPassage`
   - `noteArray`: Note[]
 - Lesson (new)
