@@ -2,12 +2,45 @@ import { defineStore } from "pinia";
 
 export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
   state: () => ({
-    instrument: null,
+    // Unified practiceUnitHeader fields
+    practiceUnitHeader: {
+      practiceName: "",
+      practiceUnitId: "",
+      lastModified: "",
+      practiceUnitType: "Scale",
+      tempo: 120,
+      keySignature: "C",
+      timeSignature: "4/4",
+      instrument: null,
+      staffDisplayOptions: {
+        showAccidentals: true,
+        showOverlays: true,
+        measuresPerLineMax: 2,
+      },
+      sourceURL: "",
+      noteColorDesignation: {},
+      // Scale-specific unified fields
+      contentType: "Major", // scaleType: Major/Minor/Chromatic
+      direction: "ascending",
+      startingOctave: "C4",
+      numberOfOctaves: 1,
+      // N/A for Scale (initialized as null/""/[])
+      rangeStart: null,
+      rangeEnd: null,
+      composer: "",
+      sourceWork: "",
+      techniqueFocus: [],
+      tagSource: "",
+      repetitionCount: null,
+      sourceMusicXML: "",
+      instrumentOverride: "",
+    },
+    // noteArray
+    noteArray: [],
+    // UI state (not part of practiceUnit schema)
     title: "Create Scale",
     instruments: [],
-    // Optional instructional color mapping saved into practiceUnitHeader.noteColorDesignation
-    // Keys allowed by schema: red, blue, green, orange, gray, purple (black excluded)
-    noteColorDesignation: {},
+    scaleSelections: null, // Deprecated; migrate to practiceUnitHeader fields
   }),
   actions: {
     async loadInstruments() {
@@ -23,7 +56,7 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
       }
     },
     setInstrument(inst) {
-      this.instrument = inst;
+      this.practiceUnitHeader.instrument = inst;
     },
     setTitle(title) {
       this.title = title;
@@ -40,7 +73,26 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
           }
         }
       } catch {}
-      this.noteColorDesignation = out;
+      this.practiceUnitHeader.noteColorDesignation = out;
+    },
+    // Helper to compose full practiceUnit for export
+    composePracticeUnit() {
+      return {
+        practiceUnitHeader: { ...this.practiceUnitHeader },
+        noteArray: [...this.noteArray],
+      };
+    },
+    // Helper to load from unified format
+    loadPracticeUnit(unit) {
+      if (unit.practiceUnitHeader) {
+        this.practiceUnitHeader = {
+          ...this.practiceUnitHeader,
+          ...unit.practiceUnitHeader,
+        };
+      }
+      if (Array.isArray(unit.noteArray)) {
+        this.noteArray = unit.noteArray.map((n) => ({ ...n }));
+      }
     },
   },
 });

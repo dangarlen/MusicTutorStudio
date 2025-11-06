@@ -1,5 +1,7 @@
 # 🎼 MTS-Unified-json.md
 
+**Transition to unified schema completed: November 6, 2025**
+
 **Music Tutor Studio Unified JSON Schema**  
 _Simplified, generalized, and audit-safe_
 
@@ -7,13 +9,12 @@ _Simplified, generalized, and audit-safe_
 
 ## 📖 Introduction
 
-This is the **unified schema** for Music Tutor Studio practice units. All three unit types—**Scales**, **Passages**, and **Exercises**—now share a single, flat `practiceUnitHeader` structure. Type-specific fields are either generalized or left blank (N/A) when not applicable.
+This is the **unified schema** for Music Tutor Studio practice units. All three unit types—**Scales**, **Passages**, and **Exercises**—share a single, flat `practiceUnitHeader` structure. Type-specific fields are either generalized or left blank (N/A) when not applicable.
 
 ### Design Goals
 
 - **Single header structure**: No more separate `practiceUnitScale`, `practiceUnitPassage`, or `practiceUnitExercise` objects
 - **Simplified persistence**: `practiceUnit` = `practiceUnitHeader` + `noteArray`
-- **Backward compatibility**: Migration path from legacy 3-section schema
 - **Type flexibility**: `practiceUnitType` determines which fields are required vs optional
 - **Audit-safe**: Retains `practiceUnitId`, `lastModified`, and traceability
 

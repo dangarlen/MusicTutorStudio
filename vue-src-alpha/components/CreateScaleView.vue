@@ -32,7 +32,7 @@
       <div class="mb-4">
         <InstrumentDropdown
           :instruments="store.instruments"
-          v-model="store.instrument"
+          v-model="store.practiceUnitHeader.instrument"
         />
       </div>
       <CreateScaleScaleSelector
@@ -58,7 +58,7 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>💾 Save/Recall Workspace Snapshot</span>
+          <span>💾 Practice Unit Snapshot Manager</span>
           <span class="text-right text-base font-normal text-gray-600">
             {{ scaleName ? `Scale Name: ${scaleName}` : "Not yet saved" }}
           </span>
@@ -66,7 +66,7 @@
         <div class="collapse-content px-4">
           <div class="flex gap-4 mb-4">
             <button class="btn btn-warning" @click="saveScale">
-              SAVE Scale to MTS-PracticeUnitExport.json
+              Export Practice Unit to JSON file
             </button>
             <button
               class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
@@ -77,7 +77,7 @@
                 aria-hidden="true"
                 >upload_file</span
               >
-              RECALL (Import JSON)
+              Import Practice Unit from JSON file
             </button>
             <input
               ref="recallFileInput"
@@ -96,21 +96,11 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>Behind the Curtain: practiceUnitScale.json</span>
+          <span>Behind the Curtain: practiceUnitStore (JSON snapshot)</span>
         </div>
         <div class="collapse-content px-4">
           <pre class="bg-base-100 p-4 rounded text-xs overflow-x-auto max-h-96"
-            >{{
-              JSON.stringify(
-                {
-                  instrument: store.instrument,
-                  scaleSelections: store.scaleSelections,
-                  noteArray: store.noteArray,
-                },
-                null,
-                2
-              )
-            }}
+            >{{ JSON.stringify(store.composePracticeUnit(), null, 2) }}
           </pre>
         </div>
       </div>
@@ -162,28 +152,51 @@ import { ref, watch, onMounted, reactive } from "vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 const store = usePracticeUnitScaleStore();
 
-// Defensive: ensure scaleSelections is always initialized before watcher
+// Initialize scaleSelections reactive proxy if needed (for backward compatibility during migration)
+// Preferred approach: access store.practiceUnitHeader directly
 if (!store.scaleSelections) {
   store.scaleSelections = reactive({
-    key: "C",
-    scaleType: "major",
-    startingOctave: "C4",
-    octaveCount: 1,
-    maxMeasuresPerLine: 2,
-    direction: "Ascending",
+    key: store.practiceUnitHeader.keySignature || "C",
+    scaleType: store.practiceUnitHeader.contentType || "Major",
+    startingOctave: store.practiceUnitHeader.startingOctave || "C4",
+    octaveCount: store.practiceUnitHeader.numberOfOctaves || 1,
+    maxMeasuresPerLine:
+      store.practiceUnitHeader.staffDisplayOptions?.measuresPerLineMax || 2,
+    direction: store.practiceUnitHeader.direction || "ascending",
     noteDuration: "quarter",
-    timeSignature: "4/4",
+    timeSignature: store.practiceUnitHeader.timeSignature || "4/4",
     staffOptions: {
       keySignature: true,
       accidentals: true,
       barLines: true,
       timeSignature: true,
-      measuresPerLineMax: 2,
+      measuresPerLineMax:
+        store.practiceUnitHeader.staffDisplayOptions?.measuresPerLineMax || 2,
       enforceLedgerLimits: false,
       accidentalFamily: "auto-key",
+      ...store.practiceUnitHeader.staffDisplayOptions,
     },
   });
 }
+
+// Sync scaleSelections changes back to unified header
+watch(
+  () => store.scaleSelections,
+  (sel) => {
+    if (!sel) return;
+    store.practiceUnitHeader.keySignature = sel.key || "C";
+    store.practiceUnitHeader.contentType = sel.scaleType || "Major";
+    store.practiceUnitHeader.startingOctave = sel.startingOctave || "C4";
+    store.practiceUnitHeader.numberOfOctaves = sel.octaveCount || 1;
+    store.practiceUnitHeader.direction = sel.direction || "ascending";
+    store.practiceUnitHeader.timeSignature = sel.timeSignature || "4/4";
+    if (sel.staffOptions) {
+      store.practiceUnitHeader.staffDisplayOptions = { ...sel.staffOptions };
+    }
+  },
+  { deep: true, immediate: true }
+);
+
 const scaleLabel = ref("Not yet saved");
 let previousInstrument = null;
 
@@ -618,33 +631,92 @@ async function handleRecallFileChange(event) {
   try {
     const text = await file.text();
     const data = JSON.parse(text);
-    // Defensive: check for expected fields
-    if (
+
+    // Check if unified format (practiceUnitHeader + noteArray) or legacy (3-section)
+    if (data.practiceUnitHeader && Array.isArray(data.noteArray)) {
+      // Unified format
+      store.loadPracticeUnit(data);
+
+      // Sync scaleSelections for UI compatibility
+      const h = data.practiceUnitHeader;
+      store.scaleSelections = reactive({
+        key: h.keySignature || "C",
+        scaleType: h.contentType || "Major",
+        startingOctave: h.startingOctave || "C4",
+        octaveCount: h.numberOfOctaves || 1,
+        direction: h.direction || "ascending",
+        noteDuration: "quarter",
+        timeSignature: h.timeSignature || "4/4",
+        maxMeasuresPerLine: h.staffDisplayOptions?.measuresPerLineMax || 2,
+        staffOptions: h.staffDisplayOptions || {},
+      });
+
+      // Sync to testStaffNoteStore for cross-view access
+      const testStaffStore = useTestStaffNoteStore();
+      testStaffStore.noteArray = data.noteArray.map((n) => ({ ...n }));
+      scaleName.value = h.practiceName || "Imported Scale";
+      alert("Practice unit loaded successfully (unified format).");
+    } else if (
       data.practiceUnitHeader &&
       data.practiceUnitScale &&
       Array.isArray(data.noteArray)
     ) {
-      // Update Pinia store
-      store.instrument = data.practiceUnitHeader.instrument;
+      // Legacy format: convert to unified
+      const h = data.practiceUnitHeader;
+      const s = data.practiceUnitScale;
+
+      store.practiceUnitHeader = {
+        ...store.practiceUnitHeader,
+        practiceName: h.practiceName || "",
+        practiceUnitId: h.practiceUnitId || "",
+        lastModified: h.lastModified || new Date().toISOString(),
+        practiceUnitType: "Scale",
+        tempo: h.tempo || 120,
+        keySignature: h.keySignature || "C",
+        timeSignature: h.timeSignature || "4/4",
+        instrument: h.instrument || null,
+        staffDisplayOptions: h.staffDisplayOptions || {},
+        sourceURL: h.sourceURL || "",
+        noteColorDesignation: h.noteColorDesignation || {},
+        // Map legacy scale fields
+        contentType: s.scaleType || "Major",
+        direction: s.direction || "ascending",
+        startingOctave: s.scaleRange?.startingOctave || "C4",
+        numberOfOctaves: s.scaleRange?.numberOfOctaves || 1,
+        // N/A for Scale
+        rangeStart: null,
+        rangeEnd: null,
+        composer: "",
+        sourceWork: "",
+        techniqueFocus: [],
+        tagSource: "",
+        repetitionCount: null,
+        sourceMusicXML: "",
+        instrumentOverride: "",
+      };
+
+      store.noteArray = data.noteArray.map((n) => ({ ...n }));
+
+      // Sync scaleSelections
       store.scaleSelections = reactive({
-        key: data.practiceUnitHeader.keySignature || "C",
-        scaleType: data.practiceUnitScale.scaleType || "major",
-        startingOctave:
-          data.practiceUnitScale.scaleRange?.startingOctave || "C4",
-        octaveCount: data.practiceUnitScale.scaleRange?.numberOfOctaves || 1,
-        direction: data.practiceUnitScale.direction || "Ascending",
-        noteDuration: "quarter", // fallback
-        timeSignature: data.practiceUnitHeader.timeSignature || "4/4",
-        staffOptions: data.practiceUnitHeader.staffDisplayOptions || {},
+        key: h.keySignature || "C",
+        scaleType: s.scaleType || "Major",
+        startingOctave: s.scaleRange?.startingOctave || "C4",
+        octaveCount: s.scaleRange?.numberOfOctaves || 1,
+        direction: s.direction || "ascending",
+        noteDuration: "quarter",
+        timeSignature: h.timeSignature || "4/4",
+        staffOptions: h.staffDisplayOptions || {},
       });
-      store.noteArray = data.noteArray;
-      // Sync to testStaffNoteStore for cross-view access
+
+      // Sync to testStaffNoteStore
       const testStaffStore = useTestStaffNoteStore();
-      testStaffStore.noteArray = data.noteArray;
-      alert("Practice unit loaded successfully.");
+      testStaffStore.noteArray = data.noteArray.map((n) => ({ ...n }));
+      scaleName.value = h.practiceName || "Imported Scale";
+      alert("Practice unit loaded successfully (legacy format converted).");
     } else {
       alert(
-        "Invalid JSON format. Please select a valid practiceUnitScale.json file."
+        "Invalid JSON format. Please select a valid practiceUnit.json file."
       );
     }
   } catch (err) {
@@ -687,20 +759,14 @@ function getFirstNoteOfScale(key, scaleType) {
   // For major/minor, return key + default octave (e.g., Bb4)
   // You may want to map key to correct octave based on instrument
   // For now, use instrument.standardRange.start if available
-  if (
-    store.instrument &&
-    store.instrument.standardRange &&
-    store.instrument.standardRange.start
-  ) {
+  const inst = store.practiceUnitHeader.instrument;
+  if (inst && inst.standardRange && inst.standardRange.start) {
     // If key matches start note, use start
-    if (store.instrument.standardRange.start.startsWith(key)) {
-      return store.instrument.standardRange.start;
+    if (inst.standardRange.start.startsWith(key)) {
+      return inst.standardRange.start;
     }
     // Otherwise, replace note name but keep octave
-    const octave = store.instrument.standardRange.start.replace(
-      /^[A-G][b#]?/,
-      ""
-    );
+    const octave = inst.standardRange.start.replace(/^[A-G][b#]?/, "");
     return key + octave;
   }
   // Fallback: Bb4 for Bb, C4 for C, etc.
@@ -739,7 +805,7 @@ watch(
   () => [
     store.scaleSelections?.key,
     store.scaleSelections?.scaleType,
-    store.instrument,
+    store.practiceUnitHeader.instrument,
   ],
   ([key, scaleType, instrument]) => {
     if (key && scaleType) {
@@ -783,7 +849,7 @@ if (!store.scaleSelections) {
 
 function assembleScaleDescription() {
   // Compose description from all labels
-  const inst = store.instrument;
+  const inst = store.practiceUnitHeader.instrument;
   const sel = store.scaleSelections;
   let desc = "";
   if (inst) {
@@ -837,13 +903,13 @@ function getInstrumentShortName(inst) {
 
 function saveScale() {
   // Default: "C Major Scale for Euphonium" (or instrument before first comma)
-  const inst = store.instrument;
+  const inst = store.practiceUnitHeader.instrument;
   const sel = store.scaleSelections;
   const shortName = getInstrumentShortName(inst);
   let defaultName = `${sel.key} ${
     sel.scaleType.charAt(0).toUpperCase() + sel.scaleType.slice(1)
   } Scale for ${shortName}`;
-  let name = window.prompt("Enter scale name:", defaultName);
+  let name = window.prompt("Enter Practice Unit Name:", defaultName);
   if (!name) return;
   scaleName.value = name;
 
@@ -965,47 +1031,39 @@ function saveScale() {
   // Sync to testStaffNoteStore for cross-view access
   testStaffStore.noteArray = generatedNotes;
 
-  // Compose practiceUnit object
-  const practiceUnit = {
-    practiceUnitHeader: {
-      practiceName: name,
-      practiceUnitId: "guid-placeholder",
-      lastModified: new Date().toISOString(),
-      practiceUnitType: "Scale",
-      tempo: 120,
-      keySignature: store.scaleSelections.key,
-      timeSignature: store.scaleSelections.timeSignature || "4/4",
-      instrument: store.instrument,
-      staffDisplayOptions: {
-        ...(store.scaleSelections?.staffOptions &&
-        typeof store.scaleSelections.staffOptions === "object"
-          ? store.scaleSelections.staffOptions
-          : {}),
-        measuresPerLineMax: (() => {
-          const v = Number(store.scaleSelections.maxMeasuresPerLine);
-          if (!Number.isFinite(v)) return 2;
-          return Math.min(4, Math.max(1, v));
-        })(),
-      },
-      sourceURL: "",
-      noteColorDesignation: {},
-    },
-    practiceUnitScale: {
-      scaleType: store.scaleSelections.scaleType,
-      scaleRange: {
-        startingOctave: store.scaleSelections.startingOctave,
-        octaveCount: store.scaleSelections.octaveCount,
-      },
-      direction: store.scaleSelections.direction,
-    },
-    noteArray: store.noteArray || [],
-  };
+  // Update practiceUnitHeader with current values
+  store.practiceUnitHeader.practiceName = name;
+  store.practiceUnitHeader.practiceUnitId = crypto.randomUUID
+    ? crypto.randomUUID()
+    : "guid-" + Date.now();
+  store.practiceUnitHeader.lastModified = new Date().toISOString();
+  store.practiceUnitHeader.practiceUnitType = "Scale";
+  store.practiceUnitHeader.tempo = 120;
+  store.practiceUnitHeader.keySignature = key;
+  store.practiceUnitHeader.timeSignature = sel.timeSignature || "4/4";
+  store.practiceUnitHeader.contentType = scaleType;
+  store.practiceUnitHeader.direction = direction.toLowerCase();
+  store.practiceUnitHeader.startingOctave = startingOctave;
+  store.practiceUnitHeader.numberOfOctaves = octaveCount;
+  // Ensure N/A fields are nulled for Scale
+  store.practiceUnitHeader.rangeStart = null;
+  store.practiceUnitHeader.rangeEnd = null;
+  store.practiceUnitHeader.composer = "";
+  store.practiceUnitHeader.sourceWork = "";
+  store.practiceUnitHeader.techniqueFocus = [];
+  store.practiceUnitHeader.tagSource = "";
+  store.practiceUnitHeader.repetitionCount = null;
+  store.practiceUnitHeader.sourceMusicXML = "";
+  store.practiceUnitHeader.instrumentOverride = "";
+
+  // Compose unified practiceUnit object
+  const practiceUnit = store.composePracticeUnit();
   const dataStr = JSON.stringify(practiceUnit, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "MTS-PracticeUnitExport.json";
+  a.download = `MTS-Practice Unit ${name}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1069,14 +1127,14 @@ onMounted(async () => {
     const cookieInstrument = getCookie("instrument");
     if (
       cookieInstrument &&
-      !store.instrument &&
+      !store.practiceUnitHeader.instrument &&
       Array.isArray(store.instruments) &&
       store.instruments.length
     ) {
       const match = store.instruments.find(
         (i) => i.instrument === cookieInstrument
       );
-      if (match) store.instrument = match;
+      if (match) store.practiceUnitHeader.instrument = match;
     }
   } catch {}
 });

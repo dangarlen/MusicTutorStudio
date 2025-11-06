@@ -30,6 +30,20 @@
             <div class="text-xs text-gray-600 mb-1">
               Imported note count: {{ store.noteArray.length }}
             </div>
+
+            <!-- TRIM Instructions -->
+            <div
+              class="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm text-gray-700"
+            >
+              <strong class="text-blue-800">How to TRIM:</strong> Click on the
+              first note you want to keep until it turns
+              <strong class="text-green-600">green</strong>, then click on the
+              last note you want to keep until it turns
+              <strong class="text-red-600">red</strong>. Press
+              <strong>[TRIM]</strong> to keep only the notes between green and
+              red (inclusive). Colors will reset to black after trimming.
+            </div>
+
             <StaffPreview
               :practice-enable-click-to-cycle="true"
               :practice-color-cycle="['black', 'green', 'red']"
@@ -222,7 +236,7 @@
         </div>
       </div>
 
-      <!-- Save/Recall Workspace Snapshot -->
+      <!-- Practice Unit Snapshot Manager -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
@@ -230,7 +244,7 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>💾 Save/Recall Workspace Snapshot</span>
+          <span>💾 Practice Unit Snapshot Manager</span>
           <span class="text-right text-base font-normal text-gray-600">
             {{ exerciseName ? `Exercise: ${exerciseName}` : "Not yet saved" }}
           </span>
@@ -238,7 +252,7 @@
         <div class="collapse-content px-4">
           <div class="flex gap-4 mb-4">
             <button class="btn btn-warning" @click="saveExercise">
-              SAVE Exercise to MTS-PracticeUnitExport.json
+              Export Practice Unit to JSON file
             </button>
             <button
               class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
@@ -249,7 +263,7 @@
                 aria-hidden="true"
                 >upload_file</span
               >
-              RECALL (Import JSON)
+              Import Practice Unit from JSON file
             </button>
             <input
               ref="recallFileInput"
@@ -268,7 +282,7 @@
       >
         <input type="checkbox" class="peer" />
         <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">
-          Behind the Curtain: currentPracticeUnit.json
+          Behind the Curtain: practiceUnitStore (JSON snapshot)
         </div>
         <div class="collapse-content px-4">
           <pre
@@ -290,12 +304,35 @@ import CreatorReturn from "./CreatorReturn.vue";
 import StaffPreview from "./StaffPreview.vue";
 import InstrumentDropdown from "./InstrumentDropdown.vue";
 import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
-import { ref, computed } from "vue";
+import { ref, computed, reactive } from "vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
 
 const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
+
+// Initialize scaleSelections if not present (needed for Staff Formatting component)
+if (!store.scaleSelections) {
+  store.scaleSelections = reactive({
+    key: "C",
+    scaleType: "Major",
+    startingOctave: "C4",
+    octaveCount: 1,
+    maxMeasuresPerLine: 2,
+    direction: "ascending",
+    noteDuration: "quarter",
+    timeSignature: "4/4",
+    staffOptions: {
+      keySignature: true,
+      accidentals: true,
+      barLines: true,
+      timeSignature: true,
+      measuresPerLineMax: 2,
+      enforceLedgerLimits: false,
+      accidentalFamily: "auto-key",
+    },
+  });
+}
 
 const importedTitle = ref("");
 const importedKey = ref("");
@@ -479,20 +516,38 @@ function composePracticeUnit(outNotes) {
   return {
     practiceUnitHeader: {
       practiceName: importedTitle.value || "Imported Exercise",
-      practiceUnitId: "temp-id",
+      practiceUnitId: crypto.randomUUID
+        ? crypto.randomUUID()
+        : "temp-" + Date.now(),
       practiceUnitType: "Exercise",
       lastModified: new Date().toISOString(),
       tempo: 80,
       keySignature: importedKey.value || "C",
       timeSignature: importedTime.value || "4/4",
       instrument: store.instrument || {},
+      staffDisplayOptions: {
+        showAccidentals: true,
+        showOverlays: true,
+        measuresPerLineMax: 2,
+      },
       sourceURL: "",
-    },
-    practiceUnitExercise: {
-      exerciseType: "Passage",
+      noteColorDesignation: {},
+      // Exercise-specific unified fields
+      contentType: "Passage", // Exercise type
       techniqueFocus: [],
+      tagSource: "user",
       repetitionCount: 1,
       sourceMusicXML: musicXmlFileName.value || "",
+      instrumentOverride: "",
+      // N/A for Exercise (Scale fields)
+      direction: "",
+      startingOctave: "",
+      numberOfOctaves: null,
+      // N/A for Exercise (Passage fields)
+      rangeStart: null,
+      rangeEnd: null,
+      composer: "",
+      sourceWork: "",
     },
     noteArray: outNotes,
   };
@@ -539,23 +594,21 @@ const trimEnd = computed(() => {
 
 function seedEditFieldsFromUnit() {
   const h = currentPracticeUnit.value?.practiceUnitHeader || {};
-  const ex = currentPracticeUnit.value?.practiceUnitExercise || {};
   editPracticeName.value = h.practiceName || "Imported Exercise";
   editTempo.value = Number(h.tempo || 80);
-  editReps.value = Number(ex.repetitionCount || 1);
-  editFocus.value = (ex.techniqueFocus || []).join(", ");
+  editReps.value = Number(h.repetitionCount || 1);
+  editFocus.value = (h.techniqueFocus || []).join(", ");
   editSourceURL.value = h.sourceURL || "";
 }
 
 function applyEdits() {
   if (!currentPracticeUnit.value) return;
   const h = currentPracticeUnit.value.practiceUnitHeader;
-  const ex = currentPracticeUnit.value.practiceUnitExercise;
   h.practiceName = editPracticeName.value || h.practiceName;
   h.tempo = Number(editTempo.value) || 80;
   h.sourceURL = editSourceURL.value || "";
-  ex.repetitionCount = Number(editReps.value) || 1;
-  ex.techniqueFocus = (editFocus.value || "")
+  h.repetitionCount = Number(editReps.value) || 1;
+  h.techniqueFocus = (editFocus.value || "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
@@ -571,7 +624,9 @@ function doTrim() {
       return;
     }
     const arr = store.noteArray || [];
-    const newArr = arr.slice(start, end + 1).map((n) => ({ ...n }));
+    const newArr = arr
+      .slice(start, end + 1)
+      .map((n) => ({ ...n, noteColor: "black" }));
     // Update stores and local practice unit
     store.noteArray = newArr;
     testStaffStore.noteArray = newArr.map((n) => ({ ...n }));
@@ -632,15 +687,26 @@ function saveExercise() {
       alert("No exercise to save. Please import or create an exercise first.");
       return;
     }
+
+    // Prompt for practice unit name
+    const defaultName = editPracticeName.value || "Exercise";
+    let name = window.prompt("Enter Practice Unit Name:", defaultName);
+    if (!name) return;
+
+    // Update the practice name in the current unit
+    if (currentPracticeUnit.value.practiceUnitHeader) {
+      currentPracticeUnit.value.practiceUnitHeader.practiceName = name;
+    }
+
     const json = JSON.stringify(currentPracticeUnit.value, null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "MTS-PracticeUnitExport.json";
+    a.download = `MTS-Practice Unit ${name}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    exerciseName.value = editPracticeName.value || "Saved Exercise";
+    exerciseName.value = name;
   } catch (e) {
     console.warn("[CreateExercise] saveExercise failed", e);
     alert("Failed to save exercise.");
@@ -661,27 +727,70 @@ function handleRecallFileChange(ev) {
     .then((text) => {
       try {
         const data = JSON.parse(text);
-        // Populate stores and currentPracticeUnit from imported JSON
-        if (data.noteArray) {
-          store.noteArray = data.noteArray;
-          testStaffStore.noteArray = data.noteArray.map((n) => ({ ...n }));
-        }
-        if (data.practiceUnitHeader) {
-          importedTitle.value = data.practiceUnitHeader.practiceName || "";
-          importedKey.value = data.practiceUnitHeader.keySignature || "C";
-          importedTime.value = data.practiceUnitHeader.timeSignature || "4/4";
+
+        // Check if unified format (2-section) or legacy (3-section with practiceUnitExercise)
+        if (data.practiceUnitHeader && Array.isArray(data.noteArray)) {
+          const h = data.practiceUnitHeader;
+
+          // Check if legacy format (has practiceUnitExercise section)
+          if (data.practiceUnitExercise) {
+            // Convert legacy to unified
+            const ex = data.practiceUnitExercise;
+            h.contentType = ex.exerciseType || "Passage";
+            h.techniqueFocus = ex.techniqueFocus || [];
+            h.tagSource = ex.tagSource || "user";
+            h.repetitionCount = ex.repetitionCount || 1;
+            h.sourceMusicXML = ex.sourceMusicXML || "";
+            h.instrumentOverride = ex.instrument || "";
+            // Ensure N/A fields are set
+            h.direction = h.direction || "";
+            h.startingOctave = h.startingOctave || "";
+            h.numberOfOctaves = h.numberOfOctaves ?? null;
+            h.rangeStart = h.rangeStart ?? null;
+            h.rangeEnd = h.rangeEnd ?? null;
+            h.composer = h.composer || "";
+            h.sourceWork = h.sourceWork || "";
+            // Remove legacy section
+            delete data.practiceUnitExercise;
+          }
+
+          // Populate stores
+          if (data.noteArray) {
+            store.noteArray = data.noteArray.map((n) => ({ ...n }));
+            testStaffStore.noteArray = data.noteArray.map((n) => ({ ...n }));
+            originalNoteArray.value = data.noteArray.map((n) => ({ ...n }));
+            octaveTranspositionCount.value = 0;
+          }
+
+          importedTitle.value = h.practiceName || "";
+          importedKey.value = h.keySignature || "C";
+          importedTime.value = h.timeSignature || "4/4";
+          musicXmlFileName.value = h.sourceMusicXML || "";
+
           store.scaleSelections = store.scaleSelections || {};
           store.scaleSelections.key = importedKey.value;
           store.scaleSelections.timeSignature = importedTime.value;
           store.title = importedTitle.value;
-          if (data.practiceUnitHeader.instrument) {
-            store.instrument = data.practiceUnitHeader.instrument;
+
+          if (h.instrument) {
+            store.instrument = h.instrument;
           }
+
+          currentPracticeUnit.value = data;
+          seedEditFieldsFromUnit();
+          refreshCurrentUnitJson();
+          exerciseName.value = importedTitle.value || "Recalled Exercise";
+
+          alert(
+            data.practiceUnitExercise
+              ? "Exercise loaded (legacy format converted)"
+              : "Exercise loaded (unified format)"
+          );
+        } else {
+          alert(
+            "Invalid practice unit format. Expected practiceUnitHeader and noteArray."
+          );
         }
-        currentPracticeUnit.value = data;
-        seedEditFieldsFromUnit();
-        refreshCurrentUnitJson();
-        exerciseName.value = importedTitle.value || "Recalled Exercise";
       } catch (e) {
         console.warn("[CreateExercise] Recall parse failed", e);
         alert("Failed to parse recalled JSON file.");
