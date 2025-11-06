@@ -8,7 +8,7 @@
         <span class="material-symbols-outlined">add_circle</span>
         <span class="text-2xl font-bold">Create Exercise</span>
       </div>
-      <!-- Exercise Selection (from prototype/show-scales style) -->
+      <!-- Preview -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
@@ -16,44 +16,9 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>Exercise</span>
+          <span>Preview</span>
         </div>
         <div class="collapse-content px-4 space-y-4">
-          <!-- Practice Type (preset) -->
-          <div class="form-control w-full max-w-md">
-            <label class="label mb-1" for="practiceType"
-              ><span class="label-text">Practice Type</span></label
-            >
-            <input
-              id="practiceType"
-              class="input input-bordered input-sm"
-              value="Passage"
-              disabled
-            />
-          </div>
-
-          <!-- Exercise selector -->
-          <div class="form-control w-full max-w-md">
-            <label for="exerciseSelect" class="label mb-1"
-              ><span class="label-text">Exercise</span></label
-            >
-            <select
-              id="exerciseSelect"
-              class="select select-bordered select-sm"
-              v-model="selectedExercise"
-              @change="onExerciseChange"
-            >
-              <option value="" disabled>Select exercise...</option>
-              <option
-                v-for="opt in exerciseOptions"
-                :key="opt.value"
-                :value="opt.value"
-              >
-                {{ opt.label }}
-              </option>
-            </select>
-          </div>
-
           <!-- Preview: basic list of imported notes -->
           <div v-if="importedTitle" class="text-sm text-gray-700">
             <div><strong>Title:</strong> {{ importedTitle }}</div>
@@ -65,12 +30,24 @@
             <div class="text-xs text-gray-600 mb-1">
               Imported note count: {{ store.noteArray.length }}
             </div>
-            <StaffPreview />
+            <StaffPreview
+              :practice-enable-click-to-cycle="true"
+              :practice-color-cycle="['black', 'green', 'red']"
+            />
+
+            <div v-if="trimEnabled" class="mt-3 flex items-center gap-2">
+              <button class="btn btn-sm btn-accent" @click="doTrim">
+                [TRIM]
+              </button>
+              <div class="text-sm text-gray-600">
+                Keeping notes {{ trimStart + 1 }} → {{ trimEnd + 1 }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Import MusicXML -->
+      <!-- MusicXML -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
@@ -78,13 +55,18 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>Import MusicXML</span>
+          <span>MusicXML</span>
+          <span class="text-sm font-normal text-gray-500">{{
+            musicXmlFileName || "Select MusicXML file for import"
+          }}</span>
         </div>
         <div class="collapse-content px-4 space-y-3">
           <p class="text-sm text-gray-600">
-            Choose a .musicxml or .xml file. We will parse title, key, time, and
-            convert notes to simple tokens (SPN + w|h|q|e|s). Dots are currently
-            flattened to the base duration for MVP.
+            Choose a .musicxml or .xml file. We'll parse title, key, and time,
+            then convert notes into simple tokens: SPN plus duration (w|h|q|e|s)
+            with an optional dot for dotted values (e.g., q., e.). Dotted
+            durations are fully supported and render/measure as 1.5× their base
+            value.
           </p>
           <input
             type="file"
@@ -182,6 +164,104 @@
         </div>
       </div>
 
+      <!-- Instrument -->
+      <div class="mb-4">
+        <InstrumentDropdown
+          :instruments="store.instruments"
+          v-model="store.instrument"
+        />
+      </div>
+
+      <!-- Staff Formatting -->
+      <CreateScaleScaleStaffFormatting
+        :scaleSelections="store.scaleSelections"
+        @update:scaleSelections="store.scaleSelections = $event"
+      />
+
+      <!-- Octave Controls -->
+      <div
+        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
+      >
+        <input type="checkbox" class="peer" />
+        <div
+          class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
+        >
+          <span>🔢 Octave Controls</span>
+          <span class="text-right text-base font-normal text-gray-600">
+            Octave Transposition: {{ octaveTranspositionCount }}
+          </span>
+        </div>
+        <div class="collapse-content px-4">
+          <div class="flex items-center gap-4">
+            <button
+              class="btn btn-sm"
+              @click="decrementOctave"
+              :disabled="octaveTranspositionCount <= -2"
+            >
+              [–]
+            </button>
+            <div class="text-center">
+              <div class="font-semibold mb-1">Octave Transposition</div>
+              <span
+                class="px-3 py-1 border rounded bg-white text-gray-800 font-mono"
+                >{{ octaveTranspositionCount }}</span
+              >
+            </div>
+            <button
+              class="btn btn-sm"
+              @click="incrementOctave"
+              :disabled="octaveTranspositionCount >= 2"
+            >
+              [+]
+            </button>
+          </div>
+          <div class="text-xs text-gray-600 mt-2">
+            Range: -2 to +2 octaves. Adjusts note octaves without changing
+            accidentals.
+          </div>
+        </div>
+      </div>
+
+      <!-- Save/Recall Workspace Snapshot -->
+      <div
+        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
+      >
+        <input type="checkbox" class="peer" />
+        <div
+          class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
+        >
+          <span>💾 Save/Recall Workspace Snapshot</span>
+          <span class="text-right text-base font-normal text-gray-600">
+            {{ exerciseName ? `Exercise: ${exerciseName}` : "Not yet saved" }}
+          </span>
+        </div>
+        <div class="collapse-content px-4">
+          <div class="flex gap-4 mb-4">
+            <button class="btn btn-warning" @click="saveExercise">
+              SAVE Exercise to MTS-PracticeUnitExport.json
+            </button>
+            <button
+              class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
+              @click="triggerRecallFileDialog"
+            >
+              <span
+                class="material-symbols-outlined align-middle mr-2"
+                aria-hidden="true"
+                >upload_file</span
+              >
+              RECALL (Import JSON)
+            </button>
+            <input
+              ref="recallFileInput"
+              type="file"
+              accept="application/json"
+              style="display: none"
+              @change="handleRecallFileChange"
+            />
+          </div>
+        </div>
+      </div>
+
       <!-- Behind the Curtain: current practice unit JSON -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
@@ -208,28 +288,24 @@ import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import CreatorReturn from "./CreatorReturn.vue";
 import StaffPreview from "./StaffPreview.vue";
-import { ref } from "vue";
+import InstrumentDropdown from "./InstrumentDropdown.vue";
+import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
+import { ref, computed } from "vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
 
 const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
 
-// Dropdown options sourced from public/alpha-vue-SPA/data/practicePassages
-const exerciseOptions = [
-  { value: "danny-boy.json", label: "Danny Boy" },
-  { value: "king-of-the-road.json", label: "King of the Road" },
-  {
-    value: "twinkle-twinkle-little-star.json",
-    label: "Twinkle Twinkle Little Star",
-  },
-];
-const selectedExercise = ref("");
-
 const importedTitle = ref("");
 const importedKey = ref("");
 const importedTime = ref("");
 const importError = ref("");
+const musicXmlFileName = ref("");
+const exerciseName = ref("");
+const recallFileInput = ref(null);
+const octaveTranspositionCount = ref(0);
+let originalNoteArray = ref([]);
 
 // current practice unit (local to this view)
 const currentPracticeUnit = ref(null);
@@ -247,69 +323,12 @@ function refreshCurrentUnitJson() {
   }
 }
 
-function onExerciseChange() {
-  if (!selectedExercise.value) return;
-  const url = `${import.meta.env.BASE_URL}data/practicePassages/${
-    selectedExercise.value
-  }`;
-  fetch(url)
-    .then((r) => r.json())
-    .then((data) => importExerciseJson(data))
-    .catch((e) => console.warn("[CreateExercise] Import failed", e));
-}
-
-function importExerciseJson(data) {
-  try {
-    const parsed = parseSimplePassageJson(data);
-    importedTitle.value = parsed.title;
-    importedKey.value = parsed.keySignature;
-    importedTime.value = parsed.timeSignature;
-    // Load into both stores for preview + data store
-    store.noteArray = parsed.noteArray;
-    testStaffStore.noteArray = parsed.noteArray.map((n) => ({ ...n }));
-    // Seed minimal scaleSelections for rendering context
-    store.scaleSelections = store.scaleSelections || {};
-    store.scaleSelections.key = importedKey.value || "C";
-    store.scaleSelections.timeSignature = importedTime.value || "4/4";
-    store.title = importedTitle.value || "Exercise";
-
-    // Compose a basic practice unit locally
-    currentPracticeUnit.value = composePracticeUnit(parsed.noteArray);
-    // Seed edit fields from current unit
-    seedEditFieldsFromUnit();
-    refreshCurrentUnitJson();
-  } catch (e) {
-    console.warn("[CreateExercise] Transform failed", e);
-  }
-}
-
-function parseSimplePassageJson(data) {
-  const title = String(data?.title || "");
-  const keySignature = String(data?.keySignature || "");
-  const timeSignature = String(data?.timeSignature || "4/4");
-  const measures = Array.isArray(data?.measures) ? data.measures : [];
-  const out = [];
-  for (const m of measures) {
-    const notes = Array.isArray(m?.notes) ? m.notes : [];
-    for (const tok of notes) {
-      const [p, dRaw] = String(tok).split(":");
-      if (!p || !dRaw) continue;
-      if (p.toLowerCase() === "rest") continue; // skip rests for now
-      // Accept w|h|q|e|s with optional dot suffix for dotted (+1/2 base)
-      const mDur = String(dRaw).match(/^([whqes])(\.)?$/);
-      if (!mDur) continue;
-      const d = mDur[1] + (mDur[2] || "");
-      out.push({ pitch: p, duration: d });
-    }
-  }
-  return { title, keySignature, timeSignature, noteArray: out };
-}
-
 // MusicXML import
 function onMusicXmlFile(ev) {
   importError.value = "";
   const file = ev?.target?.files?.[0];
   if (!file) return;
+  musicXmlFileName.value = file.name; // Capture filename for display
   file
     .text()
     .then((xml) => {
@@ -324,14 +343,18 @@ function onMusicXmlFile(ev) {
         importedTime.value = parsed.timeSignature || "4/4";
 
         // update stores for preview
-        store.noteArray = parsed.noteArray;
-        testStaffStore.noteArray = parsed.noteArray.map((n) => ({ ...n }));
+        originalNoteArray.value = parsed.noteArray.map((n) => ({ ...n }));
+        octaveTranspositionCount.value = 0;
+        store.noteArray = originalNoteArray.value.map((n) => ({ ...n }));
+        testStaffStore.noteArray = originalNoteArray.value.map((n) => ({
+          ...n,
+        }));
         store.scaleSelections = store.scaleSelections || {};
         store.scaleSelections.key = importedKey.value;
         store.scaleSelections.timeSignature = importedTime.value;
         store.title = importedTitle.value;
 
-        currentPracticeUnit.value = composePracticeUnit(parsed.noteArray);
+        currentPracticeUnit.value = composePracticeUnit(store.noteArray);
         // carry over imported header fields
         currentPracticeUnit.value.practiceUnitHeader.practiceName =
           importedTitle.value;
@@ -469,6 +492,7 @@ function composePracticeUnit(outNotes) {
       exerciseType: "Passage",
       techniqueFocus: [],
       repetitionCount: 1,
+      sourceMusicXML: musicXmlFileName.value || "",
     },
     noteArray: outNotes,
   };
@@ -480,6 +504,38 @@ const editTempo = ref(80);
 const editReps = ref(1);
 const editFocus = ref("");
 const editSourceURL = ref("");
+
+// Trim button logic: show when at least one green and one red note exist
+const trimEnabled = computed(() => {
+  const arr = store.noteArray || [];
+  const hasGreen = arr.some(
+    (n) => (n.noteColor || "").toLowerCase() === "green"
+  );
+  const hasRed = arr.some((n) => (n.noteColor || "").toLowerCase() === "red");
+  if (!hasGreen || !hasRed) return false;
+  // ensure green occurs before red in index space
+  const minGreen = arr.findIndex(
+    (n) => (n.noteColor || "").toLowerCase() === "green"
+  );
+  const maxRed = arr.reduce(
+    (acc, n, i) => ((n.noteColor || "").toLowerCase() === "red" ? i : acc),
+    -1
+  );
+  return minGreen >= 0 && maxRed >= 0 && minGreen <= maxRed;
+});
+
+const trimStart = computed(() => {
+  const arr = store.noteArray || [];
+  return arr.findIndex((n) => (n.noteColor || "").toLowerCase() === "green");
+});
+
+const trimEnd = computed(() => {
+  const arr = store.noteArray || [];
+  return arr.reduce(
+    (acc, n, i) => ((n.noteColor || "").toLowerCase() === "red" ? i : acc),
+    -1
+  );
+});
 
 function seedEditFieldsFromUnit() {
   const h = currentPracticeUnit.value?.practiceUnitHeader || {};
@@ -504,5 +560,133 @@ function applyEdits() {
     .map((s) => s.trim())
     .filter(Boolean);
   refreshCurrentUnitJson();
+}
+
+function doTrim() {
+  try {
+    const start = trimStart.value;
+    const end = trimEnd.value;
+    if (start < 0 || end < 0 || start > end) {
+      console.warn("[CreateExercise] Trim range invalid", start, end);
+      return;
+    }
+    const arr = store.noteArray || [];
+    const newArr = arr.slice(start, end + 1).map((n) => ({ ...n }));
+    // Update stores and local practice unit
+    store.noteArray = newArr;
+    testStaffStore.noteArray = newArr.map((n) => ({ ...n }));
+    if (currentPracticeUnit.value) {
+      currentPracticeUnit.value.noteArray = newArr;
+      refreshCurrentUnitJson();
+    }
+    // Reset baseline to trimmed and center transposition
+    originalNoteArray.value = newArr.map((n) => ({ ...n }));
+    octaveTranspositionCount.value = 0;
+  } catch (e) {
+    console.warn("[CreateExercise] doTrim failed", e);
+  }
+}
+
+// --- Octave transposition helpers ---
+function transposePitchOctave(spn, delta) {
+  const m = String(spn).match(/^([A-G][#b]?)(\d+)$/);
+  if (!m) return spn;
+  const note = m[1];
+  const oct = Number.parseInt(m[2], 10);
+  const newOct = oct + delta;
+  return `${note}${newOct}`;
+}
+
+function applyOctaveTransposition() {
+  const delta = octaveTranspositionCount.value || 0;
+  const base = Array.isArray(originalNoteArray.value)
+    ? originalNoteArray.value
+    : [];
+  const transposed = base.map((n) => {
+    if (!n?.pitch) return { ...n };
+    return { ...n, pitch: transposePitchOctave(n.pitch, delta) };
+  });
+  store.noteArray = transposed;
+  testStaffStore.noteArray = transposed.map((n) => ({ ...n }));
+  if (currentPracticeUnit.value) {
+    currentPracticeUnit.value.noteArray = transposed;
+    refreshCurrentUnitJson();
+  }
+}
+
+function incrementOctave() {
+  if (octaveTranspositionCount.value >= 2) return;
+  octaveTranspositionCount.value += 1;
+  applyOctaveTransposition();
+}
+function decrementOctave() {
+  if (octaveTranspositionCount.value <= -2) return;
+  octaveTranspositionCount.value -= 1;
+  applyOctaveTransposition();
+}
+
+// Save/Recall functions
+function saveExercise() {
+  try {
+    if (!currentPracticeUnit.value) {
+      alert("No exercise to save. Please import or create an exercise first.");
+      return;
+    }
+    const json = JSON.stringify(currentPracticeUnit.value, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "MTS-PracticeUnitExport.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    exerciseName.value = editPracticeName.value || "Saved Exercise";
+  } catch (e) {
+    console.warn("[CreateExercise] saveExercise failed", e);
+    alert("Failed to save exercise.");
+  }
+}
+
+function triggerRecallFileDialog() {
+  if (recallFileInput.value) {
+    recallFileInput.value.click();
+  }
+}
+
+function handleRecallFileChange(ev) {
+  const file = ev?.target?.files?.[0];
+  if (!file) return;
+  file
+    .text()
+    .then((text) => {
+      try {
+        const data = JSON.parse(text);
+        // Populate stores and currentPracticeUnit from imported JSON
+        if (data.noteArray) {
+          store.noteArray = data.noteArray;
+          testStaffStore.noteArray = data.noteArray.map((n) => ({ ...n }));
+        }
+        if (data.practiceUnitHeader) {
+          importedTitle.value = data.practiceUnitHeader.practiceName || "";
+          importedKey.value = data.practiceUnitHeader.keySignature || "C";
+          importedTime.value = data.practiceUnitHeader.timeSignature || "4/4";
+          store.scaleSelections = store.scaleSelections || {};
+          store.scaleSelections.key = importedKey.value;
+          store.scaleSelections.timeSignature = importedTime.value;
+          store.title = importedTitle.value;
+          if (data.practiceUnitHeader.instrument) {
+            store.instrument = data.practiceUnitHeader.instrument;
+          }
+        }
+        currentPracticeUnit.value = data;
+        seedEditFieldsFromUnit();
+        refreshCurrentUnitJson();
+        exerciseName.value = importedTitle.value || "Recalled Exercise";
+      } catch (e) {
+        console.warn("[CreateExercise] Recall parse failed", e);
+        alert("Failed to parse recalled JSON file.");
+      }
+    })
+    .catch(() => alert("Failed to read recall file."));
 }
 </script>

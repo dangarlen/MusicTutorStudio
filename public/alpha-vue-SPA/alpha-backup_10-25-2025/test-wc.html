@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test WC Fragments</title>
+    <script type="module">
+      import { HtmlFragmentLoader } from "./scripts/loader.js";
+      window.addEventListener("DOMContentLoaded", () => {
+        const loader = new HtmlFragmentLoader(
+          "fragments/fragment-a.html",
+          "fragments/fragment-b.html"
+        );
+        document.getElementById("fragments-container").appendChild(loader);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="fragments-container"></div>
+  </body>
+</html>

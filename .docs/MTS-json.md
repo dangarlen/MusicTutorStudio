@@ -177,6 +177,11 @@ User enters metadata and selects excerpt range after MusicXML import.
   Source: `user-defined`  
   Destination: Text override for instrument label
 
+- **sourceMusicXML**  
+  Type: `string`  
+  Source: `system-captured`  
+  Destination: Filename of imported MusicXML file for reference and re-import
+
 ---
 
 ## 🔹 practiceUnitExercise
@@ -209,6 +214,11 @@ User defines technique focus and repetition logic after MusicXML import.
   Type: `string`  
   Source: `user-defined`  
   Destination: Text override for instrument label
+
+- **sourceMusicXML**  
+  Type: `string`  
+  Source: `system-captured`  
+  Destination: Filename of imported MusicXML file for reference and re-import
 
 ---
 
@@ -375,7 +385,8 @@ Notes:
       "startMeasure": 1,
       "endMeasure": 4
     },
-    "instrument": "Cello"
+    "instrument": "Cello",
+    "sourceMusicXML": "bach-cello-suite-1.musicxml"
   },
   "noteArray": [
     {

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lessons</title>
+    <link rel="icon" href="favicon.ico" />
+    <script src="scripts/load-header.js"></script>
+    <script src="scripts/load-footer.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header fragment injected here -->
+    <div id="header-container"></div>
+
+    <main class="flex-1 container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-6">Lessons</h1>
+      <div class="flex flex-col sm:flex-row gap-4 mb-8">
+        <button
+          id="create-lesson-btn"
+          class="px-6 py-3 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition text-lg font-semibold"
+        >
+          Create Lesson
+        </button>
+        <button
+          id="recall-lesson-btn"
+          class="px-6 py-3 bg-green-600 text-white rounded shadow hover:bg-green-700 transition text-lg font-semibold"
+        >
+          Recall Lesson
+        </button>
+        <button
+          id="manage-lessons-btn"
+          class="px-6 py-3 bg-yellow-500 text-white rounded shadow hover:bg-yellow-600 transition text-lg font-semibold"
+        >
+          Manage Lessons
+        </button>
+        <button
+          id="manage-practice-units-btn"
+          class="px-6 py-3 bg-purple-600 text-white rounded shadow hover:bg-purple-700 transition text-lg font-semibold"
+        >
+          Manage Practice Units
+        </button>
+      </div>
+      <div
+        id="lessons-list-container"
+        class="bg-white rounded shadow p-6 max-w-xl mx-auto"
+      >
+        <div id="lesson-links" class="mt-0"></div>
+      </div>
+    </main>
+
+    <!-- Footer fragment injected here -->
+    <div id="footer-container"></div>
+    <script>
+      // Inject header and footer fragments
+      window.addEventListener("DOMContentLoaded", function () {
+        if (window.loadHeader) window.loadHeader();
+        if (window.loadFooter) window.loadFooter();
+
+        // Create Lesson logic
+        const createBtn = document.getElementById("create-lesson-btn");
+        // Modal for creating lesson
+        let modal = null;
+        function showCreateLessonModal() {
+          // Remove existing modal if present
+          if (modal) modal.remove();
+          modal = document.createElement("div");
+          modal.className =
+            "fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50";
+          modal.innerHTML = `
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+              <h2 class="text-2xl font-bold mb-4">Create New Lesson</h2>
+              <label class="block mb-2 font-semibold">Lesson Name:</label>
+              <input id="lesson-name-input" type="text" class="w-full border rounded px-3 py-2 mb-4" placeholder="Enter lesson name" />
+              <label class="block mb-2 font-semibold">Available Practice Units:</label>
+              <div id="practice-units-list" class="border rounded p-2 h-40 overflow-y-auto mb-4 bg-gray-50"></div>
+              <div class="mb-2">
+                <button id="add-unit-btn" class="bg-blue-600 text-white px-4 py-2 rounded mr-2 hover:bg-blue-700">Add to Lesson</button>
+                <button id="save-lesson-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Lesson</button>
+                <button id="cancel-lesson-btn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2">Cancel</button>
+              </div>
+              <div class="mb-2">
+                <span class="font-semibold">Units in Lesson:</span>
+                <ul id="units-in-lesson" class="list-disc pl-6 mt-1"></ul>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(modal);
+
+          const lessonNameInput = modal.querySelector("#lesson-name-input");
+          const unitsListDiv = modal.querySelector("#practice-units-list");
+          const addUnitBtn = modal.querySelector("#add-unit-btn");
+          const saveLessonBtn = modal.querySelector("#save-lesson-btn");
+          const cancelLessonBtn = modal.querySelector("#cancel-lesson-btn");
+          const unitsInLessonUl = modal.querySelector("#units-in-lesson");
+
+          // Load available practice units
+          let availableUnits = JSON.parse(
+            localStorage.getItem("userPracticeUnits") || "[]"
+          );
+          let selectedUnitIdx = null;
+          let lessonUnits = [];
+
+          function renderAvailableUnits() {
+            unitsListDiv.innerHTML = "";
+            if (!availableUnits.length) {
+              unitsListDiv.innerHTML =
+                '<div class="text-gray-500">No Practice Units found.</div>';
+              return;
+            }
+            availableUnits.forEach((unit, idx) => {
+              const div = document.createElement("div");
+              div.className =
+                "flex items-center mb-1 cursor-pointer hover:bg-blue-100 rounded px-2" +
+                (selectedUnitIdx === idx ? " bg-blue-200" : "");
+              div.textContent = unit.name || `Practice Unit ${idx + 1}`;
+              div.onclick = () => {
+                selectedUnitIdx = idx;
+                renderAvailableUnits();
+              };
+              unitsListDiv.appendChild(div);
+            });
+          }
+
+          function renderLessonUnits() {
+            unitsInLessonUl.innerHTML = "";
+            lessonUnits.forEach((unit, idx) => {
+              const li = document.createElement("li");
+              li.textContent = unit.name || `Practice Unit ${idx + 1}`;
+              // Remove button for each unit
+              const removeBtn = document.createElement("button");
+              removeBtn.textContent = "Remove";
+              removeBtn.className =
+                "ml-2 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-xs";
+              removeBtn.onclick = () => {
+                lessonUnits.splice(idx, 1);
+                renderLessonUnits();
+              };
+              li.appendChild(removeBtn);
+              unitsInLessonUl.appendChild(li);
+            });
+          }
+
+          renderAvailableUnits();
+          renderLessonUnits();
+
+          addUnitBtn.onclick = function () {
+            if (selectedUnitIdx === null || !availableUnits[selectedUnitIdx]) {
+              alert("Please select a Practice Unit to add.");
+              return;
+            }
+            // Prevent duplicate add
+            if (
+              lessonUnits.some(
+                (u) => u.name === availableUnits[selectedUnitIdx].name
+              )
+            ) {
+              alert("This Practice Unit is already added to the lesson.");
+              return;
+            }
+            lessonUnits.push(availableUnits[selectedUnitIdx]);
+            renderLessonUnits();
+          };
+
+          saveLessonBtn.onclick = function () {
+            const lessonName = lessonNameInput.value.trim();
+            if (!lessonName) {
+              alert("Please enter a lesson name.");
+              return;
+            }
+            if (!lessonUnits.length) {
+              alert("Please add at least one Practice Unit to the lesson.");
+              return;
+            }
+            const lessonData = { name: lessonName, units: lessonUnits };
+            let lessons = JSON.parse(
+              localStorage.getItem("userLessons") || "[]"
+            );
+            lessons.push(lessonData);
+            localStorage.setItem("userLessons", JSON.stringify(lessons));
+            alert(
+              'Lesson "' +
+                lessonName +
+                '" saved with ' +
+                lessonUnits.length +
+                " Practice Units!"
+            );
+            modal.remove();
+          };
+
+          cancelLessonBtn.onclick = function () {
+            modal.remove();
+          };
+        }
+
+        createBtn.addEventListener("click", showCreateLessonModal);
+        // Recall Lesson logic
+        const recallBtn = document.getElementById("recall-lesson-btn");
+        const lessonLinksDiv = document.getElementById("lesson-links");
+
+        // Render a lesson and its units in the lessonLinksDiv
+        function renderActiveLesson(lesson) {
+          if (!lesson) {
+            lessonLinksDiv.innerHTML =
+              '<p class="text-gray-500">No lesson loaded. Use Recall Lesson to select one.</p>';
+            // Also hide cancel button if present
+            const cancelBtn = document.getElementById("cancel-lesson-view-btn");
+            if (cancelBtn) cancelBtn.style.display = "none";
+            return;
+          }
+          let html = `<h2 class=\"text-xl font-semibold mb-2\">Current Lesson: ${lesson.name}</h2>`;
+          if (lesson.units && lesson.units.length > 0) {
+            html += '<ul class="list-disc pl-6">';
+            lesson.units.forEach((unit, idx) => {
+              html += `<li class=\"mb-2 flex items-center justify-between\">
+                <span>${unit.name || `Practice Unit ${idx + 1}`}</span>
+                <div>
+                  <button class=\"load-unit-btn bg-green-600 text-white px-3 py-1 rounded mr-2 hover:bg-green-700\" data-uidx=\"${idx}\">Load</button>
+                  <button class=\"toggle-json-btn bg-gray-400 text-white px-2 py-1 rounded hover:bg-gray-600\" data-uidx=\"${idx}\">Show JSON</button>
+                </div>
+                <pre class=\"unit-json mt-2 hidden text-xs bg-gray-200 p-2 rounded overflow-x-auto\">${JSON.stringify(
+                  unit,
+                  null,
+                  2
+                )}</pre>
+              </li>`;
+            });
+            html += "</ul>";
+          } else {
+            html += '<div class="text-gray-500">No units in this lesson.</div>';
+          }
+          lessonLinksDiv.innerHTML = html;
+          // Show cancel button
+          const cancelBtn = document.getElementById("cancel-lesson-view-btn");
+          if (cancelBtn) cancelBtn.style.display = "";
+          // Add listeners for load and toggle-json buttons
+          lessonLinksDiv.querySelectorAll(".toggle-json-btn").forEach((btn) => {
+            btn.onclick = function () {
+              const idx = btn.getAttribute("data-uidx");
+              const pre = lessonLinksDiv.querySelectorAll(".unit-json")[idx];
+              if (pre) pre.classList.toggle("hidden");
+              btn.textContent = pre.classList.contains("hidden")
+                ? "Show JSON"
+                : "Hide JSON";
+            };
+          });
+          lessonLinksDiv.querySelectorAll(".load-unit-btn").forEach((btn) => {
+            btn.onclick = function () {
+              const idx = btn.getAttribute("data-uidx");
+              const unit = lesson.units[idx];
+              sessionStorage.setItem(
+                "activeLesson",
+                JSON.stringify({ name: lesson.name, units: [unit] })
+              );
+              // Set flag so show-scales.html knows we came from lessons
+              sessionStorage.setItem("fromLessons", "1");
+              window.location.href =
+                "show-scales.html?lesson=" +
+                encodeURIComponent(lesson.name) +
+                "&unit=" +
+                encodeURIComponent(unit.name || idx);
+            };
+          });
+        }
+
+        // On page load, render the active lesson if present
+        function tryRenderActiveLessonFromStorage() {
+          let activeLesson = null;
+          try {
+            activeLesson = JSON.parse(localStorage.getItem("activeLesson"));
+          } catch {}
+          if (
+            activeLesson &&
+            activeLesson.name &&
+            Array.isArray(activeLesson.units)
+          ) {
+            renderActiveLesson(activeLesson);
+          } else {
+            lessonLinksDiv.innerHTML =
+              '<p class="text-gray-500">No lesson loaded. Use Recall Lesson to select one.</p>';
+          }
+        }
+        tryRenderActiveLessonFromStorage();
+
+        recallBtn.addEventListener("click", function () {
+          // Show all lessons as selectable
+          let lessons = JSON.parse(localStorage.getItem("userLessons") || "[]");
+          if (!lessons.length) {
+            lessonLinksDiv.innerHTML =
+              '<p class="text-gray-500">No saved lessons found.</p>';
+            return;
+          }
+          const ul = document.createElement("ul");
+          ul.className = "list-disc pl-6";
+          lessons.forEach((lesson, idx) => {
+            const li = document.createElement("li");
+            const selectBtn = document.createElement("button");
+            selectBtn.className =
+              "bg-blue-600 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700";
+            selectBtn.textContent = `Select: ${lesson.name} (${
+              lesson.units?.length || 0
+            } units)`;
+            selectBtn.addEventListener("click", function () {
+              // Set as active lesson and render
+              localStorage.setItem("activeLesson", JSON.stringify(lesson));
+              renderActiveLesson(lesson);
+            });
+            li.appendChild(selectBtn);
+            ul.appendChild(li);
+          });
+          lessonLinksDiv.innerHTML = "";
+          lessonLinksDiv.appendChild(ul);
+        });
+
+        // Manage Lessons logic (modal-based)
+        const manageLessonsBtn = document.getElementById("manage-lessons-btn");
+        manageLessonsBtn.addEventListener("click", function () {
+          // Remove any existing modal
+          document
+            .querySelectorAll(".manage-lesson-modal")
+            .forEach((m) => m.remove());
+          let lessons = JSON.parse(localStorage.getItem("userLessons") || "[]");
+          if (!lessons.length) {
+            lessonLinksDiv.innerHTML =
+              '<p class="text-gray-500">No saved lessons found.</p>';
+            return;
+          }
+          // Step 1: Select lesson
+          const modal = document.createElement("div");
+          modal.className =
+            "manage-lesson-modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50";
+          modal.innerHTML = `
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+              <h2 class="text-2xl font-bold mb-4">Manage Lessons</h2>
+              <div id="manage-lesson-step1">
+                <label class="block mb-2 font-semibold">Select a Lesson:</label>
+                <div id="manage-lesson-list" class="border rounded p-2 h-40 overflow-y-auto mb-4 bg-gray-50"></div>
+                <button id="manage-lesson-cancel" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+              </div>
+              <div id="manage-lesson-step2" style="display:none"></div>
+            </div>
+          `;
+          document.body.appendChild(modal);
+
+          const step1Div = modal.querySelector("#manage-lesson-step1");
+          const step2Div = modal.querySelector("#manage-lesson-step2");
+          const lessonListDiv = modal.querySelector("#manage-lesson-list");
+          const cancelBtn = modal.querySelector("#manage-lesson-cancel");
+          const editUnitsUl = modal.querySelector("#edit-units-list");
+          const editLessonTitle = modal.querySelector("#edit-lesson-title");
+          const deleteLessonBtn = modal.querySelector("#delete-lesson-btn");
+          const backBtn = modal.querySelector("#edit-lesson-back");
+
+          // Step 1: Render lessons to select
+          function renderLessonList() {
+            lessonListDiv.innerHTML = "";
+            lessons.forEach((lesson, idx) => {
+              const div = document.createElement("div");
+              div.className =
+                "flex items-center mb-1 cursor-pointer hover:bg-blue-100 rounded px-2";
+              div.textContent =
+                lesson.name + ` (${lesson.units?.length || 0} units)`;
+              div.onclick = () => {
+                showEditLesson(idx);
+              };
+              lessonListDiv.appendChild(div);
+            });
+          }
+
+          // Step 2: Edit lesson (delete units or lesson)
+          function showEditLesson(idx) {
+            step1Div.style.display = "none";
+            step2Div.style.display = "";
+            const lesson = lessons[idx];
+            // Build edit UI similar to Create Lesson
+            step2Div.innerHTML = `
+              <h3 class="text-xl font-semibold mb-2">Edit Lesson</h3>
+              <label class="block mb-2 font-semibold">Lesson Name:</label>
+              <input id="edit-lesson-name-input" type="text" class="w-full border rounded px-3 py-2 mb-4" value="${lesson.name}" />
+              <label class="block mb-2 font-semibold">Available Practice Units:</label>
+              <div id="edit-practice-units-list" class="border rounded p-2 h-40 overflow-y-auto mb-4 bg-gray-50"></div>
+              <div class="mb-2">
+                <button id="edit-add-unit-btn" class="bg-blue-600 text-white px-4 py-2 rounded mr-2 hover:bg-blue-700">Add to Lesson</button>
+                <button id="edit-update-lesson-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Update Lesson</button>
+                <button id="edit-save-copy-btn" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 ml-2">Save a Copy</button>
+                <button id="edit-rename-btn" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 ml-2">Rename</button>
+                <button id="edit-lesson-back" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2">Back</button>
+                <button id="edit-delete-lesson-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-800 ml-2">Delete Entire Lesson</button>
+              </div>
+              <div class="mb-2">
+                <span class="font-semibold">Units in Lesson:</span>
+                <ul id="edit-units-list" class="list-disc pl-6 mt-1"></ul>
+              </div>
+            `;
+            // Setup edit UI logic
+            const lessonNameInput = step2Div.querySelector(
+              "#edit-lesson-name-input"
+            );
+            const unitsListDiv = step2Div.querySelector(
+              "#edit-practice-units-list"
+            );
+            const addUnitBtn = step2Div.querySelector("#edit-add-unit-btn");
+            const updateLessonBtn = step2Div.querySelector(
+              "#edit-update-lesson-btn"
+            );
+            const saveCopyBtn = step2Div.querySelector("#edit-save-copy-btn");
+            const renameBtn = step2Div.querySelector("#edit-rename-btn");
+            const backBtn2 = step2Div.querySelector("#edit-lesson-back");
+            const deleteLessonBtn2 = step2Div.querySelector(
+              "#edit-delete-lesson-btn"
+            );
+            const unitsInLessonUl = step2Div.querySelector("#edit-units-list");
+
+            // Load available practice units
+            let availableUnits = JSON.parse(
+              localStorage.getItem("userPracticeUnits") || "[]"
+            );
+            let selectedUnitIdx = null;
+            let lessonUnits = lesson.units
+              ? lesson.units.map((u) => ({ ...u }))
+              : [];
+
+            function renderAvailableUnits() {
+              unitsListDiv.innerHTML = "";
+              if (!availableUnits.length) {
+                unitsListDiv.innerHTML =
+                  '<div class="text-gray-500">No Practice Units found.</div>';
+                return;
+              }
+              availableUnits.forEach((unit, idx) => {
+                const div = document.createElement("div");
+                div.className =
+                  "flex items-center mb-1 cursor-pointer hover:bg-blue-100 rounded px-2" +
+                  (selectedUnitIdx === idx ? " bg-blue-200" : "");
+                div.textContent = unit.name || `Practice Unit ${idx + 1}`;
+                div.onclick = () => {
+                  selectedUnitIdx = idx;
+                  renderAvailableUnits();
+                };
+                unitsListDiv.appendChild(div);
+              });
+            }
+
+            function renderLessonUnits() {
+              unitsInLessonUl.innerHTML = "";
+              lessonUnits.forEach((unit, idx) => {
+                const li = document.createElement("li");
+                li.textContent = unit.name || `Practice Unit ${idx + 1}`;
+                // Remove button for each unit
+                const removeBtn = document.createElement("button");
+                removeBtn.textContent = "Remove";
+                removeBtn.className =
+                  "ml-2 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-xs";
+                removeBtn.onclick = () => {
+                  lessonUnits.splice(idx, 1);
+                  renderLessonUnits();
+                };
+                li.appendChild(removeBtn);
+                unitsInLessonUl.appendChild(li);
+              });
+            }
+
+            renderAvailableUnits();
+            renderLessonUnits();
+
+            addUnitBtn.onclick = function () {
+              if (
+                selectedUnitIdx === null ||
+                !availableUnits[selectedUnitIdx]
+              ) {
+                alert("Please select a Practice Unit to add.");
+                return;
+              }
+              // Prevent duplicate add
+              if (
+                lessonUnits.some(
+                  (u) => u.name === availableUnits[selectedUnitIdx].name
+                )
+              ) {
+                alert("This Practice Unit is already added to the lesson.");
+                return;
+              }
+              lessonUnits.push(availableUnits[selectedUnitIdx]);
+              renderLessonUnits();
+            };
+
+            updateLessonBtn.onclick = function () {
+              const newName = lessonNameInput.value.trim();
+              if (!newName) {
+                alert("Please enter a lesson name.");
+                return;
+              }
+              if (!lessonUnits.length) {
+                alert("Please add at least one Practice Unit to the lesson.");
+                return;
+              }
+              lessons[idx] = { name: newName, units: lessonUnits };
+              localStorage.setItem("userLessons", JSON.stringify(lessons));
+              alert("Lesson updated.");
+              modal.remove();
+            };
+
+            saveCopyBtn.onclick = function () {
+              const newName = prompt(
+                "Enter a name for the copied lesson:",
+                lessonNameInput.value.trim() + " (Copy)"
+              );
+              if (!newName) return;
+              if (lessons.some((l) => l.name === newName)) {
+                alert("A lesson with that name already exists.");
+                return;
+              }
+              lessons.push({
+                name: newName,
+                units: lessonUnits.map((u) => ({ ...u })),
+              });
+              localStorage.setItem("userLessons", JSON.stringify(lessons));
+              alert("Lesson copy saved.");
+              modal.remove();
+              // Reopen manage lessons modal to refresh list
+              setTimeout(() => {
+                manageLessonsBtn.click();
+              }, 0);
+            };
+
+            renameBtn.onclick = function () {
+              const newName = prompt(
+                "Enter a new name for this lesson:",
+                lessonNameInput.value.trim()
+              );
+              if (!newName) return;
+              if (lessons.some((l, i) => l.name === newName && i !== idx)) {
+                alert("A lesson with that name already exists.");
+                return;
+              }
+              lessons[idx].name = newName;
+              localStorage.setItem("userLessons", JSON.stringify(lessons));
+              lessonNameInput.value = newName;
+              alert("Lesson renamed.");
+              modal.remove();
+              // Reopen manage lessons modal to refresh list
+              setTimeout(() => {
+                manageLessonsBtn.click();
+              }, 0);
+            };
+
+            backBtn2.onclick = function () {
+              step2Div.style.display = "none";
+              step1Div.style.display = "";
+            };
+
+            deleteLessonBtn2.onclick = function () {
+              if (
+                confirm(
+                  `Delete lesson '${lesson.name}'? This cannot be undone.`
+                )
+              ) {
+                lessons.splice(idx, 1);
+                localStorage.setItem("userLessons", JSON.stringify(lessons));
+                modal.remove();
+                manageLessonsBtn.click(); // Refresh modal if more lessons remain
+              }
+            };
+          }
+
+          function renderEditUnitsList(lesson, lessonIdx) {
+            editUnitsUl.innerHTML = "";
+            if (!lesson.units || !lesson.units.length) {
+              const li = document.createElement("li");
+              li.textContent = "No units in this lesson.";
+              editUnitsUl.appendChild(li);
+              return;
+            }
+            lesson.units.forEach((unit, uidx) => {
+              const li = document.createElement("li");
+              li.textContent = unit.name || `Practice Unit ${uidx + 1}`;
+              const delBtn = document.createElement("button");
+              delBtn.textContent = "Delete";
+              delBtn.className =
+                "ml-2 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-xs";
+              delBtn.onclick = function () {
+                if (
+                  confirm(
+                    `Delete unit '${
+                      unit.name || `Practice Unit ${uidx + 1}`
+                    }' from lesson?`
+                  )
+                ) {
+                  lesson.units.splice(uidx, 1);
+                  localStorage.setItem("userLessons", JSON.stringify(lessons));
+                  renderEditUnitsList(lesson, lessonIdx);
+                }
+              };
+              li.appendChild(delBtn);
+              editUnitsUl.appendChild(li);
+            });
+          }
+
+          renderLessonList();
+          cancelBtn.onclick = function () {
+            modal.remove();
+          };
+        });
+
+        // Manage Practice Units logic
+        const manageUnitsBtn = document.getElementById(
+          "manage-practice-units-btn"
+        );
+        manageUnitsBtn.addEventListener("click", function () {
+          // Remove any existing modal
+          document
+            .querySelectorAll(".manage-units-modal")
+            .forEach((m) => m.remove());
+          let units = JSON.parse(
+            localStorage.getItem("userPracticeUnits") || "[]"
+          );
+          if (!units.length) {
+            lessonLinksDiv.innerHTML =
+              '<p class="text-gray-500">No saved practice units found.</p>';
+            return;
+          }
+          // Modal for managing practice units
+          const modal = document.createElement("div");
+          modal.className =
+            "manage-units-modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50";
+          modal.innerHTML = `
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+              <h2 class="text-2xl font-bold mb-4">Manage Practice Units</h2>
+              <ul id="manage-units-list" class="list-disc pl-6 mb-4"></ul>
+              <button id="manage-units-cancel" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+            </div>
+          `;
+          document.body.appendChild(modal);
+          const ul = modal.querySelector("#manage-units-list");
+          units.forEach((unit, idx) => {
+            const li = document.createElement("li");
+            li.textContent = unit.name || `Practice Unit ${idx + 1}`;
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            delBtn.className =
+              "ml-2 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-sm";
+            delBtn.addEventListener("click", function () {
+              if (
+                confirm(
+                  `Delete practice unit '${
+                    unit.name || "Practice Unit " + (idx + 1)
+                  }'? This cannot be undone.`
+                )
+              ) {
+                units.splice(idx, 1);
+                localStorage.setItem(
+                  "userPracticeUnits",
+                  JSON.stringify(units)
+                );
+                modal.remove();
+                manageUnitsBtn.click(); // Refresh modal
+              }
+            });
+            li.appendChild(delBtn);
+            ul.appendChild(li);
+          });
+          modal.querySelector("#manage-units-cancel").onclick = function () {
+            modal.remove();
+          };
+        });
+      });
+    </script>
+  </body>
+</html>

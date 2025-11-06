@@ -1,0 +1,18 @@
+{
+  "rootNotes": [
+    { "value": "A", "label": "A" },
+    { "value": "Bb", "label": "B♭" },
+    { "value": "B", "label": "B" },
+    { "value": "C", "label": "C" },
+    { "value": "D♭", "label": "D♭" },
+    { "value": "C#", "label": "C♯ ℹ️ Enharmonic of D♭ Major" },
+    { "value": "D", "label": "D" },
+    { "value": "Eb", "label": "E♭" },
+    { "value": "E", "label": "E" },
+    { "value": "F", "label": "F" },
+    { "value": "F#", "label": "F♯" },
+    { "value": "Gb", "label": "G♭ ℹ️ Enharmonic of F♯ Major" },
+    { "value": "G", "label": "G" },
+    { "value": "Ab", "label": "A♭" }
+  ]
+}

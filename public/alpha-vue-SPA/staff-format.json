@@ -1,8 +1,8 @@
 {
   "staff": {
     "x": 10,
-    "y": 40,
-    "width": 380,
+    "y": 60,
+    "width": 500,
     "height": 200,
     "clef": "treble",
     "backgroundColor": "#f3f4f6",
@@ -10,9 +10,13 @@
     "containerBorderRadius": 12,
     "containerShadow": "0 2px 8px 0 rgba(0,0,0,0.07)",
     "verticalCenter": false,
+    "enforceLedgerLimits": false,
     "ledgerLines": {
       "above": 3,
       "below": 3
+    },
+    "noteSpacing": {
+      "mode": "default"
     }
   },
   "noteColors": ["black", "blue", "orange", "green"]

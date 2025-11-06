@@ -1,13 +1,14 @@
-# PowerShell script to build Vue SPA and copy distribution files to public/alpha-vue-SPA
-# Usage: Run from repo root
+<#
+  Build the Vue SPA and output directly into public/alpha-vue-SPA (as configured in vite.config.js).
+  IMPORTANT: Do NOT delete or copy public/alpha-vue-SPA onto itself (prevents wiping hashed assets).
+  Usage: Run from repo root.
+#>
 
 $sourceDir = "vue-src-alpha"
-$targetDir = "public\alpha-vue-SPA"
-$expectedDistDir = Join-Path $PSScriptRoot "..\public\alpha-vue-SPA"
+$outDir = Join-Path $PSScriptRoot "..\public\alpha-vue-SPA"
 
 Write-Host "[DEBUG] sourceDir: $sourceDir"
-Write-Host "[DEBUG] targetDir: $targetDir"
-Write-Host "[DEBUG] expectedDistDir: $expectedDistDir"
+Write-Host "[DEBUG] outDir (vite): $outDir"
 
 Write-Host "[DEBUG] Checking for build script in $sourceDir\package.json..."
 $packageJsonPath = "$sourceDir\package.json"
@@ -16,36 +17,22 @@ if (-not (Test-Path $packageJsonPath)) {
     exit 1
 }
 $packageJson = Get-Content $packageJsonPath | Out-String | ConvertFrom-Json
-Write-Host "[DEBUG] packageJson.scripts: $($packageJson.scripts | Out-String)"
 if (-not $packageJson.scripts.build) {
-    Write-Error "[DEBUG] No 'build' script found in $sourceDir\package.json. Aborting."
-    Write-Host "[DEBUG] To fix: Add a 'build' script to your package.json, e.g.:"
-    Write-Host '[DEBUG]   "scripts": { "build": "vite build" }'
+    Write-Error "[DEBUG] No 'build' script found in $sourceDir\package.json. Add one (e.g., vite build)."
     exit 1
 }
 
 Write-Host "[DEBUG] Building Vue SPA from $sourceDir..."
-Set-Location $sourceDir
+Push-Location $sourceDir
 npm install
 npm run build -- --emptyOutDir
-Set-Location $PSScriptRoot
+Pop-Location
 
-Write-Host "[DEBUG] Checking for build output: $expectedDistDir\index.html"
-if (-not (Test-Path "$expectedDistDir\index.html")) {
-    Write-Error "[DEBUG] Build failed or expected output folder missing: $expectedDistDir"
+Write-Host "[DEBUG] Verifying build output: $outDir\index.html"
+if (-not (Test-Path "$outDir\index.html")) {
+    Write-Error "[DEBUG] Build failed or output missing: $outDir"
     exit 1
 }
 
-Write-Host "[DEBUG] Ensuring $targetDir exists and is up to date..."
-if (Test-Path $targetDir) {
-    Write-Host "[DEBUG] Removing existing $targetDir"
-    Remove-Item $targetDir -Recurse -Force
-}
-Write-Host "[DEBUG] Creating $targetDir"
-New-Item -ItemType Directory -Path $targetDir | Out-Null
-Write-Host "[DEBUG] Copying files from $expectedDistDir to $targetDir"
-Copy-Item "$expectedDistDir\*" $targetDir -Recurse
-
-Write-Host "[DEBUG] SPA files copied. You can now serve public/ for static testing."
-Write-Host "[DEBUG] NOTE: This script does NOT deploy to Netlify."
-Write-Host "[DEBUG] To deploy, run: tools/deploy.ps1 or use the VS Code '🚀 Push & Deploy to Netlify' task."
+Write-Host "✅ Build complete. Files are in $outDir."
+Write-Host "Next: deploy 'public' to Netlify (tools/deploy.ps1 or VS Code task)."

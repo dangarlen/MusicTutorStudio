@@ -1,0 +1,149 @@
+/* Global style: black writing on gray background (matches index.html Music Tutor Studio heading) */
+.mtsFomatGlobal {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+/* Music Tutor Studio custom theme classes */
+.mtsFormatPreferencePages {
+  background-color: #60a5fa;
+  color: #111827;
+}
+
+/* Practice page highlight (matches Practice button pink) */
+.mtsFormatPracticePages {
+  background-color: #ec6dda;
+  color: #111827;
+}
+
+/* Practice navigation button: rounded daisy button with mtsFormatPracticePages colors */
+.mtsFormatPracticeButtons {
+  background-color: #ec6dda;
+  color: #111827;
+  border-radius: 9999px;
+  padding: 0.75em 1.5em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  text-decoration: none;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.mtsFormatPracticeButtons:hover,
+.mtsFormatPracticeButtons:focus {
+  background-color: #d45cc2;
+  color: #111827;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Creator page highlight (matches Creator Indigo-400) */
+.mtsFormatCreatorPages {
+  background-color: #818cf8;
+  color: #111827;
+}
+
+/* Creator navigation button: rounded daisy button with mtsFormatCreatorPages colors */
+.mtsFormatCreatorButtons {
+  background-color: #818cf8;
+  color: #111827;
+  border-radius: 9999px;
+  padding: 0.75em 1.5em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  text-decoration: none;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.mtsFormatCreatorButtons:hover,
+.mtsFormatCreatorButtons:focus {
+  background-color: #6366f1;
+  color: #111827;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Creator page highlight (matches Creator yellow-300) */
+.mtsFormatAboutPages {
+  background-color: #fde047;
+  color: #111827;
+}
+
+/* Creator page highlight (matches Lessons Teal-400) */
+.mtsFormatLessonPages {
+  background-color: #5fd1c7;
+  color: #111827;
+}
+
+/* Lesson navigation button: rounded daisy button with mtsFormatLessonPages colors */
+.mtsFormatLessonButtons {
+  background-color: #5fd1c7;
+  color: #111827;
+  border-radius: 9999px;
+  padding: 0.75em 1.5em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  text-decoration: none;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.mtsFormatLessonButtons:hover,
+.mtsFormatLessonButtons:focus {
+  background-color: #4bb3a9;
+  color: #111827;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Site header: bold black on gray */
+.site-header {
+  @apply w-full py-6 bg-gray-200 text-center shadow;
+}
+.site-header-title {
+  @apply text-3xl font-bold text-black;
+}
+/* theme.css: Centralized Tailwind utility classes and customizations for consistent UI */
+
+/* Example: Use Tailwind's @apply for custom classes if using PostCSS, else use utility classes in HTML */
+
+/* Button base style */
+.btn-base {
+  @apply px-4 py-2 rounded font-semibold flex items-center gap-2 transition;
+}
+
+/* Primary action button (blue, for main actions like Preferences, Save, etc.) */
+.btn-primary {
+  @apply btn-base bg-blue-600 text-white hover:bg-blue-700;
+}
+
+/* Icon style for buttons and headings */
+.icon {
+  @apply inline-block align-middle text-xl mr-2;
+}
+
+/* Heading with icon (e.g., Preferences page) */
+.heading-with-icon {
+  @apply text-3xl font-bold flex items-center gap-2 mb-8;
+}
+
+/* Example: Save icon (Material Symbols) */
+/* Use <span class="material-symbols-outlined icon">save</span> */
+
+/* Example: Gear icon (Material Symbols) */
+/* Use <span class="material-symbols-outlined icon">settings</span> */
+
+/* Navigation button (neutral) */
+.btn-nav {
+  @apply btn-base bg-neutral text-white hover:bg-neutral-focus;
+}
+
+/* Form controls */
+.input-base {
+  @apply w-full p-2 border rounded mb-4;
+}
+
+/* Label style */
+.label-base {
+  @apply block mb-2 font-semibold;
+}

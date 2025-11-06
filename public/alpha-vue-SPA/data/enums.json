@@ -1,0 +1,8 @@
+{
+  "practiceUnitType": ["Scale", "Passage", "Exercise"],
+  "scaleType": ["Major", "Minor", "Chromatic"],
+  "direction": ["ascending", "descending"],
+  "duration": ["e", "q", "h", "w"],
+  "noteColor": ["black", "red", "blue", "green", "orange", "gray", "purple"],
+  "exerciseType": ["Articulation", "Dynamics", "Tone", "Rhythm", "Fingering"]
+}
