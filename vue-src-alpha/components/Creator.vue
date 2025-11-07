@@ -27,13 +27,6 @@
           >
           Create Scale
         </RouterLink>
-        <RouterLink to="/create-scale-view" class="mtsFormatCreatorButtons">
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >visibility</span
-          >
-          View Scale
-        </RouterLink>
-        <br />
 
         <RouterLink to="/create-exercises" class="mtsFormatCreatorButtons">
           <span class="material-symbols-outlined" aria-hidden="true"
@@ -42,11 +35,14 @@
           Create Exercise
         </RouterLink>
 
-        <RouterLink to="/create-exercise-view" class="mtsFormatCreatorButtons">
+        <RouterLink
+          to="/create-practice-unit-view"
+          class="mtsFormatCreatorButtons"
+        >
           <span class="material-symbols-outlined" aria-hidden="true"
             >visibility</span
           >
-          View Exercise
+          Preview Practice Unit
         </RouterLink>
         <br />
 

@@ -19,8 +19,7 @@ import CreateTestStaffNoteBuilder from "../components/CreateTestStaffNoteBuilder
 import CreateTestStaffNoteDisplay from "../components/CreateTestStaffNoteDisplay.vue";
 import CreateTestStaffNoteData from "../components/CreateTestStaffNoteData.vue";
 import CreateScaleView from "../components/CreateScaleView.vue";
-import ViewScale from "../components/ViewScale.vue";
-import CreateExerciseView from "../components/CreateExerciseView.vue";
+import CreatePracticeUnitView from "../components/CreatePracticeUnitView.vue";
 import PhaseBasedVueTestContainer from "../components/PhaseBasedVueTestContainer.vue";
 import SaveToPracticeUnitExport from "../components/SaveToPracticeUnitExport.vue";
 import RecallJsonFromPinia from "../components/RecallJsonFromPinia.vue";
@@ -74,15 +73,22 @@ const routes = [
     name: "create-test-staff-note-data",
     component: CreateTestStaffNoteData,
   },
+  // Unified Practice Unit Viewer (replaces separate scale/exercise viewers)
+  {
+    path: "/create-practice-unit-view",
+    name: "create-practice-unit-view",
+    component: CreatePracticeUnitView,
+  },
+  // Deprecated routes - redirect to unified viewer
   {
     path: "/create-scale-view",
     name: "create-scale-view",
-    component: ViewScale,
+    redirect: "/create-practice-unit-view",
   },
   {
     path: "/create-exercise-view",
     name: "create-exercise-view",
-    component: CreateExerciseView,
+    redirect: "/create-practice-unit-view",
   },
   {
     path: "/phase-test-container",
