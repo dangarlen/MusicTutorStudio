@@ -35,18 +35,58 @@
             <div
               class="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm text-gray-700"
             >
-              <strong class="text-blue-800">How to TRIM:</strong> Click on the
-              first note you want to keep until it turns
-              <strong class="text-green-600">green</strong>, then click on the
-              last note you want to keep until it turns
-              <strong class="text-red-600">red</strong>. Press
-              <strong>[TRIM]</strong> to keep only the notes between green and
-              red (inclusive). Colors will reset to black after trimming.
+              <strong class="text-blue-800">How to TRIM:</strong> Click on notes
+              to cycle through colors:
+              <span
+                style="
+                  background-color: #bbf7d0;
+                  padding: 0 0.25rem;
+                  border-radius: 0.25rem;
+                "
+                ><strong style="color: #166534">green</strong></span
+              >
+              = trim start,
+              <span
+                style="
+                  background-color: #fecaca;
+                  padding: 0 0.25rem;
+                  border-radius: 0.25rem;
+                "
+                ><strong style="color: #991b1b">red</strong></span
+              >
+              = trim end,
+              <span
+                style="
+                  background-color: #fed7aa;
+                  padding: 0 0.25rem;
+                  border-radius: 0.25rem;
+                "
+                ><strong style="color: #9a3412">orange</strong></span
+              >
+              = delete note,
+              <span
+                style="
+                  background-color: #d1d5db;
+                  padding: 0 0.25rem;
+                  border-radius: 0.25rem;
+                "
+                ><strong style="color: #1f2937">gray</strong></span
+              >
+              = replace with rest. Press <strong>[TRIM]</strong> to keep only
+              notes between green and red (inclusive). Press
+              <strong>[Delete Selected Notes]</strong> to remove orange notes
+              and convert gray notes to rests.
             </div>
 
             <StaffPreview
               :practice-enable-click-to-cycle="true"
-              :practice-color-cycle="['black', 'green', 'red']"
+              :practice-color-cycle="[
+                'black',
+                'green',
+                'red',
+                'orange',
+                'gray',
+              ]"
             />
 
             <div v-if="trimEnabled" class="mt-3 flex items-center gap-2">
@@ -55,6 +95,22 @@
               </button>
               <div class="text-sm text-gray-600">
                 Keeping notes {{ trimStart + 1 }} → {{ trimEnd + 1 }}
+              </div>
+            </div>
+
+            <div
+              v-if="hasDeleteOrRestNotes"
+              class="mt-3 flex items-center gap-2"
+            >
+              <button
+                class="btn btn-sm btn-warning"
+                @click="deleteSelectedNotes"
+              >
+                [Delete Selected Notes]
+              </button>
+              <div class="text-sm text-gray-600">
+                {{ orangeNoteCount }} to delete, {{ grayNoteCount }} to convert
+                to rests
               </div>
             </div>
           </div>
@@ -236,132 +292,6 @@
         </div>
       </div>
 
-      <!-- Practice Unit Snapshot Manager -->
-      <div
-        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
-      >
-        <input type="checkbox" class="peer" />
-        <div
-          class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
-        >
-          <span>💾 Practice Unit Snapshot Manager</span>
-          <span class="text-right text-base font-normal text-gray-600">
-            {{ exerciseName ? `Exercise: ${exerciseName}` : "Not yet saved" }}
-          </span>
-        </div>
-        <div class="collapse-content px-4">
-          <!-- User Help Note -->
-          <div
-            class="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm text-gray-700"
-          >
-            <strong class="text-blue-800">Save Options:</strong>
-            <ul class="list-disc list-inside mt-1 space-y-1">
-              <li>
-                <strong>SAVE to Database</strong> – Updates the current exercise
-                (if it has an ID) or creates a new one (if first save).
-              </li>
-              <li>
-                <strong>SAVE as New</strong> – Always creates a brand new
-                exercise with a fresh ID, even if the name matches an existing
-                one. Use this to create variations or backups.
-              </li>
-              <li>
-                <strong>Export/Import JSON</strong> – Download or upload
-                exercises as standalone files for sharing or backup outside the
-                database.
-              </li>
-            </ul>
-          </div>
-          <div class="flex gap-4 mb-4 flex-wrap">
-            <button class="btn btn-warning" @click="saveExercise">
-              Export to JSON file
-            </button>
-            <button
-              class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
-              @click="triggerRecallFileDialog"
-            >
-              <span
-                class="material-symbols-outlined align-middle mr-2"
-                aria-hidden="true"
-                >upload_file</span
-              >
-              Import from JSON file
-            </button>
-            <input
-              ref="recallFileInput"
-              type="file"
-              accept="application/json"
-              style="display: none"
-              @change="handleRecallFileChange"
-            />
-            <button class="btn btn-primary mt-4" @click="saveToDatabase">
-              {{ currentPracticeUnit?.practiceUnitHeader?.practiceUnitId ? 'UPDATE in Database' : 'SAVE to Database' }}
-            </button>
-            <button class="btn btn-accent mt-4" @click="saveAsNewToDatabase">
-              SAVE as New
-            </button>
-            <button class="btn btn-outline mt-4" @click="recallFromDatabase">
-              RECALL from Database
-            </button>
-          </div>
-        </div>
-      </div>
-      <!-- Recall Modal -->
-      <div v-if="showRecallModal" class="modal modal-open">
-        <div class="modal-box max-w-2xl">
-          <h3 class="font-bold text-lg mb-3">Select Exercise to Recall</h3>
-          <div class="form-control mb-3">
-            <input
-              type="text"
-              class="input input-bordered w-full"
-              placeholder="Filter by name, key, time, focus, or instrument..."
-              v-model="recallFilterText"
-            />
-          </div>
-          <div v-if="loadingUnits" class="flex justify-center py-8">
-            <span class="loading loading-spinner loading-lg"></span>
-          </div>
-          <div
-            v-else-if="availableExercises.length === 0"
-            class="py-8 text-center text-gray-500"
-          >
-            No saved exercises found for your account.
-          </div>
-          <div
-            v-else-if="filteredExercises.length === 0"
-            class="py-8 text-center text-gray-500"
-          >
-            No matches for "{{ recallFilterText }}".
-          </div>
-          <div v-else class="space-y-2 max-h-96 overflow-y-auto">
-            <div
-              v-for="unit in filteredExercises"
-              :key="unit.practice_unit_id"
-              class="card bg-base-100 border hover:border-primary cursor-pointer transition-all"
-              @click="loadSelectedExercise(unit)"
-            >
-              <div class="card-body p-4">
-                <div class="flex justify-between items-start">
-                  <div class="flex-1">
-                    <h4 class="font-semibold">{{ unit.name }}</h4>
-                    <p class="text-sm text-gray-500">
-                      {{ describeExercise(unit) }}
-                    </p>
-                    <p class="text-xs text-gray-500 mt-1">
-                      {{ formatDate(unit.last_modified) }}
-                    </p>
-                  </div>
-                  <span class="badge badge-secondary">{{ unit.type }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-action">
-            <button class="btn" @click="showRecallModal = false">Cancel</button>
-          </div>
-        </div>
-      </div>
-
       <!-- Behind the Curtain: current practice unit JSON -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
@@ -390,7 +320,7 @@ import CreatorReturn from "./CreatorReturn.vue";
 import StaffPreview from "./StaffPreview.vue";
 import InstrumentDropdown from "./InstrumentDropdown.vue";
 import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
-import { ref, computed, reactive } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
 import supabase from "../scripts/supabaseClient.js";
@@ -503,6 +433,48 @@ function refreshCurrentUnitJson() {
   }
 }
 
+// Auto-populate workspace if coming from Create Scales with existing noteArray
+onMounted(() => {
+  // Check if store has noteArray data (e.g., from a scale)
+  if (store.noteArray && store.noteArray.length > 0) {
+    // Pre-populate the exercise workspace with the scale data
+    const header = store.practiceUnitHeader || {};
+
+    // Set imported values from the existing scale header
+    importedTitle.value =
+      header.practiceName || header.sourceTitle || "Imported from Scale";
+    importedKey.value = header.keySignature || "C";
+    importedTime.value = header.timeSignature || "4/4";
+
+    // Copy noteArray to exercise workspace
+    originalNoteArray.value = store.noteArray.map((n) => ({ ...n }));
+    octaveTranspositionCount.value = 0;
+    testStaffStore.noteArray = store.noteArray.map((n) => ({ ...n }));
+
+    // Create the practice unit from the existing data
+    currentPracticeUnit.value = composePracticeUnit(store.noteArray);
+    currentPracticeUnit.value.practiceUnitHeader.practiceName =
+      importedTitle.value;
+    currentPracticeUnit.value.practiceUnitHeader.keySignature =
+      importedKey.value;
+    currentPracticeUnit.value.practiceUnitHeader.timeSignature =
+      importedTime.value;
+
+    // Update store header to match
+    store.practiceUnitHeader = {
+      ...store.practiceUnitHeader,
+      ...currentPracticeUnit.value.practiceUnitHeader,
+    };
+
+    seedEditFieldsFromUnit();
+    refreshCurrentUnitJson();
+
+    console.log(
+      "[CreateExercise] Auto-populated workspace from existing scale data"
+    );
+  }
+});
+
 // MusicXML import
 function onMusicXmlFile(ev) {
   importError.value = "";
@@ -542,6 +514,13 @@ function onMusicXmlFile(ev) {
           importedKey.value;
         currentPracticeUnit.value.practiceUnitHeader.timeSignature =
           importedTime.value;
+
+        // Update store header to match (needed for unified viewer)
+        store.practiceUnitHeader = {
+          ...store.practiceUnitHeader,
+          ...currentPracticeUnit.value.practiceUnitHeader,
+        };
+
         seedEditFieldsFromUnit();
         refreshCurrentUnitJson();
       } catch (e) {
@@ -735,6 +714,26 @@ const trimEnd = computed(() => {
   );
 });
 
+// Delete/Rest button logic: show when there are orange or gray notes
+const hasDeleteOrRestNotes = computed(() => {
+  const arr = store.noteArray || [];
+  return arr.some((n) => {
+    const color = (n.noteColor || "").toLowerCase();
+    return color === "orange" || color === "gray";
+  });
+});
+
+const orangeNoteCount = computed(() => {
+  const arr = store.noteArray || [];
+  return arr.filter((n) => (n.noteColor || "").toLowerCase() === "orange")
+    .length;
+});
+
+const grayNoteCount = computed(() => {
+  const arr = store.noteArray || [];
+  return arr.filter((n) => (n.noteColor || "").toLowerCase() === "gray").length;
+});
+
 function seedEditFieldsFromUnit() {
   const h = currentPracticeUnit.value?.practiceUnitHeader || {};
   editPracticeName.value = h.practiceName || "Imported Exercise";
@@ -782,6 +781,54 @@ function doTrim() {
     octaveTranspositionCount.value = 0;
   } catch (e) {
     console.warn("[CreateExercise] doTrim failed", e);
+  }
+}
+
+// Delete selected notes (orange = delete, gray = convert to rest)
+function deleteSelectedNotes() {
+  try {
+    const arr = store.noteArray || [];
+    const newArr = [];
+
+    for (const note of arr) {
+      const color = (note.noteColor || "").toLowerCase();
+
+      if (color === "orange") {
+        // Skip this note (delete it)
+        continue;
+      } else if (color === "gray") {
+        // Convert to rest: use "B/4" as placeholder pitch and add "r" to duration
+        // VexFlow recognizes duration + "r" as a rest (e.g., "qr" = quarter rest)
+        newArr.push({
+          ...note,
+          pitch: "B/4", // Placeholder pitch (won't be rendered for rests)
+          duration: note.duration + "r", // Add "r" suffix to mark as rest
+          noteColor: "black",
+        });
+      } else {
+        // Keep the note as-is, but reset color to black
+        newArr.push({
+          ...note,
+          noteColor: "black",
+        });
+      }
+    }
+
+    // Update stores and local practice unit
+    store.noteArray = newArr;
+    testStaffStore.noteArray = newArr.map((n) => ({ ...n }));
+    if (currentPracticeUnit.value) {
+      currentPracticeUnit.value.noteArray = newArr;
+      refreshCurrentUnitJson();
+    }
+    // Reset baseline to new array
+    originalNoteArray.value = newArr.map((n) => ({ ...n }));
+
+    console.log(
+      "[CreateExercise] Deleted orange notes and converted gray notes to rests"
+    );
+  } catch (e) {
+    console.warn("[CreateExercise] deleteSelectedNotes failed", e);
   }
 }
 

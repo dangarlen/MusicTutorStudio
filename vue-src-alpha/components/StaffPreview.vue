@@ -256,10 +256,13 @@ async function renderVexFlow() {
   const den = Number(denStr) || 4;
   const measureCapacityQN = num * (4 / den);
   function parseDurToken(tok) {
-    const m = String(tok || "").match(/^([whqes])(\.)?$/);
-    return m
-      ? { base: m[1], dotted: Boolean(m[2]) }
-      : { base: "q", dotted: false };
+    // Support rests using an optional 'r' suffix (e.g., 'qr', 'hr', 'wr', 'er', 'sr')
+    // and an optional dotted marker '.' (e.g., 'q.r' won't be used; expect 'qr.' or 'q.')
+    const m = String(tok || "").match(/^([whqes])(r)?(\.)?$/);
+    if (m) {
+      return { base: m[1], isRest: Boolean(m[2]), dotted: Boolean(m[3]) };
+    }
+    return { base: "q", isRest: false, dotted: false };
   }
   function durationToQN(tok) {
     const { base, dotted } = parseDurToken(tok);
@@ -394,8 +397,14 @@ async function renderVexFlow() {
 
   // Helper to create a VexFlow StaveNote for a given note
   function buildVFNote(n) {
-    const key = n.pitch.replace(/([A-G][#b]?)(\d)/, "$1/$2");
-    const { base, dotted } = parseDurToken(n.duration);
+    const parsed = parseDurToken(n.duration);
+    const { base, dotted, isRest } = parsed;
+    // For rests, VexFlow expects a placeholder key; use 'B/4'
+    const key = isRest
+      ? "B/4"
+      : n.pitch
+          .replace(/([A-G][#b]?)\/(\d)/, "$1/$2")
+          .replace(/([A-G][#b]??)(\d)/, "$1/$2");
     let vexDur;
     switch (base) {
       case "e":
@@ -407,6 +416,8 @@ async function renderVexFlow() {
       default:
         vexDur = base;
     }
+    // Append 'r' to duration for rests so VexFlow renders a rest glyph
+    if (isRest) vexDur = `${vexDur}r`;
     const note = new VF.StaveNote({ keys: [key], duration: vexDur, clef });
     if (dotted) {
       try {
@@ -417,7 +428,8 @@ async function renderVexFlow() {
       } catch {}
     }
     note.__mtsDur = n.duration;
-    if (shouldShow("accidentals", true)) {
+    // Do not add accidentals to rests
+    if (!isRest && shouldShow("accidentals", true)) {
       const acc = parseAccidental(n.pitch);
       if (acc) note.addModifier(0, new VF.Accidental(acc));
     }
