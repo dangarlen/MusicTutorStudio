@@ -29,12 +29,16 @@
           <StaffPreview />
         </div>
       </div>
+
+      <!-- Instrument Selection -->
       <div class="mb-4">
         <InstrumentDropdown
           :instruments="store.instruments"
           v-model="store.practiceUnitHeader.instrument"
         />
       </div>
+
+      <!-- Scale Configuration Components -->
       <CreateScaleScaleSelector
         :scaleSelections="store.scaleSelections"
         @update:scaleSelections="store.scaleSelections = $event"
@@ -51,33 +55,37 @@
         :scaleSelections="store.scaleSelections"
         @update:scaleSelections="store.scaleSelections = $event"
       />
+
+      <!-- Snapshot Manager -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
         <input type="checkbox" class="peer" />
-        <div
-          class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
-        >
-          <span>💾 Practice Unit Snapshot Manager</span>
-          <span class="text-right text-base font-normal text-gray-600">
-            {{ scaleName ? `Scale Name: ${scaleName}` : "Not yet saved" }}
-          </span>
+        <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">
+          <span>💾 Snapshot Manager</span>
         </div>
         <div class="collapse-content px-4">
           <!-- User Help Note -->
           <div
             class="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm text-gray-700"
           >
-            <strong class="text-blue-800">Save Options:</strong>
+            <strong class="text-blue-800">Save/Update Options:</strong>
             <ul class="list-disc list-inside mt-1 space-y-1">
               <li>
-                <strong>SAVE to Database</strong> – Updates the current practice
-                unit (if it has an ID) or creates a new one (if first save).
+                <strong>SAVE to Database</strong> –
+                <span v-if="!store.practiceUnitHeader?.practiceUnitId"
+                  >Creates a new record (first time)</span
+                ><span v-else>Disabled after first save</span>.
               </li>
               <li>
-                <strong>SAVE as New</strong> – Always creates a brand new
-                practice unit with a fresh ID, even if the name matches an
-                existing one. Use this to create variations or backups.
+                <strong>UPDATE in Database</strong> –
+                <span v-if="store.practiceUnitHeader?.practiceUnitId"
+                  >Updates the existing record (after first save)</span
+                ><span v-else>Disabled until first save</span>.
+              </li>
+              <li>
+                <strong>SAVE as New</strong> – Always creates a brand new copy
+                with a fresh ID. Use to make a variation or backup.
               </li>
               <li>
                 <strong>Export/Import JSON</strong> – Download or upload
@@ -108,8 +116,19 @@
               style="display: none"
               @change="handleRecallFileChange"
             />
-            <button class="btn btn-primary mt-4" @click="saveToDatabase">
-              {{ store.practiceUnitHeader?.practiceUnitId ? 'UPDATE in Database' : 'SAVE to Database' }}
+            <button
+              class="btn btn-primary mt-4"
+              @click="saveToDatabase"
+              :disabled="store.practiceUnitHeader?.practiceUnitId"
+            >
+              SAVE to Database
+            </button>
+            <button
+              class="btn btn-primary mt-4"
+              @click="saveToDatabase"
+              v-if="store.practiceUnitHeader?.practiceUnitId"
+            >
+              UPDATE in Database
             </button>
             <button class="btn btn-accent mt-4" @click="saveAsNewToDatabase">
               SAVE as New
@@ -125,7 +144,6 @@
       <div v-if="showRecallModal" class="modal modal-open">
         <div class="modal-box max-w-2xl">
           <h3 class="font-bold text-lg mb-3">Select Practice Unit to Recall</h3>
-
           <div class="form-control mb-3">
             <input
               type="text"
@@ -134,25 +152,21 @@
               v-model="recallFilterText"
             />
           </div>
-
           <div v-if="loadingUnits" class="flex justify-center py-8">
             <span class="loading loading-spinner loading-lg"></span>
           </div>
-
           <div
             v-else-if="availablePracticeUnits.length === 0"
             class="py-8 text-center text-gray-500"
           >
             No saved scales found for your account.
           </div>
-
           <div
             v-else-if="filteredPracticeUnits.length === 0"
             class="py-8 text-center text-gray-500"
           >
             No matches for "{{ recallFilterText }}".
           </div>
-
           <div v-else class="space-y-2 max-h-96 overflow-y-auto">
             <div
               v-for="unit in filteredPracticeUnits"
@@ -182,7 +196,6 @@
               </div>
             </div>
           </div>
-
           <div class="modal-action">
             <button class="btn" @click="showRecallModal = false">Cancel</button>
           </div>
@@ -221,6 +234,7 @@
     <FooterStandard />
   </div>
 </template>
+
 <script setup>
 // --- Copy Scale SPN to clipboard ---
 function copyScaleSPN() {
