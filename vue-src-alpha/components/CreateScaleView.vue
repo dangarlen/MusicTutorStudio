@@ -1129,7 +1129,7 @@ function saveScale() {
 }
 
 function recallScale() {
-  // Use file input to load JSON, similar to Step 1 in CreateTestStaffNoteBuilder
+  // Use file input to load JSON (matches the unified viewer import flow)
   const input = document.createElement("input");
   input.type = "file";
   input.accept = ".json";

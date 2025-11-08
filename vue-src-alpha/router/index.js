@@ -15,9 +15,6 @@ import CreateLessons from "../components/CreateLessons.vue";
 import About from "../components/About.vue";
 import Preferences from "../components/Preferences.vue";
 
-import CreateTestStaffNoteBuilder from "../components/CreateTestStaffNoteBuilder.vue";
-import CreateTestStaffNoteDisplay from "../components/CreateTestStaffNoteDisplay.vue";
-import CreateTestStaffNoteData from "../components/CreateTestStaffNoteData.vue";
 import CreateScaleView from "../components/CreateScaleView.vue";
 import CreatePracticeUnitView from "../components/CreatePracticeUnitView.vue";
 import PhaseBasedVueTestContainer from "../components/PhaseBasedVueTestContainer.vue";
@@ -58,21 +55,7 @@ const routes = [
   },
   { path: "/create-lessons", name: "create-lessons", component: CreateLessons },
   { path: "/about", name: "about", component: About },
-  {
-    path: "/create-test-staff-note-builder",
-    name: "create-test-staff-note-builder",
-    component: CreateTestStaffNoteBuilder,
-  },
-  {
-    path: "/create-test-staff-note-display",
-    name: "create-test-staff-note-display",
-    component: CreateTestStaffNoteDisplay,
-  },
-  {
-    path: "/create-test-staff-note-data",
-    name: "create-test-staff-note-data",
-    component: CreateTestStaffNoteData,
-  },
+  // Removed legacy test-staff routes (builder/display/data)
   // Unified Practice Unit Viewer (replaces separate scale/exercise viewers)
   {
     path: "/create-practice-unit-view",

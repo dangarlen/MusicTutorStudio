@@ -53,33 +53,6 @@
           Create Lessons
         </RouterLink>
         <br />
-        <RouterLink
-          to="/create-test-staff-note-builder"
-          class="mtsFormatCreatorButtons"
-        >
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >build</span
-          >
-          create-Test-Staff-Note-Builder
-        </RouterLink>
-        <RouterLink
-          to="/create-test-staff-note-display"
-          class="mtsFormatCreatorButtons"
-        >
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >visibility</span
-          >
-          create-Test-Staff-Note-Display
-        </RouterLink>
-        <RouterLink
-          to="/create-test-staff-note-data"
-          class="mtsFormatCreatorButtons"
-        >
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >data_object</span
-          >
-          create-Test-Staff-Note-Data
-        </RouterLink>
       </div>
     </main>
     <FooterStandard />
