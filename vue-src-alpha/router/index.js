@@ -7,7 +7,6 @@ import PracticeScales from "../components/PracticeScales.vue";
 import Creator from "../components/Creator.vue";
 import Lessons from "../components/Lessons.vue";
 import LessonsManage from "../components/LessonsManage.vue";
-import LessonsManagePracticeUnits from "../components/LessonsManagePracticeUnits.vue";
 import LessonsCreate from "../components/LessonsCreate.vue";
 import LessonsStart from "../components/LessonsStart.vue";
 import CreateExercise from "../components/CreateExercise.vue";
@@ -39,12 +38,9 @@ const routes = [
   { path: "/creator", name: "creator", component: Creator },
   { path: "/lessons", name: "lessons", component: Lessons },
   { path: "/lessons-manage", name: "lessons-manage", component: LessonsManage },
-  {
-    path: "/lessons-manage-practice-units",
-    name: "lessons-manage-practice-units",
-    component: LessonsManagePracticeUnits,
-  },
-  { path: "/lessons-create", name: "lessons-create", component: LessonsCreate },
+  // Removed route: /lessons-manage-practice-units (Manage Practice Units)
+  // Route repointed: use the CreateLessons component at /lessons-create
+  { path: "/lessons-create", name: "lessons-create", component: CreateLessons },
   { path: "/lessons-start", name: "lessons-start", component: LessonsStart },
   { path: "/preferences", name: "preferences", component: Preferences },
   { path: "/create-scales", name: "create-scales", component: CreateScaleView },
@@ -53,7 +49,8 @@ const routes = [
     name: "create-exercises",
     component: CreateExercise,
   },
-  { path: "/create-lessons", name: "create-lessons", component: CreateLessons },
+  // Keep old /create-lessons for compatibility and redirect to /lessons-create
+  { path: "/create-lessons", name: "create-lessons", redirect: "/lessons-create" },
   { path: "/about", name: "about", component: About },
   // Removed legacy test-staff routes (builder/display/data)
   // Unified Practice Unit Viewer (replaces separate scale/exercise viewers)

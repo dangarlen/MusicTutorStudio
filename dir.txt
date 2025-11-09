@@ -1,0 +1,3048 @@
+ Volume in drive C has no label.
+ Volume Serial Number is 02AF-80D8
+
+ Directory of C:\Dev\MusicTutorStudio\Code
+
+10/26/2025  04:15 PM            93,392 package-lock.json
+10/25/2025  08:36 AM               890 package.json
+10/26/2025  05:36 PM               789 ShortCuts.json
+               3 File(s)         95,071 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\.netlify
+
+10/07/2025  11:11 AM                53 state.json
+               1 File(s)             53 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\.vscode
+
+10/08/2025  06:18 AM               137 keybindings.json
+10/01/2025  06:24 AM               613 settings.json
+11/02/2025  03:04 PM             4,318 tasks.json
+               3 File(s)          5,068 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\.vscode\extension
+
+09/30/2025  07:52 AM               757 package.json
+               1 File(s)            757 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules
+
+10/26/2025  04:15 PM            72,123 .package-lock.json
+               1 File(s)         72,123 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\.vite\deps
+
+10/26/2025  04:22 PM                23 package.json
+10/26/2025  04:22 PM               146 _metadata.json
+               2 File(s)            169 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@alloc\quick-lru
+
+10/22/2025  01:37 PM               747 package.json
+               1 File(s)            747 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@babel\helper-string-parser
+
+10/24/2025  06:24 AM               758 package.json
+               1 File(s)            758 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@babel\helper-validator-identifier
+
+10/24/2025  06:24 AM               738 package.json
+               1 File(s)            738 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@babel\parser
+
+10/24/2025  06:24 AM             1,382 package.json
+               1 File(s)          1,382 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@babel\types
+
+10/24/2025  06:24 AM             1,046 package.json
+               1 File(s)          1,046 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@esbuild\win32-x64
+
+10/24/2025  06:19 AM               375 package.json
+               1 File(s)            375 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@isaacs\cliui
+
+10/22/2025  01:37 PM             2,164 package.json
+               1 File(s)          2,164 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@jridgewell\gen-mapping
+
+10/22/2025  01:37 PM             2,201 package.json
+               1 File(s)          2,201 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@jridgewell\resolve-uri
+
+10/22/2025  01:37 PM             2,063 package.json
+               1 File(s)          2,063 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@jridgewell\sourcemap-codec
+
+10/22/2025  01:37 PM             2,150 package.json
+               1 File(s)          2,150 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@jridgewell\trace-mapping
+
+10/22/2025  01:37 PM             2,252 package.json
+               1 File(s)          2,252 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@nodelib\fs.scandir
+
+10/22/2025  01:37 PM             1,163 package.json
+               1 File(s)          1,163 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@nodelib\fs.stat
+
+10/22/2025  01:37 PM               987 package.json
+               1 File(s)            987 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@nodelib\fs.walk
+
+10/22/2025  01:37 PM             1,138 package.json
+               1 File(s)          1,138 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@pkgjs\parseargs
+
+10/22/2025  01:37 PM               881 package.json
+               1 File(s)            881 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@rolldown\pluginutils
+
+10/24/2025  06:24 AM               739 package.json
+               1 File(s)            739 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@rollup\rollup-win32-x64-gnu
+
+10/24/2025  06:19 AM               451 package.json
+               1 File(s)            451 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@rollup\rollup-win32-x64-msvc
+
+10/24/2025  06:19 AM               454 package.json
+               1 File(s)            454 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@types\estree
+
+10/24/2025  06:19 AM               829 package.json
+               1 File(s)            829 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vitejs\plugin-vue
+
+10/24/2025  06:24 AM             1,260 package.json
+               1 File(s)          1,260 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\compiler-core
+
+10/24/2025  06:24 AM             1,386 package.json
+               1 File(s)          1,386 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\compiler-dom
+
+10/24/2025  06:24 AM             1,380 package.json
+               1 File(s)          1,380 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\compiler-sfc
+
+10/24/2025  06:24 AM             1,708 package.json
+               1 File(s)          1,708 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\compiler-ssr
+
+10/24/2025  06:24 AM               728 package.json
+               1 File(s)            728 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\devtools-api
+
+10/24/2025  09:33 AM               973 package.json
+               1 File(s)            973 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\devtools-kit
+
+10/24/2025  09:59 AM               983 package.json
+               1 File(s)            983 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\devtools-shared
+
+10/24/2025  09:59 AM               697 package.json
+               1 File(s)            697 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\reactivity
+
+10/24/2025  06:24 AM             1,297 package.json
+               1 File(s)          1,297 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\runtime-core
+
+10/24/2025  06:24 AM             1,233 package.json
+               1 File(s)          1,233 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\runtime-dom
+
+10/24/2025  06:24 AM             1,424 package.json
+               1 File(s)          1,424 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\server-renderer
+
+10/24/2025  06:24 AM             1,317 package.json
+               1 File(s)          1,317 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\@vue\shared
+
+10/24/2025  06:24 AM             1,082 package.json
+               1 File(s)          1,082 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\ansi-regex
+
+10/22/2025  01:37 PM             1,035 package.json
+               1 File(s)          1,035 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\ansi-styles
+
+10/22/2025  01:37 PM             1,021 package.json
+               1 File(s)          1,021 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\any-promise
+
+10/22/2025  01:37 PM             1,017 package.json
+               1 File(s)          1,017 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\anymatch
+
+10/22/2025  01:37 PM               904 package.json
+               1 File(s)            904 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\arg
+
+10/22/2025  01:37 PM               589 package.json
+               1 File(s)            589 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\balanced-match
+
+10/22/2025  01:37 PM             1,069 package.json
+               1 File(s)          1,069 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\binary-extensions
+
+10/22/2025  01:37 PM             2,193 binary-extensions.json
+10/22/2025  01:37 PM               739 package.json
+               2 File(s)          2,932 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\birpc
+
+10/24/2025  09:59 AM             1,343 package.json
+               1 File(s)          1,343 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\brace-expansion
+
+10/22/2025  01:37 PM             1,135 package.json
+               1 File(s)          1,135 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\braces
+
+10/22/2025  01:37 PM             1,647 package.json
+               1 File(s)          1,647 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\camelcase-css
+
+10/22/2025  01:37 PM               860 package.json
+               1 File(s)            860 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\chokidar
+
+10/22/2025  01:37 PM             1,648 package.json
+               1 File(s)          1,648 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\chokidar\node_modules\glob-parent
+
+10/22/2025  01:37 PM             1,105 package.json
+               1 File(s)          1,105 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\color-convert
+
+10/22/2025  01:37 PM               827 package.json
+               1 File(s)            827 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\color-name
+
+10/22/2025  01:37 PM               607 package.json
+               1 File(s)            607 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\commander
+
+10/22/2025  01:37 PM               929 package.json
+               1 File(s)            929 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\copy-anything
+
+10/24/2025  09:59 AM             1,294 package.json
+               1 File(s)          1,294 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\cross-spawn
+
+10/22/2025  01:37 PM             1,655 package.json
+               1 File(s)          1,655 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\cssesc
+
+10/24/2025  06:19 AM             1,252 package.json
+               1 File(s)          1,252 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\csstype
+
+10/24/2025  06:24 AM             2,137 package.json
+               1 File(s)          2,137 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\daisyui
+
+10/22/2025  09:25 AM             1,676 package.json
+               1 File(s)          1,676 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\didyoumean
+
+10/22/2025  01:37 PM               647 package.json
+               1 File(s)            647 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\dlv
+
+10/22/2025  01:37 PM               794 package.json
+               1 File(s)            794 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\eastasianwidth
+
+10/22/2025  01:37 PM               390 package.json
+               1 File(s)            390 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\emoji-regex
+
+10/22/2025  01:37 PM             1,331 package.json
+               1 File(s)          1,331 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\entities
+
+10/24/2025  06:24 AM             2,883 package.json
+               1 File(s)          2,883 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\entities\lib\esm
+
+10/24/2025  06:24 AM                18 package.json
+               1 File(s)             18 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\esbuild
+
+10/24/2025  06:19 AM             1,490 package.json
+               1 File(s)          1,490 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\estree-walker
+
+10/24/2025  06:24 AM               848 package.json
+               1 File(s)            848 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\estree-walker\dist\esm
+
+10/24/2025  06:24 AM                17 package.json
+               1 File(s)             17 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\estree-walker\src
+
+10/24/2025  06:24 AM                18 package.json
+               1 File(s)             18 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\fast-glob
+
+10/22/2025  01:37 PM             2,800 package.json
+               1 File(s)          2,800 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\fast-glob\node_modules\glob-parent
+
+10/22/2025  01:37 PM             1,105 package.json
+               1 File(s)          1,105 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\fastq
+
+10/22/2025  01:37 PM             1,374 package.json
+               1 File(s)          1,374 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\fastq\test
+
+10/22/2025  01:37 PM               154 tsconfig.json
+               1 File(s)            154 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\fill-range
+
+10/22/2025  01:37 PM             1,760 package.json
+               1 File(s)          1,760 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\foreground-child
+
+10/22/2025  01:37 PM             2,713 package.json
+               1 File(s)          2,713 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\foreground-child\dist\commonjs
+
+10/22/2025  01:37 PM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\foreground-child\dist\esm
+
+10/22/2025  01:37 PM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\function-bind
+
+10/22/2025  01:37 PM             2,262 package.json
+               1 File(s)          2,262 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\glob
+
+10/24/2025  06:19 AM             2,601 package.json
+               1 File(s)          2,601 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\glob\dist\commonjs
+
+10/24/2025  06:19 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\glob\dist\esm
+
+10/24/2025  06:19 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\glob-parent
+
+10/22/2025  01:37 PM             1,050 package.json
+               1 File(s)          1,050 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\hasown
+
+10/22/2025  01:37 PM             2,283 package.json
+10/22/2025  01:37 PM                73 tsconfig.json
+               2 File(s)          2,356 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\hookable
+
+10/24/2025  09:59 AM             1,299 package.json
+               1 File(s)          1,299 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\is-binary-path
+
+10/22/2025  01:37 PM               657 package.json
+               1 File(s)            657 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\is-core-module
+
+10/22/2025  01:37 PM             5,953 core.json
+10/22/2025  01:37 PM             1,914 package.json
+               2 File(s)          7,867 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\is-extglob
+
+10/22/2025  01:37 PM             1,220 package.json
+               1 File(s)          1,220 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\is-fullwidth-code-point
+
+10/22/2025  01:37 PM               737 package.json
+               1 File(s)            737 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\is-glob
+
+10/22/2025  01:37 PM             1,748 package.json
+               1 File(s)          1,748 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\is-number
+
+10/22/2025  01:37 PM             1,599 package.json
+               1 File(s)          1,599 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\is-what
+
+10/24/2025  09:59 AM             1,532 package.json
+               1 File(s)          1,532 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\isexe
+
+10/22/2025  01:37 PM               786 package.json
+               1 File(s)            786 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\jackspeak
+
+10/22/2025  01:37 PM             2,204 package.json
+               1 File(s)          2,204 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\jackspeak\dist\commonjs
+
+10/22/2025  01:37 PM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\jackspeak\dist\esm
+
+10/22/2025  01:37 PM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\jiti
+
+10/24/2025  06:19 AM             2,805 package.json
+               1 File(s)          2,805 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\lilconfig
+
+10/22/2025  01:37 PM             1,301 package.json
+               1 File(s)          1,301 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\lines-and-columns
+
+10/22/2025  01:37 PM             1,372 package.json
+               1 File(s)          1,372 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\lru-cache
+
+10/22/2025  01:37 PM             2,827 package.json
+               1 File(s)          2,827 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\lru-cache\dist\commonjs
+
+10/22/2025  01:37 PM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\lru-cache\dist\esm
+
+10/22/2025  01:37 PM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\magic-string
+
+10/24/2025  06:24 AM             1,840 package.json
+               1 File(s)          1,840 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\merge2
+
+10/22/2025  01:37 PM               830 package.json
+               1 File(s)            830 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\micromatch
+
+10/22/2025  01:37 PM             2,648 package.json
+               1 File(s)          2,648 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\minimatch
+
+10/22/2025  01:37 PM             2,003 package.json
+               1 File(s)          2,003 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\minimatch\dist\commonjs
+
+10/22/2025  01:37 PM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\minimatch\dist\esm
+
+10/22/2025  01:37 PM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\minipass
+
+10/22/2025  01:37 PM             1,933 package.json
+               1 File(s)          1,933 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\minipass\dist\commonjs
+
+10/22/2025  01:37 PM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\minipass\dist\esm
+
+10/22/2025  01:37 PM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\mitt
+
+10/24/2025  09:59 AM             2,313 package.json
+               1 File(s)          2,313 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\mz
+
+10/22/2025  01:37 PM             1,012 package.json
+               1 File(s)          1,012 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\nanoid
+
+10/24/2025  06:19 AM             2,283 package.json
+               1 File(s)          2,283 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\nanoid\async
+
+10/24/2025  06:19 AM               233 package.json
+               1 File(s)            233 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\nanoid\non-secure
+
+10/24/2025  06:19 AM                99 package.json
+               1 File(s)             99 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\nanoid\url-alphabet
+
+10/24/2025  06:19 AM                99 package.json
+               1 File(s)             99 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\normalize-path
+
+10/22/2025  01:37 PM             1,666 package.json
+               1 File(s)          1,666 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\object-assign
+
+10/22/2025  01:37 PM               764 package.json
+               1 File(s)            764 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\object-hash
+
+10/22/2025  01:37 PM             1,271 package.json
+               1 File(s)          1,271 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\package-json-from-dist
+
+10/22/2025  01:37 PM             1,690 package.json
+               1 File(s)          1,690 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\package-json-from-dist\dist\commonjs
+
+10/22/2025  01:37 PM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\package-json-from-dist\dist\esm
+
+10/22/2025  01:37 PM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\path-key
+
+10/22/2025  01:37 PM               650 package.json
+               1 File(s)            650 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\path-parse
+
+10/22/2025  01:37 PM               667 package.json
+               1 File(s)            667 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\path-scurry
+
+10/22/2025  01:37 PM             2,172 package.json
+               1 File(s)          2,172 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\path-scurry\dist\commonjs
+
+10/22/2025  01:37 PM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\path-scurry\dist\esm
+
+10/22/2025  01:37 PM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\perfect-debounce
+
+10/24/2025  09:59 AM             1,178 package.json
+               1 File(s)          1,178 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\picocolors
+
+10/22/2025  01:37 PM               552 package.json
+               1 File(s)            552 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\picomatch
+
+10/22/2025  01:37 PM             1,912 package.json
+               1 File(s)          1,912 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\pify
+
+10/22/2025  01:37 PM               890 package.json
+               1 File(s)            890 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\pinia
+
+10/24/2025  09:59 AM             2,329 package.json
+               1 File(s)          2,329 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\pinia\node_modules\@vue\devtools-api
+
+10/24/2025  09:59 AM               686 package.json
+               1 File(s)            686 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\pirates
+
+10/22/2025  01:37 PM               839 package.json
+               1 File(s)            839 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\postcss
+
+10/22/2025  01:37 PM             2,496 package.json
+               1 File(s)          2,496 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\postcss-import
+
+10/22/2025  01:37 PM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\postcss-js
+
+10/22/2025  01:37 PM             1,016 package.json
+               1 File(s)          1,016 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\postcss-load-config
+
+10/22/2025  01:37 PM             1,043 package.json
+               1 File(s)          1,043 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\postcss-load-config\node_modules\lilconfig
+
+10/22/2025  01:37 PM               998 package.json
+               1 File(s)            998 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\postcss-nested
+
+10/22/2025  01:37 PM               695 package.json
+               1 File(s)            695 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\postcss-selector-parser
+
+10/22/2025  01:37 PM             2,050 package.json
+               1 File(s)          2,050 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\postcss-value-parser
+
+10/22/2025  01:37 PM             1,302 package.json
+               1 File(s)          1,302 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\queue-microtask
+
+10/22/2025  01:37 PM             1,177 package.json
+               1 File(s)          1,177 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\read-cache
+
+10/22/2025  01:37 PM               712 package.json
+               1 File(s)            712 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\readdirp
+
+10/22/2025  01:37 PM             2,522 package.json
+               1 File(s)          2,522 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve
+
+10/24/2025  06:19 AM             2,065 package.json
+               1 File(s)          2,065 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\lib
+
+10/24/2025  06:19 AM             5,953 core.json
+               1 File(s)          5,953 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\module_dir\zmodules\bbb
+
+10/24/2025  06:19 AM                24 package.json
+               1 File(s)             24 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\baz
+
+10/24/2025  06:19 AM                45 package.json
+               1 File(s)             45 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\browser_field
+
+10/24/2025  06:19 AM                63 package.json
+               1 File(s)             63 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\dot_main
+
+10/24/2025  06:19 AM                20 package.json
+               1 File(s)             20 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\dot_slash_main
+
+10/24/2025  06:19 AM                21 package.json
+               1 File(s)             21 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\false_main
+
+10/24/2025  06:19 AM                42 package.json
+               1 File(s)             42 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\incorrect_main
+
+10/24/2025  06:19 AM                27 package.json
+               1 File(s)             27 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\invalid_main
+
+10/24/2025  06:19 AM                93 package.json
+               1 File(s)             93 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\multirepo
+
+10/24/2025  06:19 AM                63 lerna.json
+10/24/2025  06:19 AM               387 package.json
+               2 File(s)            450 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\multirepo\packages\package-a
+
+10/24/2025  06:19 AM               281 package.json
+               1 File(s)            281 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\multirepo\packages\package-b
+
+10/24/2025  06:19 AM               281 package.json
+               1 File(s)            281 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\nested_symlinks\mylib
+
+10/24/2025  06:19 AM               259 package.json
+               1 File(s)            259 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\resolve\test\resolver\symlinked\package
+
+10/24/2025  06:19 AM                24 package.json
+               1 File(s)             24 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\reusify
+
+10/22/2025  01:37 PM             1,074 package.json
+10/22/2025  01:37 PM               156 tsconfig.json
+               2 File(s)          1,230 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\rfdc
+
+10/24/2025  09:59 AM             1,656 package.json
+               1 File(s)          1,656 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\rollup
+
+10/24/2025  06:19 AM            11,799 package.json
+               1 File(s)         11,799 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\rollup\dist\es
+
+10/24/2025  06:19 AM                17 package.json
+               1 File(s)             17 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\run-parallel
+
+10/22/2025  01:37 PM             1,291 package.json
+               1 File(s)          1,291 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\shebang-command
+
+10/22/2025  01:37 PM               558 package.json
+               1 File(s)            558 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\shebang-regex
+
+10/22/2025  01:37 PM               582 package.json
+               1 File(s)            582 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\signal-exit
+
+10/22/2025  01:37 PM             2,573 package.json
+               1 File(s)          2,573 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\signal-exit\dist\cjs
+
+10/22/2025  01:37 PM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\signal-exit\dist\mjs
+
+10/22/2025  01:37 PM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\source-map-js
+
+10/22/2025  01:37 PM             2,548 package.json
+               1 File(s)          2,548 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\speakingurl
+
+10/24/2025  09:59 AM               549 bower.json
+10/24/2025  09:59 AM               570 component.json
+10/24/2025  09:59 AM             2,306 package.json
+               3 File(s)          3,425 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\string-width
+
+10/22/2025  01:37 PM             1,044 package.json
+               1 File(s)          1,044 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\string-width-cjs
+
+10/22/2025  01:37 PM               941 package.json
+               1 File(s)            941 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\string-width-cjs\node_modules\ansi-regex
+
+10/22/2025  01:37 PM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\string-width-cjs\node_modules\emoji-regex
+
+10/22/2025  01:37 PM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\string-width-cjs\node_modules\strip-ansi
+
+10/22/2025  01:37 PM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\strip-ansi
+
+10/22/2025  01:37 PM               963 package.json
+               1 File(s)            963 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\strip-ansi-cjs
+
+10/22/2025  01:37 PM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\strip-ansi-cjs\node_modules\ansi-regex
+
+10/22/2025  01:37 PM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\sucrase
+
+10/24/2025  06:19 AM             3,307 package.json
+               1 File(s)          3,307 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\superjson
+
+10/24/2025  09:59 AM             1,787 package.json
+               1 File(s)          1,787 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\supports-preserve-symlinks-flag
+
+10/22/2025  01:37 PM             1,895 package.json
+               1 File(s)          1,895 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\tailwindcss
+
+10/24/2025  06:19 AM             3,548 package.json
+               1 File(s)          3,548 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\tailwindcss\stubs
+
+10/24/2025  06:19 AM                90 .prettierrc.json
+               1 File(s)             90 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\thenify
+
+10/22/2025  01:37 PM               752 package.json
+               1 File(s)            752 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\thenify-all
+
+10/22/2025  01:37 PM               793 package.json
+               1 File(s)            793 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\tinyglobby
+
+10/24/2025  06:19 AM             1,818 package.json
+               1 File(s)          1,818 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\tinyglobby\node_modules\fdir
+
+10/24/2025  06:19 AM             2,694 package.json
+               1 File(s)          2,694 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\tinyglobby\node_modules\picomatch
+
+10/24/2025  06:19 AM             1,953 package.json
+               1 File(s)          1,953 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\to-regex-range
+
+10/22/2025  01:37 PM             1,782 package.json
+               1 File(s)          1,782 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\ts-interface-checker
+
+10/22/2025  01:37 PM             1,326 package.json
+               1 File(s)          1,326 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\util-deprecate
+
+10/22/2025  01:37 PM               694 package.json
+               1 File(s)            694 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vite
+
+10/24/2025  06:19 AM             5,067 package.json
+               1 File(s)          5,067 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vite\node_modules\fdir
+
+10/24/2025  06:19 AM             2,694 package.json
+               1 File(s)          2,694 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vite\node_modules\picomatch
+
+10/24/2025  06:19 AM             1,953 package.json
+               1 File(s)          1,953 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vite\types
+
+10/24/2025  06:19 AM               109 package.json
+               1 File(s)            109 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vue
+
+10/24/2025  06:24 AM             2,810 package.json
+               1 File(s)          2,810 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vue\compiler-sfc
+
+10/24/2025  06:24 AM                50 package.json
+               1 File(s)             50 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vue\jsx-runtime
+
+10/24/2025  06:24 AM                75 package.json
+               1 File(s)             75 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vue\server-renderer
+
+10/24/2025  06:24 AM                50 package.json
+               1 File(s)             50 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vue-router
+
+10/24/2025  09:33 AM             4,963 package.json
+               1 File(s)          4,963 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\vue-router\vetur
+
+10/24/2025  09:33 AM             1,847 attributes.json
+10/24/2025  09:33 AM               636 tags.json
+               2 File(s)          2,483 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\which
+
+10/24/2025  06:19 AM             1,043 package.json
+               1 File(s)          1,043 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\wrap-ansi
+
+10/22/2025  01:37 PM             1,148 package.json
+               1 File(s)          1,148 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\wrap-ansi-cjs
+
+10/22/2025  01:37 PM             1,014 package.json
+               1 File(s)          1,014 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\wrap-ansi-cjs\node_modules\ansi-regex
+
+10/22/2025  01:37 PM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\wrap-ansi-cjs\node_modules\ansi-styles
+
+10/22/2025  01:37 PM             1,054 package.json
+               1 File(s)          1,054 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\wrap-ansi-cjs\node_modules\emoji-regex
+
+10/22/2025  01:37 PM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\wrap-ansi-cjs\node_modules\string-width
+
+10/22/2025  01:37 PM               941 package.json
+               1 File(s)            941 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\wrap-ansi-cjs\node_modules\strip-ansi
+
+10/22/2025  01:37 PM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\yaml
+
+10/24/2025  06:19 AM             3,229 package.json
+               1 File(s)          3,229 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\node_modules\yaml\browser
+
+10/24/2025  06:19 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public
+
+11/03/2025  09:18 AM               510 staff-format.json
+               1 File(s)            510 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha\data
+
+10/06/2025  08:36 AM             4,127 instruments.json
+10/04/2025  02:25 PM             1,556 pitch-class.json
+10/17/2025  06:17 AM             1,368 scales.json
+10/05/2025  09:02 AM             1,206 show-scales.json
+               4 File(s)          8,257 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha\fragments
+
+10/26/2025  05:41 PM                84 footer.json
+               1 File(s)             84 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-backup_10-25-2025\data
+
+10/06/2025  08:36 AM             4,127 instruments.json
+10/04/2025  02:25 PM             1,556 pitch-class.json
+10/17/2025  06:17 AM             1,368 scales.json
+10/05/2025  09:02 AM             1,206 show-scales.json
+               4 File(s)          8,257 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-backup_10-25-2025\fragments
+
+10/20/2025  07:24 AM                80 footer.json
+               1 File(s)             80 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA
+
+11/03/2025  09:18 AM               510 staff-format.json
+               1 File(s)            510 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA\alpha\data
+
+10/06/2025  08:36 AM             4,127 instruments.json
+10/04/2025  02:25 PM             1,556 pitch-class.json
+10/17/2025  06:17 AM             1,368 scales.json
+10/05/2025  09:02 AM             1,206 show-scales.json
+               4 File(s)          8,257 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA\alpha\fragments
+
+10/26/2025  05:41 PM                84 footer.json
+               1 File(s)             84 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA\alpha-backup_10-25-2025\data
+
+10/06/2025  08:36 AM             4,127 instruments.json
+10/04/2025  02:25 PM             1,556 pitch-class.json
+10/17/2025  06:17 AM             1,368 scales.json
+10/05/2025  09:02 AM             1,206 show-scales.json
+               4 File(s)          8,257 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA\alpha-backup_10-25-2025\fragments
+
+10/20/2025  07:24 AM                80 footer.json
+               1 File(s)             80 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA\data
+
+10/31/2025  12:05 PM               352 enums.json
+10/06/2025  08:36 AM             4,127 instruments.json
+11/01/2025  02:11 PM               413 scaleKeys.json
+               3 File(s)          4,892 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA\prototype\data
+
+10/14/2025  09:04 AM             3,662 ack.json
+10/07/2025  06:32 PM            20,844 change-log.json
+09/21/2025  06:53 AM                85 clef.json
+10/08/2025  05:55 AM             4,614 feature-pipeline.json
+10/06/2025  08:36 AM             4,127 instruments.json
+10/09/2025  10:22 AM                38 noteColors.json
+10/03/2025  06:02 AM             2,866 notesAscending.json
+10/04/2025  02:25 PM             1,556 pitch-class.json
+10/05/2025  08:04 AM               640 show-scales copy.json
+10/05/2025  09:02 AM             1,206 show-scales.json
+10/10/2025  11:45 AM               156 version.json
+              11 File(s)         39,794 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA\prototype\practicePassages
+
+10/06/2025  07:26 PM             1,424 danny-boy.json
+10/06/2025  09:00 PM               930 king-of-the-road.json
+10/06/2025  08:51 PM             1,128 twinkle-twinkle-little-star.json
+               3 File(s)          3,482 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\alpha-vue-SPA\test
+
+11/04/2025  12:49 PM             1,541 test.json
+               1 File(s)          1,541 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\data
+
+10/31/2025  12:05 PM               352 enums.json
+10/06/2025  08:36 AM             4,127 instruments.json
+11/01/2025  02:11 PM               413 scaleKeys.json
+               3 File(s)          4,892 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\prototype\data
+
+10/14/2025  09:04 AM             3,662 ack.json
+10/07/2025  06:32 PM            20,844 change-log.json
+09/21/2025  06:53 AM                85 clef.json
+10/08/2025  05:55 AM             4,614 feature-pipeline.json
+10/06/2025  08:36 AM             4,127 instruments.json
+10/09/2025  10:22 AM                38 noteColors.json
+10/03/2025  06:02 AM             2,866 notesAscending.json
+10/04/2025  02:25 PM             1,556 pitch-class.json
+10/05/2025  08:04 AM               640 show-scales copy.json
+10/05/2025  09:02 AM             1,206 show-scales.json
+10/10/2025  11:45 AM               156 version.json
+              11 File(s)         39,794 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\prototype\practicePassages
+
+10/06/2025  07:26 PM             1,424 danny-boy.json
+10/06/2025  09:00 PM               930 king-of-the-road.json
+10/06/2025  08:51 PM             1,128 twinkle-twinkle-little-star.json
+               3 File(s)          3,482 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\public\test
+
+11/04/2025  12:49 PM             1,541 test.json
+               1 File(s)          1,541 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind
+
+10/14/2025  09:56 AM            54,268 package-lock.json
+10/14/2025  09:57 AM               294 package.json
+               2 File(s)         54,562 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules
+
+10/14/2025  09:56 AM            53,595 .package-lock.json
+               1 File(s)         53,595 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@alloc\quick-lru
+
+10/14/2025  09:56 AM               747 package.json
+               1 File(s)            747 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@isaacs\cliui
+
+10/14/2025  09:56 AM             2,164 package.json
+               1 File(s)          2,164 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@jridgewell\gen-mapping
+
+10/14/2025  09:56 AM             2,201 package.json
+               1 File(s)          2,201 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@jridgewell\resolve-uri
+
+10/14/2025  09:56 AM             2,063 package.json
+               1 File(s)          2,063 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@jridgewell\sourcemap-codec
+
+10/14/2025  09:56 AM             2,150 package.json
+               1 File(s)          2,150 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@jridgewell\trace-mapping
+
+10/14/2025  09:56 AM             2,252 package.json
+               1 File(s)          2,252 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@nodelib\fs.scandir
+
+10/14/2025  09:56 AM             1,163 package.json
+               1 File(s)          1,163 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@nodelib\fs.stat
+
+10/14/2025  09:56 AM               987 package.json
+               1 File(s)            987 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@nodelib\fs.walk
+
+10/14/2025  09:56 AM             1,138 package.json
+               1 File(s)          1,138 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\@pkgjs\parseargs
+
+10/14/2025  09:56 AM               881 package.json
+               1 File(s)            881 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\ansi-regex
+
+10/14/2025  09:56 AM             1,035 package.json
+               1 File(s)          1,035 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\ansi-styles
+
+10/14/2025  09:56 AM             1,021 package.json
+               1 File(s)          1,021 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\any-promise
+
+10/14/2025  09:56 AM             1,017 package.json
+               1 File(s)          1,017 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\anymatch
+
+10/14/2025  09:56 AM               904 package.json
+               1 File(s)            904 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\arg
+
+10/14/2025  09:56 AM               589 package.json
+               1 File(s)            589 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\balanced-match
+
+10/14/2025  09:56 AM             1,069 package.json
+               1 File(s)          1,069 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\binary-extensions
+
+10/14/2025  09:56 AM             2,193 binary-extensions.json
+10/14/2025  09:56 AM               739 package.json
+               2 File(s)          2,932 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\brace-expansion
+
+10/14/2025  09:56 AM             1,135 package.json
+               1 File(s)          1,135 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\braces
+
+10/14/2025  09:56 AM             1,647 package.json
+               1 File(s)          1,647 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\camelcase-css
+
+10/14/2025  09:56 AM               860 package.json
+               1 File(s)            860 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\chokidar
+
+10/14/2025  09:56 AM             1,648 package.json
+               1 File(s)          1,648 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\chokidar\node_modules\glob-parent
+
+10/14/2025  09:56 AM             1,105 package.json
+               1 File(s)          1,105 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\color-convert
+
+10/14/2025  09:56 AM               827 package.json
+               1 File(s)            827 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\color-name
+
+10/14/2025  09:56 AM               607 package.json
+               1 File(s)            607 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\commander
+
+10/14/2025  09:56 AM               929 package.json
+               1 File(s)            929 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\cross-spawn
+
+10/14/2025  09:56 AM             1,655 package.json
+               1 File(s)          1,655 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\css-selector-tokenizer
+
+10/14/2025  09:56 AM             1,279 package.json
+               1 File(s)          1,279 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\cssesc
+
+10/14/2025  09:56 AM             1,252 package.json
+               1 File(s)          1,252 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\culori
+
+10/14/2025  09:56 AM             2,148 package.json
+               1 File(s)          2,148 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\culori\bundled
+
+10/14/2025  09:56 AM            98,864 meta.json
+               1 File(s)         98,864 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\daisyui
+
+10/14/2025  09:56 AM             2,104 package.json
+               1 File(s)          2,104 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\didyoumean
+
+10/14/2025  09:56 AM               647 package.json
+               1 File(s)            647 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\dlv
+
+10/14/2025  09:56 AM               794 package.json
+               1 File(s)            794 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\eastasianwidth
+
+10/14/2025  09:56 AM               390 package.json
+               1 File(s)            390 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\emoji-regex
+
+10/14/2025  09:56 AM             1,331 package.json
+               1 File(s)          1,331 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\fast-glob
+
+10/14/2025  09:56 AM             2,800 package.json
+               1 File(s)          2,800 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\fast-glob\node_modules\glob-parent
+
+10/14/2025  09:56 AM             1,105 package.json
+               1 File(s)          1,105 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\fastparse
+
+10/14/2025  09:56 AM             1,027 package.json
+               1 File(s)          1,027 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\fastq
+
+10/14/2025  09:56 AM             1,374 package.json
+               1 File(s)          1,374 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\fastq\test
+
+10/14/2025  09:56 AM               154 tsconfig.json
+               1 File(s)            154 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\fill-range
+
+10/14/2025  09:56 AM             1,760 package.json
+               1 File(s)          1,760 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\foreground-child
+
+10/14/2025  09:56 AM             2,713 package.json
+               1 File(s)          2,713 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\foreground-child\dist\commonjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\foreground-child\dist\esm
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\function-bind
+
+10/14/2025  09:56 AM             2,262 package.json
+               1 File(s)          2,262 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\glob
+
+10/14/2025  09:56 AM             2,601 package.json
+               1 File(s)          2,601 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\glob\dist\commonjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\glob\dist\esm
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\glob-parent
+
+10/14/2025  09:56 AM             1,050 package.json
+               1 File(s)          1,050 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\hasown
+
+10/14/2025  09:56 AM             2,283 package.json
+10/14/2025  09:56 AM                73 tsconfig.json
+               2 File(s)          2,356 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\is-binary-path
+
+10/14/2025  09:56 AM               657 package.json
+               1 File(s)            657 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\is-core-module
+
+10/14/2025  09:56 AM             5,953 core.json
+10/14/2025  09:56 AM             1,914 package.json
+               2 File(s)          7,867 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\is-extglob
+
+10/14/2025  09:56 AM             1,220 package.json
+               1 File(s)          1,220 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\is-fullwidth-code-point
+
+10/14/2025  09:56 AM               737 package.json
+               1 File(s)            737 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\is-glob
+
+10/14/2025  09:56 AM             1,748 package.json
+               1 File(s)          1,748 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\is-number
+
+10/14/2025  09:56 AM             1,599 package.json
+               1 File(s)          1,599 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\isexe
+
+10/14/2025  09:56 AM               786 package.json
+               1 File(s)            786 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\jackspeak
+
+10/14/2025  09:56 AM             2,204 package.json
+               1 File(s)          2,204 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\jackspeak\dist\commonjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\jackspeak\dist\esm
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\jiti
+
+10/14/2025  09:56 AM             2,805 package.json
+               1 File(s)          2,805 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\lilconfig
+
+10/14/2025  09:56 AM               998 package.json
+               1 File(s)            998 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\lines-and-columns
+
+10/14/2025  09:56 AM             1,372 package.json
+               1 File(s)          1,372 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\lru-cache
+
+10/14/2025  09:56 AM             2,827 package.json
+               1 File(s)          2,827 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\lru-cache\dist\commonjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\lru-cache\dist\esm
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\merge2
+
+10/14/2025  09:56 AM               830 package.json
+               1 File(s)            830 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\micromatch
+
+10/14/2025  09:56 AM             2,648 package.json
+               1 File(s)          2,648 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\minimatch
+
+10/14/2025  09:56 AM             2,003 package.json
+               1 File(s)          2,003 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\minimatch\dist\commonjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\minimatch\dist\esm
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\minipass
+
+10/14/2025  09:56 AM             1,933 package.json
+               1 File(s)          1,933 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\minipass\dist\commonjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\minipass\dist\esm
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\mz
+
+10/14/2025  09:56 AM             1,012 package.json
+               1 File(s)          1,012 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\nanoid
+
+10/14/2025  09:56 AM             2,283 package.json
+               1 File(s)          2,283 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\nanoid\async
+
+10/14/2025  09:56 AM               233 package.json
+               1 File(s)            233 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\nanoid\non-secure
+
+10/14/2025  09:56 AM                99 package.json
+               1 File(s)             99 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\nanoid\url-alphabet
+
+10/14/2025  09:56 AM                99 package.json
+               1 File(s)             99 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\normalize-path
+
+10/14/2025  09:56 AM             1,666 package.json
+               1 File(s)          1,666 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\object-assign
+
+10/14/2025  09:56 AM               764 package.json
+               1 File(s)            764 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\object-hash
+
+10/14/2025  09:56 AM             1,271 package.json
+               1 File(s)          1,271 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\package-json-from-dist
+
+10/14/2025  09:56 AM             1,690 package.json
+               1 File(s)          1,690 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\package-json-from-dist\dist\commonjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\package-json-from-dist\dist\esm
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\path-key
+
+10/14/2025  09:56 AM               650 package.json
+               1 File(s)            650 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\path-parse
+
+10/14/2025  09:56 AM               667 package.json
+               1 File(s)            667 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\path-scurry
+
+10/14/2025  09:56 AM             2,172 package.json
+               1 File(s)          2,172 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\path-scurry\dist\commonjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\path-scurry\dist\esm
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\picocolors
+
+10/14/2025  09:56 AM               552 package.json
+               1 File(s)            552 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\picomatch
+
+10/14/2025  09:56 AM             1,912 package.json
+               1 File(s)          1,912 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\pify
+
+10/14/2025  09:56 AM               890 package.json
+               1 File(s)            890 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\pirates
+
+10/14/2025  09:56 AM               839 package.json
+               1 File(s)            839 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\postcss
+
+10/14/2025  09:56 AM             2,496 package.json
+               1 File(s)          2,496 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\postcss-import
+
+10/14/2025  09:56 AM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\postcss-js
+
+10/14/2025  09:56 AM             1,016 package.json
+               1 File(s)          1,016 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\postcss-load-config
+
+10/14/2025  09:56 AM             1,146 package.json
+               1 File(s)          1,146 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\postcss-nested
+
+10/14/2025  09:56 AM               695 package.json
+               1 File(s)            695 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\postcss-selector-parser
+
+10/14/2025  09:56 AM             2,050 package.json
+               1 File(s)          2,050 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\postcss-value-parser
+
+10/14/2025  09:56 AM             1,302 package.json
+               1 File(s)          1,302 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\queue-microtask
+
+10/14/2025  09:56 AM             1,177 package.json
+               1 File(s)          1,177 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\read-cache
+
+10/14/2025  09:56 AM               712 package.json
+               1 File(s)            712 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\readdirp
+
+10/14/2025  09:56 AM             2,522 package.json
+               1 File(s)          2,522 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve
+
+10/14/2025  09:56 AM             2,065 package.json
+               1 File(s)          2,065 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\lib
+
+10/14/2025  09:56 AM             5,931 core.json
+               1 File(s)          5,931 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\module_dir\zmodules\bbb
+
+10/14/2025  09:56 AM                24 package.json
+               1 File(s)             24 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\baz
+
+10/14/2025  09:56 AM                45 package.json
+               1 File(s)             45 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\browser_field
+
+10/14/2025  09:56 AM                63 package.json
+               1 File(s)             63 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\dot_main
+
+10/14/2025  09:56 AM                20 package.json
+               1 File(s)             20 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\dot_slash_main
+
+10/14/2025  09:56 AM                21 package.json
+               1 File(s)             21 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\false_main
+
+10/14/2025  09:56 AM                42 package.json
+               1 File(s)             42 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\incorrect_main
+
+10/14/2025  09:56 AM                27 package.json
+               1 File(s)             27 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\invalid_main
+
+10/14/2025  09:56 AM                93 package.json
+               1 File(s)             93 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\multirepo
+
+10/14/2025  09:56 AM                63 lerna.json
+10/14/2025  09:56 AM               387 package.json
+               2 File(s)            450 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\multirepo\packages\package-a
+
+10/14/2025  09:56 AM               281 package.json
+               1 File(s)            281 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\multirepo\packages\package-b
+
+10/14/2025  09:56 AM               281 package.json
+               1 File(s)            281 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\nested_symlinks\mylib
+
+10/14/2025  09:56 AM               259 package.json
+               1 File(s)            259 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\resolve\test\resolver\symlinked\package
+
+10/14/2025  09:56 AM                24 package.json
+               1 File(s)             24 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\reusify
+
+10/14/2025  09:56 AM             1,074 package.json
+10/14/2025  09:56 AM               156 tsconfig.json
+               2 File(s)          1,230 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\run-parallel
+
+10/14/2025  09:56 AM             1,291 package.json
+               1 File(s)          1,291 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\shebang-command
+
+10/14/2025  09:56 AM               558 package.json
+               1 File(s)            558 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\shebang-regex
+
+10/14/2025  09:56 AM               582 package.json
+               1 File(s)            582 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\signal-exit
+
+10/14/2025  09:56 AM             2,573 package.json
+               1 File(s)          2,573 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\signal-exit\dist\cjs
+
+10/14/2025  09:56 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\signal-exit\dist\mjs
+
+10/14/2025  09:56 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\source-map-js
+
+10/14/2025  09:56 AM             2,548 package.json
+               1 File(s)          2,548 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\string-width
+
+10/14/2025  09:56 AM             1,044 package.json
+               1 File(s)          1,044 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\string-width-cjs
+
+10/14/2025  09:56 AM               941 package.json
+               1 File(s)            941 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\string-width-cjs\node_modules\ansi-regex
+
+10/14/2025  09:56 AM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\string-width-cjs\node_modules\emoji-regex
+
+10/14/2025  09:56 AM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\string-width-cjs\node_modules\strip-ansi
+
+10/14/2025  09:56 AM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\strip-ansi
+
+10/14/2025  09:56 AM               963 package.json
+               1 File(s)            963 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\strip-ansi-cjs
+
+10/14/2025  09:56 AM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\strip-ansi-cjs\node_modules\ansi-regex
+
+10/14/2025  09:56 AM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\sucrase
+
+10/14/2025  09:56 AM             3,307 package.json
+               1 File(s)          3,307 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\supports-preserve-symlinks-flag
+
+10/14/2025  09:56 AM             1,895 package.json
+               1 File(s)          1,895 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\tailwindcss
+
+10/14/2025  09:56 AM             3,446 package.json
+               1 File(s)          3,446 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\tailwindcss\stubs
+
+10/14/2025  09:56 AM                90 .prettierrc.json
+               1 File(s)             90 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\thenify
+
+10/14/2025  09:56 AM               752 package.json
+               1 File(s)            752 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\thenify-all
+
+10/14/2025  09:56 AM               793 package.json
+               1 File(s)            793 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\to-regex-range
+
+10/14/2025  09:56 AM             1,782 package.json
+               1 File(s)          1,782 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\ts-interface-checker
+
+10/14/2025  09:56 AM             1,326 package.json
+               1 File(s)          1,326 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\util-deprecate
+
+10/14/2025  09:56 AM               694 package.json
+               1 File(s)            694 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\which
+
+10/14/2025  09:56 AM             1,043 package.json
+               1 File(s)          1,043 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\wrap-ansi
+
+10/14/2025  09:56 AM             1,148 package.json
+               1 File(s)          1,148 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\wrap-ansi-cjs
+
+10/14/2025  09:56 AM             1,014 package.json
+               1 File(s)          1,014 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\wrap-ansi-cjs\node_modules\ansi-regex
+
+10/14/2025  09:56 AM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\wrap-ansi-cjs\node_modules\ansi-styles
+
+10/14/2025  09:56 AM             1,054 package.json
+               1 File(s)          1,054 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\wrap-ansi-cjs\node_modules\emoji-regex
+
+10/14/2025  09:56 AM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\wrap-ansi-cjs\node_modules\string-width
+
+10/14/2025  09:56 AM               941 package.json
+               1 File(s)            941 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tailwind\node_modules\wrap-ansi-cjs\node_modules\strip-ansi
+
+10/14/2025  09:56 AM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\tools\public\alpha-vue-SPA
+
+10/27/2025  11:27 AM               420 staff-format.json
+10/27/2025  10:56 AM                 0 staffFormat.json
+               2 File(s)            420 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha
+
+11/08/2025  11:55 AM            97,185 package-lock.json
+11/06/2025  11:44 AM               459 package.json
+               2 File(s)         97,644 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\fragments
+
+10/26/2025  09:03 AM                83 footer.json
+               1 File(s)             83 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules
+
+11/08/2025  11:55 AM            74,373 .package-lock.json
+               1 File(s)         74,373 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\.vite\deps
+
+11/08/2025  08:12 AM                23 package.json
+11/08/2025  08:12 AM               999 _metadata.json
+               2 File(s)          1,022 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@alloc\quick-lru
+
+10/25/2025  07:52 AM               747 package.json
+               1 File(s)            747 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@babel\helper-string-parser
+
+10/25/2025  08:17 AM               758 package.json
+               1 File(s)            758 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@babel\helper-validator-identifier
+
+10/25/2025  08:17 AM               738 package.json
+               1 File(s)            738 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@babel\parser
+
+10/25/2025  08:17 AM             1,382 package.json
+               1 File(s)          1,382 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@babel\types
+
+10/25/2025  08:17 AM             1,046 package.json
+               1 File(s)          1,046 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@esbuild\win32-x64
+
+10/25/2025  08:17 AM               375 package.json
+               1 File(s)            375 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@isaacs\cliui
+
+10/25/2025  07:52 AM             2,164 package.json
+               1 File(s)          2,164 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@jridgewell\gen-mapping
+
+10/25/2025  07:52 AM             2,201 package.json
+               1 File(s)          2,201 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@jridgewell\resolve-uri
+
+10/25/2025  07:52 AM             2,063 package.json
+               1 File(s)          2,063 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@jridgewell\sourcemap-codec
+
+10/25/2025  07:52 AM             2,150 package.json
+               1 File(s)          2,150 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@jridgewell\trace-mapping
+
+10/25/2025  07:52 AM             2,252 package.json
+               1 File(s)          2,252 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@nodelib\fs.scandir
+
+10/25/2025  07:52 AM             1,163 package.json
+               1 File(s)          1,163 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@nodelib\fs.stat
+
+10/25/2025  07:52 AM               987 package.json
+               1 File(s)            987 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@nodelib\fs.walk
+
+10/25/2025  07:52 AM             1,138 package.json
+               1 File(s)          1,138 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@pkgjs\parseargs
+
+10/25/2025  07:52 AM               881 package.json
+               1 File(s)            881 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@rolldown\pluginutils
+
+10/25/2025  08:17 AM               739 package.json
+               1 File(s)            739 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@rollup\rollup-win32-x64-gnu
+
+10/25/2025  08:17 AM               451 package.json
+               1 File(s)            451 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@rollup\rollup-win32-x64-msvc
+
+10/25/2025  08:17 AM               454 package.json
+               1 File(s)            454 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@supabase\auth-js
+
+11/06/2025  11:44 AM             1,530 package.json
+               1 File(s)          1,530 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@supabase\functions-js
+
+11/06/2025  11:44 AM             1,344 package.json
+               1 File(s)          1,344 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@supabase\postgrest-js
+
+11/06/2025  11:44 AM             2,848 package.json
+               1 File(s)          2,848 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@supabase\realtime-js
+
+11/06/2025  11:44 AM             1,707 package.json
+               1 File(s)          1,707 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@supabase\storage-js
+
+11/06/2025  11:44 AM             1,927 package.json
+               1 File(s)          1,927 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@supabase\supabase-js
+
+11/06/2025  11:44 AM             3,794 package.json
+               1 File(s)          3,794 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@types\estree
+
+10/25/2025  08:17 AM               829 package.json
+               1 File(s)            829 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@types\node
+
+11/06/2025  11:44 AM             4,510 package.json
+               1 File(s)          4,510 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@types\phoenix
+
+11/06/2025  11:44 AM             1,115 package.json
+               1 File(s)          1,115 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@types\ws
+
+11/06/2025  11:44 AM             2,072 package.json
+               1 File(s)          2,072 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vitejs\plugin-vue
+
+10/25/2025  08:17 AM             1,260 package.json
+               1 File(s)          1,260 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\compiler-core
+
+10/25/2025  08:17 AM             1,386 package.json
+               1 File(s)          1,386 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\compiler-dom
+
+10/25/2025  08:17 AM             1,380 package.json
+               1 File(s)          1,380 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\compiler-sfc
+
+10/25/2025  08:17 AM             1,708 package.json
+               1 File(s)          1,708 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\compiler-ssr
+
+10/25/2025  08:17 AM               728 package.json
+               1 File(s)            728 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\reactivity
+
+10/25/2025  08:17 AM             1,297 package.json
+               1 File(s)          1,297 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\runtime-core
+
+10/25/2025  08:17 AM             1,233 package.json
+               1 File(s)          1,233 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\runtime-dom
+
+10/25/2025  08:17 AM             1,424 package.json
+               1 File(s)          1,424 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\server-renderer
+
+10/25/2025  08:17 AM             1,317 package.json
+               1 File(s)          1,317 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\@vue\shared
+
+10/25/2025  08:17 AM             1,082 package.json
+               1 File(s)          1,082 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\ansi-regex
+
+10/25/2025  07:52 AM             1,035 package.json
+               1 File(s)          1,035 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\ansi-styles
+
+10/25/2025  07:52 AM             1,021 package.json
+               1 File(s)          1,021 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\any-promise
+
+10/25/2025  07:52 AM             1,017 package.json
+               1 File(s)          1,017 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\anymatch
+
+10/25/2025  07:52 AM               904 package.json
+               1 File(s)            904 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\arg
+
+10/25/2025  07:52 AM               589 package.json
+               1 File(s)            589 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\balanced-match
+
+10/25/2025  07:52 AM             1,069 package.json
+               1 File(s)          1,069 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\binary-extensions
+
+10/25/2025  07:52 AM             2,193 binary-extensions.json
+10/25/2025  07:52 AM               739 package.json
+               2 File(s)          2,932 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\brace-expansion
+
+10/25/2025  07:52 AM             1,135 package.json
+               1 File(s)          1,135 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\braces
+
+10/25/2025  07:52 AM             1,647 package.json
+               1 File(s)          1,647 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\camelcase-css
+
+10/25/2025  07:52 AM               860 package.json
+               1 File(s)            860 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\chokidar
+
+10/25/2025  07:52 AM             1,648 package.json
+               1 File(s)          1,648 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\chokidar\node_modules\glob-parent
+
+10/25/2025  07:52 AM             1,105 package.json
+               1 File(s)          1,105 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\color-convert
+
+10/25/2025  07:52 AM               827 package.json
+               1 File(s)            827 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\color-name
+
+10/25/2025  07:52 AM               607 package.json
+               1 File(s)            607 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\commander
+
+10/25/2025  07:52 AM               929 package.json
+               1 File(s)            929 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\cross-spawn
+
+10/25/2025  07:52 AM             1,655 package.json
+               1 File(s)          1,655 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\css-selector-tokenizer
+
+10/25/2025  07:52 AM             1,279 package.json
+               1 File(s)          1,279 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\cssesc
+
+10/25/2025  07:52 AM             1,252 package.json
+               1 File(s)          1,252 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\csstype
+
+10/25/2025  08:17 AM             2,137 package.json
+               1 File(s)          2,137 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\culori
+
+10/25/2025  07:52 AM             2,148 package.json
+               1 File(s)          2,148 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\culori\bundled
+
+10/25/2025  07:52 AM            98,864 meta.json
+               1 File(s)         98,864 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\daisyui
+
+10/25/2025  07:52 AM             2,104 package.json
+               1 File(s)          2,104 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\didyoumean
+
+10/25/2025  07:52 AM               647 package.json
+               1 File(s)            647 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\dlv
+
+10/25/2025  07:52 AM               794 package.json
+               1 File(s)            794 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\eastasianwidth
+
+10/25/2025  07:52 AM               390 package.json
+               1 File(s)            390 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\emoji-regex
+
+10/25/2025  07:52 AM             1,331 package.json
+               1 File(s)          1,331 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\entities
+
+10/25/2025  08:17 AM             2,883 package.json
+               1 File(s)          2,883 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\entities\lib\esm
+
+10/25/2025  08:17 AM                18 package.json
+               1 File(s)             18 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\esbuild
+
+10/25/2025  08:17 AM             1,490 package.json
+               1 File(s)          1,490 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\estree-walker
+
+10/25/2025  08:17 AM               848 package.json
+               1 File(s)            848 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\estree-walker\dist\esm
+
+10/25/2025  08:17 AM                17 package.json
+               1 File(s)             17 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\estree-walker\src
+
+10/25/2025  08:17 AM                18 package.json
+               1 File(s)             18 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\fast-glob
+
+10/25/2025  07:52 AM             2,800 package.json
+               1 File(s)          2,800 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\fast-glob\node_modules\glob-parent
+
+10/25/2025  07:52 AM             1,105 package.json
+               1 File(s)          1,105 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\fastparse
+
+10/25/2025  07:52 AM             1,027 package.json
+               1 File(s)          1,027 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\fastq
+
+10/25/2025  07:52 AM             1,374 package.json
+               1 File(s)          1,374 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\fastq\test
+
+10/25/2025  07:52 AM               154 tsconfig.json
+               1 File(s)            154 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\fill-range
+
+10/25/2025  07:52 AM             1,760 package.json
+               1 File(s)          1,760 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\foreground-child
+
+10/25/2025  07:52 AM             2,713 package.json
+               1 File(s)          2,713 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\foreground-child\dist\commonjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\foreground-child\dist\esm
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\function-bind
+
+10/25/2025  07:52 AM             2,262 package.json
+               1 File(s)          2,262 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\glob
+
+10/25/2025  07:52 AM             2,601 package.json
+               1 File(s)          2,601 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\glob\dist\commonjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\glob\dist\esm
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\glob-parent
+
+10/25/2025  07:52 AM             1,050 package.json
+               1 File(s)          1,050 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\hasown
+
+10/25/2025  07:52 AM             2,283 package.json
+10/25/2025  07:52 AM                73 tsconfig.json
+               2 File(s)          2,356 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\is-binary-path
+
+10/25/2025  07:52 AM               657 package.json
+               1 File(s)            657 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\is-core-module
+
+10/25/2025  07:52 AM             5,953 core.json
+10/25/2025  07:52 AM             1,914 package.json
+               2 File(s)          7,867 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\is-extglob
+
+10/25/2025  07:52 AM             1,220 package.json
+               1 File(s)          1,220 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\is-fullwidth-code-point
+
+10/25/2025  07:52 AM               737 package.json
+               1 File(s)            737 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\is-glob
+
+10/25/2025  07:52 AM             1,748 package.json
+               1 File(s)          1,748 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\is-number
+
+10/25/2025  07:52 AM             1,599 package.json
+               1 File(s)          1,599 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\isexe
+
+10/25/2025  07:52 AM               786 package.json
+               1 File(s)            786 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\jackspeak
+
+10/25/2025  07:52 AM             2,204 package.json
+               1 File(s)          2,204 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\jackspeak\dist\commonjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\jackspeak\dist\esm
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\jiti
+
+10/25/2025  07:52 AM             2,805 package.json
+               1 File(s)          2,805 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\lilconfig
+
+10/25/2025  07:52 AM               998 package.json
+               1 File(s)            998 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\lines-and-columns
+
+10/25/2025  07:52 AM             1,372 package.json
+               1 File(s)          1,372 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\lru-cache
+
+10/25/2025  07:52 AM             2,827 package.json
+               1 File(s)          2,827 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\lru-cache\dist\commonjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\lru-cache\dist\esm
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\magic-string
+
+10/25/2025  08:17 AM             1,840 package.json
+               1 File(s)          1,840 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\merge2
+
+10/25/2025  07:52 AM               830 package.json
+               1 File(s)            830 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\micromatch
+
+10/25/2025  07:52 AM             2,648 package.json
+               1 File(s)          2,648 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\minimatch
+
+10/25/2025  07:52 AM             2,003 package.json
+               1 File(s)          2,003 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\minimatch\dist\commonjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\minimatch\dist\esm
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\minipass
+
+10/25/2025  07:52 AM             1,933 package.json
+               1 File(s)          1,933 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\minipass\dist\commonjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\minipass\dist\esm
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\mz
+
+10/25/2025  07:52 AM             1,012 package.json
+               1 File(s)          1,012 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\nanoid
+
+10/25/2025  07:52 AM             2,283 package.json
+               1 File(s)          2,283 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\nanoid\async
+
+10/25/2025  07:52 AM               233 package.json
+               1 File(s)            233 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\nanoid\non-secure
+
+10/25/2025  07:52 AM                99 package.json
+               1 File(s)             99 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\nanoid\url-alphabet
+
+10/25/2025  07:52 AM                99 package.json
+               1 File(s)             99 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\normalize-path
+
+10/25/2025  07:52 AM             1,666 package.json
+               1 File(s)          1,666 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\object-assign
+
+10/25/2025  07:52 AM               764 package.json
+               1 File(s)            764 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\object-hash
+
+10/25/2025  07:52 AM             1,271 package.json
+               1 File(s)          1,271 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\package-json-from-dist
+
+10/25/2025  07:52 AM             1,690 package.json
+               1 File(s)          1,690 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\package-json-from-dist\dist\commonjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\package-json-from-dist\dist\esm
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\path-key
+
+10/25/2025  07:52 AM               650 package.json
+               1 File(s)            650 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\path-parse
+
+10/25/2025  07:52 AM               667 package.json
+               1 File(s)            667 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\path-scurry
+
+10/25/2025  07:52 AM             2,172 package.json
+               1 File(s)          2,172 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\path-scurry\dist\commonjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\path-scurry\dist\esm
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\picocolors
+
+10/25/2025  07:52 AM               552 package.json
+               1 File(s)            552 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\picomatch
+
+10/25/2025  07:52 AM             1,912 package.json
+               1 File(s)          1,912 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\pify
+
+10/25/2025  07:52 AM               890 package.json
+               1 File(s)            890 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\pirates
+
+10/25/2025  07:52 AM               839 package.json
+               1 File(s)            839 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\postcss
+
+10/25/2025  07:52 AM             2,496 package.json
+               1 File(s)          2,496 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\postcss-import
+
+10/25/2025  07:52 AM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\postcss-js
+
+10/25/2025  07:52 AM             1,016 package.json
+               1 File(s)          1,016 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\postcss-load-config
+
+10/25/2025  07:52 AM             1,146 package.json
+               1 File(s)          1,146 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\postcss-nested
+
+10/25/2025  07:52 AM               695 package.json
+               1 File(s)            695 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\postcss-selector-parser
+
+10/25/2025  07:52 AM             2,050 package.json
+               1 File(s)          2,050 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\postcss-value-parser
+
+10/25/2025  07:52 AM             1,302 package.json
+               1 File(s)          1,302 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\queue-microtask
+
+10/25/2025  07:52 AM             1,177 package.json
+               1 File(s)          1,177 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\read-cache
+
+10/25/2025  07:52 AM               712 package.json
+               1 File(s)            712 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\readdirp
+
+10/25/2025  07:52 AM             2,522 package.json
+               1 File(s)          2,522 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve
+
+10/25/2025  07:52 AM             2,065 package.json
+               1 File(s)          2,065 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\lib
+
+10/25/2025  07:52 AM             5,953 core.json
+               1 File(s)          5,953 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\module_dir\zmodules\bbb
+
+10/25/2025  07:52 AM                24 package.json
+               1 File(s)             24 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\baz
+
+10/25/2025  07:52 AM                45 package.json
+               1 File(s)             45 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\browser_field
+
+10/25/2025  07:52 AM                63 package.json
+               1 File(s)             63 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\dot_main
+
+10/25/2025  07:52 AM                20 package.json
+               1 File(s)             20 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\dot_slash_main
+
+10/25/2025  07:52 AM                21 package.json
+               1 File(s)             21 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\false_main
+
+10/25/2025  07:52 AM                42 package.json
+               1 File(s)             42 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\incorrect_main
+
+10/25/2025  07:52 AM                27 package.json
+               1 File(s)             27 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\invalid_main
+
+10/25/2025  07:52 AM                93 package.json
+               1 File(s)             93 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\multirepo
+
+10/25/2025  07:52 AM                63 lerna.json
+10/25/2025  07:52 AM               387 package.json
+               2 File(s)            450 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\multirepo\packages\package-a
+
+10/25/2025  07:52 AM               281 package.json
+               1 File(s)            281 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\multirepo\packages\package-b
+
+10/25/2025  07:52 AM               281 package.json
+               1 File(s)            281 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\nested_symlinks\mylib
+
+10/25/2025  07:52 AM               259 package.json
+               1 File(s)            259 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\resolve\test\resolver\symlinked\package
+
+10/25/2025  07:52 AM                24 package.json
+               1 File(s)             24 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\reusify
+
+10/25/2025  07:52 AM             1,074 package.json
+10/25/2025  07:52 AM               156 tsconfig.json
+               2 File(s)          1,230 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\rollup
+
+10/25/2025  08:17 AM            11,799 package.json
+               1 File(s)         11,799 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\rollup\dist\es
+
+10/25/2025  08:17 AM                17 package.json
+               1 File(s)             17 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\run-parallel
+
+10/25/2025  07:52 AM             1,291 package.json
+               1 File(s)          1,291 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\shebang-command
+
+10/25/2025  07:52 AM               558 package.json
+               1 File(s)            558 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\shebang-regex
+
+10/25/2025  07:52 AM               582 package.json
+               1 File(s)            582 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\signal-exit
+
+10/25/2025  07:52 AM             2,573 package.json
+               1 File(s)          2,573 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\signal-exit\dist\cjs
+
+10/25/2025  07:52 AM                25 package.json
+               1 File(s)             25 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\signal-exit\dist\mjs
+
+10/25/2025  07:52 AM                23 package.json
+               1 File(s)             23 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\source-map-js
+
+10/25/2025  07:52 AM             2,548 package.json
+               1 File(s)          2,548 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\string-width
+
+10/25/2025  07:52 AM             1,044 package.json
+               1 File(s)          1,044 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\string-width-cjs
+
+10/25/2025  07:52 AM               941 package.json
+               1 File(s)            941 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\string-width-cjs\node_modules\ansi-regex
+
+10/25/2025  07:52 AM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\string-width-cjs\node_modules\emoji-regex
+
+10/25/2025  07:52 AM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\string-width-cjs\node_modules\strip-ansi
+
+10/25/2025  07:52 AM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\strip-ansi
+
+10/25/2025  07:52 AM               963 package.json
+               1 File(s)            963 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\strip-ansi-cjs
+
+10/25/2025  07:52 AM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\strip-ansi-cjs\node_modules\ansi-regex
+
+10/25/2025  07:52 AM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\sucrase
+
+10/25/2025  07:52 AM             3,307 package.json
+               1 File(s)          3,307 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\supports-preserve-symlinks-flag
+
+10/25/2025  07:52 AM             1,895 package.json
+               1 File(s)          1,895 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\tailwindcss
+
+10/25/2025  07:52 AM             3,446 package.json
+               1 File(s)          3,446 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\tailwindcss\stubs
+
+10/25/2025  07:52 AM                90 .prettierrc.json
+               1 File(s)             90 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\thenify
+
+10/25/2025  07:52 AM               752 package.json
+               1 File(s)            752 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\thenify-all
+
+10/25/2025  07:52 AM               793 package.json
+               1 File(s)            793 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\tinyglobby
+
+10/25/2025  08:17 AM             1,818 package.json
+               1 File(s)          1,818 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\tinyglobby\node_modules\fdir
+
+10/25/2025  08:17 AM             2,694 package.json
+               1 File(s)          2,694 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\tinyglobby\node_modules\picomatch
+
+10/25/2025  08:17 AM             1,953 package.json
+               1 File(s)          1,953 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\to-regex-range
+
+10/25/2025  07:52 AM             1,782 package.json
+               1 File(s)          1,782 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\ts-interface-checker
+
+10/25/2025  07:52 AM             1,326 package.json
+               1 File(s)          1,326 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\tslib
+
+11/06/2025  11:44 AM             1,219 package.json
+               1 File(s)          1,219 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\tslib\modules
+
+11/06/2025  11:44 AM                26 package.json
+               1 File(s)             26 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\undici-types
+
+11/06/2025  11:44 AM             1,193 package.json
+               1 File(s)          1,193 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\util-deprecate
+
+10/25/2025  07:52 AM               694 package.json
+               1 File(s)            694 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\vite
+
+10/25/2025  08:17 AM             5,067 package.json
+               1 File(s)          5,067 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\vite\node_modules\fdir
+
+10/25/2025  08:17 AM             2,694 package.json
+               1 File(s)          2,694 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\vite\node_modules\picomatch
+
+10/25/2025  08:17 AM             1,953 package.json
+               1 File(s)          1,953 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\vite\types
+
+10/25/2025  08:17 AM               109 package.json
+               1 File(s)            109 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\vue
+
+10/25/2025  08:17 AM             2,810 package.json
+               1 File(s)          2,810 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\vue\compiler-sfc
+
+10/25/2025  08:17 AM                50 package.json
+               1 File(s)             50 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\vue\jsx-runtime
+
+10/25/2025  08:17 AM                75 package.json
+               1 File(s)             75 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\vue\server-renderer
+
+10/25/2025  08:17 AM                50 package.json
+               1 File(s)             50 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\which
+
+10/25/2025  07:52 AM             1,043 package.json
+               1 File(s)          1,043 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\wrap-ansi
+
+10/25/2025  07:52 AM             1,148 package.json
+               1 File(s)          1,148 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\wrap-ansi-cjs
+
+10/25/2025  07:52 AM             1,014 package.json
+               1 File(s)          1,014 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\wrap-ansi-cjs\node_modules\ansi-regex
+
+10/25/2025  07:52 AM               841 package.json
+               1 File(s)            841 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\wrap-ansi-cjs\node_modules\ansi-styles
+
+10/25/2025  07:52 AM             1,054 package.json
+               1 File(s)          1,054 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\wrap-ansi-cjs\node_modules\emoji-regex
+
+10/25/2025  07:52 AM             1,278 package.json
+               1 File(s)          1,278 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\wrap-ansi-cjs\node_modules\string-width
+
+10/25/2025  07:52 AM               941 package.json
+               1 File(s)            941 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\wrap-ansi-cjs\node_modules\strip-ansi
+
+10/25/2025  07:52 AM               798 package.json
+               1 File(s)            798 bytes
+
+ Directory of C:\Dev\MusicTutorStudio\Code\vue-src-alpha\node_modules\ws
+
+11/06/2025  11:44 AM             1,723 package.json
+               1 File(s)          1,723 bytes
+
+     Total Files Listed:
+             662 File(s)      1,487,517 bytes
+               0 Dir(s)  861,614,080,000 bytes free

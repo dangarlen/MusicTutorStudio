@@ -18,26 +18,17 @@
           margin: 2em auto;
         "
       >
-        <RouterLink to="/lessons-manage" class="mtsFormatLessonButtons">
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >launch</span
-          >
-          Manage Lessons
-        </RouterLink>
-        <RouterLink
-          to="/lessons-manage-practice-units"
-          class="mtsFormatLessonButtons"
-        >
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >play_arrow</span
-          >
-          Manage Practice Units
-        </RouterLink>
         <RouterLink to="/lessons-create" class="mtsFormatLessonButtons">
           <span class="material-symbols-outlined" aria-hidden="true"
             >add_circle</span
           >
           Create Lessons
+        </RouterLink>
+        <RouterLink to="/lessons-manage" class="mtsFormatLessonButtons">
+          <span class="material-symbols-outlined" aria-hidden="true"
+            >launch</span
+          >
+          Manage Lessons
         </RouterLink>
         <RouterLink to="/lessons-start" class="mtsFormatLessonButtons">
           <span class="material-symbols-outlined" aria-hidden="true"

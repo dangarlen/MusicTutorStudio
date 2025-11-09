@@ -8,10 +8,13 @@ const SUPABASE_URL = "https://rlcepiyvbxfzjtrxpqad.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2VwaXl2Ynhmemp0cnhwcWFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0NDYzNzgsImV4cCI6MjA3ODAyMjM3OH0.OHVFiRYMPNdplLsH4Wp1TO9oxkWiGJ4QDQiVSH3PUJE";
 
-// Your PostgREST is configured to expose ONLY the 'api' schema
+// NOTE: Previously forced to use the 'api' schema. Our new tables (lessons, lesson_units)
+// live in the 'public' schema. Switch the default schema to 'public' so standard
+// supabase.from('lessons') resolves correctly. If we later migrate everything
+// into 'api' just flip this back.
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   db: {
-    schema: "api",
+    schema: "public",
   },
 });
 export default supabase;

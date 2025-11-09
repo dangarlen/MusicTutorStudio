@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.github.com/copilotrc/v1",
+  "defaultModel": "gpt-5",
+  "fallbackModels": ["gpt-4", "claude-2"],
+  "agentProfiles": ["gpt-5", "gpt-4", "claude-2"],
+  "features": {
+    "chat": true,
+    "ask": true,
+    "agent": true
+  },
+  "diagnostics": {
+    "verbose": true,
+    "logRouting": true,
+    "logTokens": true
+  },
+  "timeouts": {
+    "modelResponse": 8000,
+    "fallbackRetry": 3000
+  },
+  "routing": {
+    "html": "gpt-5",
+    "markdown": "gpt-5",
+    "plaintext": "gpt-5",
+    "scminput": "gpt-5",
+    "*": "gpt-5"
+  },
+  "telemetry": {
+    "enabled": true,
+    "logLevel": "debug"
+  }
+}

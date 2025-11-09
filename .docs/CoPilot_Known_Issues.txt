@@ -1,0 +1,7 @@
+Document this orchestration override in your audit log
+
+Flag Claude-2 as blocked or non-routable in your fallback dashboard
+
+Use GPT-5 as your primary and GPT-4 as fallback until Claude-2 is explicitly supported
+
+Monitor copilotmd logs for future Claude traces if GitHub updates routing

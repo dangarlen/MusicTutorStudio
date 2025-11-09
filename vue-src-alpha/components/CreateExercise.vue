@@ -8,6 +8,10 @@
         <span class="material-symbols-outlined">add_circle</span>
         <span class="text-2xl font-bold">Create Exercise</span>
       </div>
+
+      <div class="max-w-3xl mx-auto mb-4">
+        <AuthStatusBanner />
+      </div>
       <!-- Preview -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
@@ -318,6 +322,7 @@ import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import CreatorReturn from "./CreatorReturn.vue";
 import StaffPreview from "./StaffPreview.vue";
+import AuthStatusBanner from "./AuthStatusBanner.vue";
 import InstrumentDropdown from "./InstrumentDropdown.vue";
 import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
 import { ref, computed, reactive, onMounted } from "vue";

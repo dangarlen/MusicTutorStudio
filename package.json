@@ -1,4 +1,10 @@
 {
+  "chatParticipants": {
+    "claude-code": {
+      "displayName": "Claude 2",
+      "model": "claude-2"
+    }
+  },
   "dependencies": {
     "daisyui": "^5.3.7",
     "pinia": "^3.0.3",

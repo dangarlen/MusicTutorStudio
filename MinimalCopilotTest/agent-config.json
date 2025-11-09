@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schemas.github.com/agent-config/v1",
+  "agents": {
+    "default": {
+      "model": "gpt-5",
+      "fallback": ["gpt-5-codex-preview", "claude-sonnet-4.5"],
+      "timeoutMs": 8000,
+      "retry": {
+        "enabled": true,
+        "maxAttempts": 2,
+        "backoffMs": 3000
+      },
+      "logging": {
+        "enabled": true,
+        "level": "debug",
+        "logTokens": true,
+        "logRouting": true
+      }
+    },
+    "code": {
+      "model": "gpt-5-codex-preview",
+      "fallback": ["claude-sonnet-4.5"],
+      "timeoutMs": 6000
+    },
+    "chat": {
+      "model": "claude-sonnet-4.5",
+      "fallback": ["gpt-5"],
+      "timeoutMs": 7000
+    }
+  },
+  "telemetry": {
+    "enabled": true,
+    "logLevel": "debug"
+  }
+}

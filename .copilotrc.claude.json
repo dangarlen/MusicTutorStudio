@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.github.com/copilotrc/v1",
+  "defaultModel": "claude-2",
+  "fallbackModels": [],
+  "agentProfiles": ["claude-2"],
+  "debugEcho": "claude-only",
+  "diagnostics": {
+    "logRouting": true,
+    "logTokens": true
+  },
+  "timeouts": {
+    "modelResponse": 8000,
+    "fallbackRetry": 3000
+  }
+}

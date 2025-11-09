@@ -46,13 +46,7 @@
         </RouterLink>
         <br />
 
-        <RouterLink to="/create-lessons" class="mtsFormatCreatorButtons">
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >note_add</span
-          >
-          Create Lessons
-        </RouterLink>
-        <br />
+        <!-- Create Lessons button removed: now available under Lessons page -->
       </div>
     </main>
     <FooterStandard />
