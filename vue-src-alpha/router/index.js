@@ -4,6 +4,7 @@ import Home from "../components/Home.vue";
 import Practice from "../components/Practice.vue";
 import PracticeExercises from "../components/PracticeExercises.vue";
 import PracticeScales from "../components/PracticeScales.vue";
+import PracticeNotes from "../components/PracticeNotes.vue";
 import Creator from "../components/Creator.vue";
 import Lessons from "../components/Lessons.vue";
 import LessonsManage from "../components/LessonsManage.vue";
@@ -36,6 +37,7 @@ const routes = [
     name: "practice-active-unit",
     component: PracticeScales,
   },
+  { path: "/practice-notes", name: "practice-notes", component: PracticeNotes },
   { path: "/creator", name: "creator", component: Creator },
   { path: "/lessons", name: "lessons", component: Lessons },
   { path: "/lessons-manage", name: "lessons-manage", component: LessonsManage },
