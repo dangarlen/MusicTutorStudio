@@ -16,6 +16,7 @@ import Preferences from "../components/Preferences.vue";
 
 import CreateScaleView from "../components/CreateScaleView.vue";
 import CreatePracticeUnitView from "../components/CreatePracticeUnitView.vue";
+import CreateEditPracticeUnit from "../components/CreateEditPracticeUnit.vue";
 import PhaseBasedVueTestContainer from "../components/PhaseBasedVueTestContainer.vue";
 import SaveToPracticeUnitExport from "../components/SaveToPracticeUnitExport.vue";
 import RecallJsonFromPinia from "../components/RecallJsonFromPinia.vue";
@@ -26,13 +27,13 @@ const routes = [
   { path: "/", name: "home", component: Home },
   { path: "/practice", name: "practice", component: Practice },
   {
-    path: "/practice-exercises",
-    name: "practice-exercises",
+    path: "/practice-recall-practice-unit",
+    name: "practice-recall-practice-unit",
     component: PracticeExercises,
   },
   {
-    path: "/practice-scales",
-    name: "practice-scales",
+    path: "/practice-active-unit",
+    name: "practice-active-unit",
     component: PracticeScales,
   },
   { path: "/creator", name: "creator", component: Creator },
@@ -58,6 +59,11 @@ const routes = [
     path: "/create-practice-unit-view",
     name: "create-practice-unit-view",
     component: CreatePracticeUnitView,
+  },
+  {
+    path: "/create-edit-practice-unit",
+    name: "create-edit-practice-unit",
+    component: CreateEditPracticeUnit,
   },
   // Deprecated routes - redirect to unified viewer
   {

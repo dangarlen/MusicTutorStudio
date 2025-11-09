@@ -35,6 +35,28 @@
         </div>
       </div>
 
+      <!-- Play controls for preview: per-note durations, pause/resume, looping, step controls -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button class="btn btn-sm" @click="stepBack" title="Step back">⏮️</button>
+          <button class="btn btn-sm" @click="playing ? pausePlayback() : startPlayback()" :class="playing ? 'btn-warning' : 'btn-primary'">
+            <span v-if="!playing">▶️ Play</span>
+            <span v-else>⏸ Pause</span>
+          </button>
+          <button class="btn btn-sm btn-ghost" @click="stopPlayback" title="Stop">⏹</button>
+          <button class="btn btn-sm" @click="stepForward" title="Step forward">⏭️</button>
+
+          <label class="ml-2 input-group input-group-sm">
+            <span class="text-sm">Tempo</span>
+            <input type="number" class="input input-sm input-bordered w-28" v-model.number="tempoBpm" min="30" max="300" />
+          </label>
+
+          <button class="btn btn-sm ml-2" :class="loop ? 'btn-primary' : 'btn-outline'" @click="toggleLoop">Loop: {{ loop ? 'On' : 'Off' }}</button>
+
+          <div class="text-sm text-gray-600 ml-4">Notes: {{ noteCount }}</div>
+        </div>
+      </div>
+
       <!-- Details (only shown for Scales) -->
       <div
         v-if="practiceUnitType === 'Scale'"
@@ -282,7 +304,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, onBeforeUnmount } from "vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import supabase from "../scripts/supabaseClient.js";
 import Header from "./Header.vue";
@@ -340,6 +362,186 @@ const formattedJson = computed(() => {
     null,
     2
   );
+});
+
+// Playback state & controls
+const playing = ref(false);
+const paused = ref(false);
+const currentIndex = ref(0);
+const loop = ref(false);
+let scheduledId = null;
+let synth = null;
+const tempoBpm = ref(store.practiceUnitHeader?.tempo || 80);
+
+// Load Tone.js dynamically if needed
+function loadTone() {
+  return new Promise((resolve, reject) => {
+    if (typeof globalThis.Tone !== "undefined") return resolve(globalThis.Tone);
+    const existing = document.querySelector('script[data-src="tone-cdn"]');
+    if (existing) {
+      existing.addEventListener("load", () => resolve(globalThis.Tone));
+      existing.addEventListener("error", () => reject(new Error("Failed to load Tone.js")));
+      return;
+    }
+    const s = document.createElement("script");
+    s.setAttribute("data-src", "tone-cdn");
+    s.src = "https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.js";
+    s.onload = () => resolve(globalThis.Tone);
+    s.onerror = () => reject(new Error("Failed to load Tone.js"));
+    document.head.appendChild(s);
+  });
+}
+
+function clearScheduled() {
+  if (scheduledId) {
+    clearTimeout(scheduledId);
+    scheduledId = null;
+  }
+}
+
+function getDurationMsForNote(note) {
+  try {
+    const tok = String(note?.duration || "q");
+    const m = tok.match(/^([whqes])(?:\.|\*)?(r)?$/i); // accept w,h,q,e,s, optional dot/star for dotted, optional r
+    let base = "q";
+    let dotted = false;
+    if (m) {
+      base = m[1].toLowerCase();
+      dotted = /\.|\*/.test(tok);
+    }
+    const quarterMs = 60000 / (Number(tempoBpm.value) || 80);
+    const baseQN = { w: 4, h: 2, q: 1, e: 0.5, s: 0.25 }[base] || 1;
+    const mult = dotted ? 1.5 : 1;
+    return Math.max(50, Math.round(baseQN * mult * quarterMs));
+  } catch {
+    return 60000 / (Number(tempoBpm.value) || 80);
+  }
+}
+
+async function ensureSynth() {
+  if (synth) return synth;
+  const Tone = await loadTone();
+  await Tone.start?.();
+  synth = new Tone.Synth().toDestination();
+  return synth;
+}
+
+function highlightAt(index) {
+  try {
+    const groups = Array.from(document.querySelectorAll(".vf-stavenote"));
+    groups.forEach((g) => g.classList.remove("note-highlight"));
+    if (groups[index]) groups[index].classList.add("note-highlight");
+  } catch {}
+}
+
+async function playFrom(index = 0) {
+  try {
+    clearScheduled();
+    const arr = Array.isArray(store.noteArray) ? store.noteArray : [];
+    if (!arr.length) {
+      alert("No notes to play.");
+      playing.value = false;
+      return;
+    }
+    currentIndex.value = Math.max(0, Math.min(index, arr.length - 1));
+    const Tone = await ensureSynth();
+    playing.value = true;
+    paused.value = false;
+
+    const note = arr[currentIndex.value];
+    // Highlight
+    highlightAt(currentIndex.value);
+
+    // Trigger
+    const pitchRaw = String(note?.pitch || "");
+    const pitch = pitchRaw.includes("/") ? pitchRaw.replace(/\//g, "") : pitchRaw;
+    const durMs = getDurationMsForNote(note);
+    const durSec = Math.max(0.08, durMs / 1000);
+    try {
+      Tone.triggerAttackRelease(pitch, durSec);
+    } catch {
+      try {
+        Tone.triggerAttackRelease(pitchRaw, durSec);
+      } catch {}
+    }
+
+    // Schedule next
+    scheduledId = setTimeout(() => {
+      scheduledId = null;
+      if (!playing.value) return;
+      currentIndex.value++;
+      const arrLen = arr.length;
+      if (currentIndex.value >= arrLen) {
+        if (loop.value) {
+          currentIndex.value = 0;
+          playFrom(currentIndex.value);
+        } else {
+          stopPlayback();
+        }
+      } else {
+        playFrom(currentIndex.value);
+      }
+    }, durMs);
+  } catch (e) {
+    console.warn("[CreatePracticeUnitView] playFrom failed", e);
+    stopPlayback();
+  }
+}
+
+function startPlayback() {
+  if (playing.value && !paused.value) return;
+  if (paused.value) {
+    // resume by playing from currentIndex
+    paused.value = false;
+    playFrom(currentIndex.value);
+    return;
+  }
+  // start fresh
+  playFrom(currentIndex.value || 0);
+}
+
+function pausePlayback() {
+  if (!playing.value) return;
+  paused.value = true;
+  playing.value = false;
+  clearScheduled();
+}
+
+function stopPlayback() {
+  playing.value = false;
+  paused.value = false;
+  currentIndex.value = 0;
+  clearScheduled();
+  // clear highlights
+  try { document.querySelectorAll('.vf-stavenote').forEach(g=>g.classList.remove('note-highlight')); } catch {}
+}
+
+function stepForward() {
+  stopPlayback();
+  const arr = Array.isArray(store.noteArray) ? store.noteArray : [];
+  if (!arr.length) return;
+  currentIndex.value = Math.min(arr.length - 1, (currentIndex.value || 0) + 1);
+  playFrom(currentIndex.value);
+}
+
+function stepBack() {
+  stopPlayback();
+  const arr = Array.isArray(store.noteArray) ? store.noteArray : [];
+  if (!arr.length) return;
+  currentIndex.value = Math.max(0, (currentIndex.value || 0) - 1);
+  playFrom(currentIndex.value);
+}
+
+function toggleLoop() {
+  loop.value = !loop.value;
+}
+
+onBeforeUnmount(() => {
+  clearScheduled();
+  try {
+    if (synth && typeof synth.dispose === 'function') synth.dispose();
+  } catch {}
+  synth = null;
 });
 
 // ----- Scale-specific computed properties -----

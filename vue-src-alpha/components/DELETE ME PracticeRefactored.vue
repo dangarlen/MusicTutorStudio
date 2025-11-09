@@ -9,18 +9,16 @@
         <span class="text-2xl font-bold">Practice</span>
       </div>
       <div class="flex flex-col gap-4 max-w-xs mx-auto mt-8">
-        <router-link to="/practice-scales" class="mtsFormatPracticeButtons">
+        <router-link to="/practice-active-unit" class="mtsFormatPracticeButtons">
           <span class="material-symbols-outlined align-middle mr-2"
             >play_circle</span
           >
-          Practice Scales
+          Active Unit Practice
         </router-link>
 
-        <router-link to="/practice-exercises" class="mtsFormatPracticeButtons">
-          <span class="material-symbols-outlined align-middle mr-2"
-            >play_arrow</span
-          >
-          Practice Exercises
+        <router-link to="/practice-recall-practice-unit" class="mtsFormatPracticeButtons">
+          <span class="material-symbols-outlined align-middle mr-2">download</span>
+          Recall Saved Practice Unit
         </router-link>
       </div>
     </main>

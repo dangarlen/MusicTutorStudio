@@ -6,7 +6,7 @@
         class="flex items-center gap-2 mb-8 px-4 py-2 rounded mtsFormatPracticePages"
       >
         <span class="material-symbols-outlined">music_note</span>
-        <span class="text-2xl">Practice Scales</span>
+  <span class="text-2xl">Practice</span>
       </div>
 
       <!-- Scale Preview START -->
@@ -17,7 +17,7 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>Scale Preview</span>
+          <span>Preview</span>
           <span class="text-right text-base font-normal text-gray-600">
             {{
               store.noteArray && store.noteArray.length > 0
@@ -186,7 +186,7 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>Scale Details</span>
+          <span>Details</span>
         </div>
         <div class="collapse-content px-4 text-sm leading-7">
           <div><strong>Instrument:</strong> {{ instrumentName }}</div>
@@ -210,7 +210,7 @@
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
-          <span>Behind the Curtain: practiceUnitScale.json</span>
+          <span>Behind the Curtain: practiceUnit.json</span>
         </div>
         <div class="collapse-content px-4">
           <pre

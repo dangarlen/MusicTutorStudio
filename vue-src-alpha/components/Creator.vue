@@ -35,6 +35,11 @@
           Create Exercise
         </RouterLink>
 
+        <RouterLink to="/create-edit-practice-unit" class="mtsFormatCreatorButtons">
+          <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+          Edit Practice Unit
+        </RouterLink>
+
         <RouterLink
           to="/create-practice-unit-view"
           class="mtsFormatCreatorButtons"

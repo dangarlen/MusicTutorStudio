@@ -18,18 +18,16 @@
           margin: 2em auto;
         "
       >
-        <RouterLink to="/practice-scales" class="mtsFormatPracticeButtons">
+        <RouterLink to="/practice-active-unit" class="mtsFormatPracticeButtons">
           <span class="material-symbols-outlined" aria-hidden="true"
             >play_circle</span
           >
-          Practice Scales
+          Active Unit Practice
         </RouterLink>
 
-        <RouterLink to="/practice-exercises" class="mtsFormatPracticeButtons">
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >play_arrow</span
-          >
-          Practice Exercises
+        <RouterLink to="/practice-recall-practice-unit" class="mtsFormatPracticeButtons">
+          <span class="material-symbols-outlined" aria-hidden="true">download</span>
+          Recall Saved Practice Unit
         </RouterLink>
       </div>
     </main>
