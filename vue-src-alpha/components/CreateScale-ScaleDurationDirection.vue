@@ -17,7 +17,7 @@
     </div>
     <div class="collapse-content">
       <!-- Direction -->
-      <div class="flex items-center gap-4 mb-3">
+      <div class="flex items-center gap-4 mb-6">
         <label class="font-semibold w-32">Direction:</label>
         <div class="flex gap-6">
           <label class="flex items-center gap-2 cursor-pointer">
@@ -28,7 +28,7 @@
               class="radio radio-primary"
               v-model="localSelections.direction"
             />
-            <span>▲ Ascending</span>
+            <span class="mr-4">▲ Ascending</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input
@@ -38,14 +38,24 @@
               class="radio radio-primary"
               v-model="localSelections.direction"
             />
-            <span>▼ Descending</span>
+            <span class="mr-4">▼ Descending</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="direction"
+              value="Both"
+              class="radio radio-primary"
+              v-model="localSelections.direction"
+            />
+            <span class="mr-4">▲▼ Ascending &amp; Descending</span>
           </label>
         </div>
       </div>
       <!-- Note Duration -->
-      <div class="mb-3">
-        <div class="font-semibold mb-2">Note Duration:</div>
-        <div class="flex gap-6">
+      <div class="mb-6 flex items-center gap-6">
+        <div class="font-semibold w-40">Note Duration:</div>
+        <div class="flex gap-6 flex-nowrap">
           <label class="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
@@ -54,7 +64,7 @@
               class="radio radio-primary"
               v-model="localSelections.noteDuration"
             />
-            <span>Eighth Notes</span>
+            <span class="mr-4">Eighth Notes</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input
@@ -64,7 +74,7 @@
               class="radio radio-primary"
               v-model="localSelections.noteDuration"
             />
-            <span>Quarter Notes</span>
+            <span class="mr-4">Quarter Notes</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input
@@ -74,7 +84,7 @@
               class="radio radio-primary"
               v-model="localSelections.noteDuration"
             />
-            <span>Half Notes</span>
+            <span class="mr-4">Half Notes</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input
@@ -84,18 +94,19 @@
               class="radio radio-primary"
               v-model="localSelections.noteDuration"
             />
-            <span>Whole Notes</span>
+            <span class="mr-4">Whole Notes</span>
           </label>
         </div>
       </div>
       <!-- Time Signature -->
       <div class="mb-3">
-        <div class="font-semibold mb-2">Time Signature:</div>
         <div class="flex items-center gap-4">
-          <select
-            class="select select-bordered max-w-xs"
-            v-model="localSelections.timeSignature"
-          >
+          <div class="font-semibold w-48">Time Signature:</div>
+          <div class="flex items-center gap-4">
+            <select
+              class="select select-bordered max-w-xs"
+              v-model="localSelections.timeSignature"
+            >
             <option value="2/4">2/4</option>
             <option value="3/4">3/4</option>
             <option value="4/4">4/4</option>
@@ -103,9 +114,10 @@
             <option value="9/8">9/8</option>
             <option value="12/8">12/8</option>
           </select>
-          <span class="text-sm text-gray-600"
-            >Used by staff preview and export</span
-          >
+            <span class="text-sm text-gray-600"
+              >Used by staff preview and export</span
+            >
+          </div>
         </div>
       </div>
     </div>

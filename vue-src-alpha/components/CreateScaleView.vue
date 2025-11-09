@@ -565,6 +565,16 @@ function buildScale() {
       octaveCount
     );
   }
+  // Direction handling: support Ascending, Descending, and Both (asc then desc)
+  if (direction === "Both") {
+    // Build ascending then descending (don't duplicate the top tonic)
+    const asc = finalNotes.slice();
+    const desc = finalNotes.slice(0, -1).slice().reverse();
+    finalNotes = asc.concat(desc);
+  } else if (direction === "Descending") {
+    finalNotes.reverse();
+  }
+
   // Accidental family logic
   let preferredFamily = "sharps";
   if (accidentalFamily === "auto-key") {
@@ -576,21 +586,15 @@ function buildScale() {
   } else if (accidentalFamily === "force-flats") {
     preferredFamily = "flats";
   }
+
   if (
     accidentalFamily === "auto-direction" ||
     scaleType === "chromatic" ||
     accidentalFamily.startsWith("force-")
   ) {
-    if (direction === "Descending") {
-      finalNotes.reverse();
-    }
     finalNotes = finalNotes.map((note) =>
       convertToAccidentalFamily(note, preferredFamily)
     );
-  } else {
-    if (direction === "Descending") {
-      finalNotes.reverse();
-    }
   }
   // Map to noteArray
   const durationMap = { quarter: "q", eighth: "e", half: "h", whole: "w" };
