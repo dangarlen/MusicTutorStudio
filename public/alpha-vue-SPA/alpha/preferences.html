@@ -24,6 +24,8 @@
     />
     <!-- Centralized theme for consistent UI -->
     <link href="styles/theme.css" rel="stylesheet" />
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   </head>
   <body class="bg-base-200 flex flex-col min-h-screen">
     <div id="header-container"></div>
@@ -37,6 +39,50 @@
       >
         <span class="material-symbols-outlined icon">settings</span>
         <span class="text-2xl">Preferences</span>
+      </div>
+
+      <!-- User Account Section -->
+      <div
+        class="collapse collapse-arrow bg-base-100 border border-base-300 mb-6 rounded-xl"
+      >
+        <input type="checkbox" class="peer" id="user-collapse-toggle" />
+        <div
+          class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined">person</span>
+          <span>User</span>
+        </div>
+        <div class="collapse-content px-4 pb-4 space-y-4">
+          <div class="form-control w-full max-w-xs">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input
+              id="user-email"
+              type="email"
+              placeholder="Enter your email"
+              class="input input-bordered w-full"
+            />
+          </div>
+          <div class="form-control w-full max-w-xs">
+            <label class="label">
+              <span class="label-text">Password</span>
+            </label>
+            <input
+              id="user-password"
+              type="password"
+              placeholder="Enter your password"
+              class="input input-bordered w-full"
+            />
+          </div>
+          <div class="flex gap-2">
+            <button id="signup-btn" class="btn btn-primary">
+              Create Account
+            </button>
+            <button id="login-btn" class="btn btn-secondary">Login</button>
+          </div>
+          <div id="user-message" class="text-sm mt-2"></div>
+        </div>
       </div>
 
       <!-- Instrument selection -->
@@ -90,52 +136,7 @@
         Save Preferences
       </button>
 
-      <div
-        style="
-          display: flex;
-          flex-direction: column;
-          gap: 1em;
-          max-width: 400px;
-          margin: 2em 0;
-        "
-      >
-        <button
-          class="mtsFomatGlobal"
-          style="
-            border-radius: 9999px;
-            padding: 0.75em 1.5em;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.7em;
-            border: none;
-            cursor: pointer;
-          "
-        >
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >cloud_upload</span
-          >
-          Backup Studio Workspace
-        </button>
-        <button
-          class="mtsFomatGlobal"
-          style="
-            border-radius: 9999px;
-            padding: 0.75em 1.5em;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.7em;
-            border: none;
-            cursor: pointer;
-          "
-        >
-          <span class="material-symbols-outlined" aria-hidden="true"
-            >cloud_download</span
-          >
-          Restore Studio Workspace
-        </button>
-      </div>
+      <!-- Backup/Restore buttons removed to simplify Preferences UI -->
     </main>
 
     <script type="module">
@@ -149,6 +150,60 @@
       document
         .getElementById("save-btn")
         .addEventListener("click", savePreferences);
+      // --- Supabase Auth wiring ---
+      // TODO: Replace with your actual Supabase project URL and anon key
+      const SUPABASE_URL = "https://rlcepiyvbxfzjtrxpqad.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2VwaXl2Ynhmemp0cnhwcWFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0NDYzNzgsImV4cCI6MjA3ODAyMjM3OH0.OHVFiRYMPNdplLsH4Wp1TO9oxkWiGJ4QDQiVSH3PUJE";
+      const supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
+
+      const emailInput = document.getElementById("user-email");
+      const passwordInput = document.getElementById("user-password");
+      const signupBtn = document.getElementById("signup-btn");
+      const loginBtn = document.getElementById("login-btn");
+      const userMsg = document.getElementById("user-message");
+
+      async function handleSignup() {
+        userMsg.textContent = "";
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        if (!email || !password) {
+          userMsg.textContent = "Please enter both email and password.";
+          return;
+        }
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) {
+          userMsg.textContent = `Signup failed: ${error.message}`;
+        } else {
+          userMsg.textContent =
+            "Signup successful! Please check your email to confirm your account.";
+        }
+      }
+
+      async function handleLogin() {
+        userMsg.textContent = "";
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        if (!email || !password) {
+          userMsg.textContent = "Please enter both email and password.";
+          return;
+        }
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) {
+          userMsg.textContent = `Login failed: ${error.message}`;
+        } else {
+          userMsg.textContent = `Login successful! Welcome, ${email}.`;
+        }
+      }
+
+      if (signupBtn) signupBtn.addEventListener("click", handleSignup);
+      if (loginBtn) loginBtn.addEventListener("click", handleLogin);
     </script>
     <!-- Begin Footer Include -->
     <div id="footer-container"></div>

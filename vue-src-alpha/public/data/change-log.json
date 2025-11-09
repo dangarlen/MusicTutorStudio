@@ -1,0 +1,24 @@
+{
+  "changes": [
+    {
+      "timestamp": "2025-10-07T07:00:00-05:00",
+      "file": "public/scripts/show-scales.js",
+      "change": "FEATURE COMPLETED: Practice Overlays Now Work with Practice Passages - Implemented support for practice overlays (such as fingering displays and note names) when rendering practice passages. Previously, overlays only worked with scale displays. Updated practice passage rendering logic to apply the same overlay functionality available for scales, providing consistent visual aids across both scale and practice passage modes."
+    },
+    {
+      "timestamp": "2025-10-07T06:00:00-05:00",
+      "file": "public/scripts/render-scale.js, public/scripts/show-scales.js",
+      "change": "FEATURE COMPLETED: Out-of-Range Notes Now Display in Red - Implemented visual feedback to highlight notes that fall outside an instrument's standard playing range. Notes beyond the instrument's standardRange (defined in instruments.json) are now rendered in red color using VexFlow's setStyle() method. Added range checking logic to both scale rendering (render-scale.js) and practice passage rendering (show-scales.js convertToVexNote function). Range validation uses MIDI number comparison for accurate pitch-based checking across octaves."
+    },
+    {
+      "timestamp": "2025-10-07T05:00:00-05:00",
+      "file": "public/scripts/render-scale.js",
+      "change": "FEATURE COMPLETED: CMT Now Shows Above Staff Notes - Fixed Compact Music Token (CMT) display functionality to properly render CMT notation above musical staff notes. Added 'cmt' display mode handling in render-scale.js that converts notes to CMT format (e.g., 'C/4:q' for C4 quarter note). CMT tokens now appear as annotations above staff notes when CMT display option is selected, providing the intended tokenized music notation display."
+    },
+    {
+      "timestamp": "2025-10-07T04:00:00-05:00",
+      "file": "public/scripts/show-scales.js",
+      "change": "FEATURE COMPLETED: Bar Lines Now Render for Practice Passages - Fixed bar lines not rendering on staff with Practice Passages. Implemented manual bar line drawing using canvas context (similar to scale rendering) instead of relying on VexFlow BarNote objects. Bar lines now properly appear between measures when 'Show Bar Lines' checkbox is enabled. Updated renderPracticePassage(), renderPassageStave(), and renderStaveNotesFixed() functions to support bar line rendering based on measure boundaries from practice passage JSON data."
+    }
+  ]
+}
