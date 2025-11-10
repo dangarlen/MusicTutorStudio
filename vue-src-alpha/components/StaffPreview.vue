@@ -217,8 +217,108 @@ async function renderVexFlow() {
   if (!vfContainer.value) return;
   vfContainer.value.innerHTML = "";
   const VF = globalThis.Vex ? globalThis.Vex.Flow : null;
+  // If VexFlow is not available, draw a simple SVG staff as a graceful fallback
+  function noteToKeyObj(n) {
+    // attempt to convert pitch like 'C4' or 'C#4' or 'Bb4' to { key: 'c#/4', acc: '#'}
+    try {
+      const p = String(n.pitch || 'C4').trim();
+      const m = p.match(/^([A-Ga-g])([#b♭♯]?)(\d+)$/);
+      if (!m) return { key: 'c/4', acc: null };
+      let note = m[1].toLowerCase();
+      let acc = m[2] || '';
+      if (acc === '♭') acc = 'b';
+      if (acc === '♯') acc = '#';
+      const oct = m[3];
+      const key = note + (acc || '') + '/' + oct;
+      return { key, acc: acc || null };
+    } catch (e) { return { key: 'c/4', acc: null }; }
+  }
+
+  function drawSimpleStaff(containerEl, noteObjs, clefName) {
+    try {
+      containerEl.innerHTML = '';
+      const w = containerEl.clientWidth || 560;
+      const h = Math.max(80, containerEl.clientHeight || 120);
+      const xmlns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(xmlns, 'svg');
+      svg.setAttribute('width', String(w));
+      svg.setAttribute('height', String(h));
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.style.background = 'transparent';
+      const top = 16;
+      const spacing = 10;
+      for (let i = 0; i < 5; i++) {
+        const y = top + i * spacing;
+        const line = document.createElementNS(xmlns, 'line');
+        line.setAttribute('x1', '0');
+        line.setAttribute('x2', String(w));
+        line.setAttribute('y1', String(y));
+        line.setAttribute('y2', String(y));
+        line.setAttribute('stroke', '#444');
+        line.setAttribute('stroke-width', '1');
+        svg.appendChild(line);
+      }
+      // reference midi per clef
+      let refMidi = 64;
+      if (clefName === 'bass') refMidi = 52;
+      else if (clefName === 'alto') refMidi = 60;
+      const centerY = top + 2 * spacing;
+      const leftPad = 10;
+      const availableW = Math.max(40, w - leftPad - 10);
+      const stepX = availableW / Math.max(1, noteObjs.length);
+      function keyToMidi(key) {
+        const m = String(key).match(/^([a-g])(#|b)?\/(\d+)$/i);
+        if (!m) return 60;
+        const letter = m[1].toUpperCase();
+        const acc = m[2] || '';
+        const oct = Number(m[3]);
+        const base = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 }[letter] ?? 0;
+        const delta = acc === '#' ? 1 : acc === 'b' ? -1 : 0;
+        return (oct + 1) * 12 + base + delta;
+      }
+      for (let i = 0; i < noteObjs.length; i++) {
+        const it = noteObjs[i];
+        const midi = keyToMidi(it.key);
+        const dySemis = midi - refMidi;
+        const y = centerY - (dySemis * (spacing / 2));
+        const x = leftPad + i * stepX;
+        const circle = document.createElementNS(xmlns, 'ellipse');
+        circle.setAttribute('cx', String(x));
+        circle.setAttribute('cy', String(y));
+        circle.setAttribute('rx', '6');
+        circle.setAttribute('ry', '4');
+        circle.setAttribute('fill', '#222');
+        svg.appendChild(circle);
+        if (it.acc) {
+          const txt = document.createElementNS(xmlns, 'text');
+          txt.setAttribute('x', String(x - 12));
+          txt.setAttribute('y', String(y + 4));
+          txt.setAttribute('font-size', '12');
+          txt.setAttribute('fill', '#222');
+          txt.textContent = it.acc === '#' ? '#' : '♭';
+          svg.appendChild(txt);
+        }
+      }
+      containerEl.appendChild(svg);
+    } catch (e) {
+      containerEl.textContent = noteObjs.map(n => n.key).join(' ');
+    }
+  }
+
   if (!VF) {
-    console.error("[VexFlow] Not available on globalThis");
+    // map notesToRender to simple key objects
+    const noteObjs = (notesToRender || []).map(x => noteToKeyObj(x.n || {}));
+    drawSimpleStaff(vfContainer.value, noteObjs, scaleStore?.instrument?.clef || staffFormat.staff.clef || 'treble');
+    // try to lazy-load VexFlow and re-render when available
+    const scriptId = 'vexflow-cdn';
+    if (!document.getElementById(scriptId)) {
+      const s = document.createElement('script');
+      s.id = scriptId;
+      s.src = 'https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js';
+      s.async = true;
+      s.onload = () => setTimeout(renderVexFlow, 50);
+      document.head.appendChild(s);
+    }
     return;
   }
 
@@ -291,7 +391,24 @@ async function renderVexFlow() {
   const showMeasureBars = shouldShow("barLines", true);
 
   const arr = Array.isArray(notesStore.noteArray) ? notesStore.noteArray : [];
-  if (!arr.length) return;
+  // If there are no notes to render, still draw an empty stave so the UI shows a staff
+  if (!arr.length) {
+    try {
+      const renderer = new VF.Renderer(vfContainer.value, VF.Renderer.Backends.SVG);
+      const width = staffFormat.staff.width ?? 560;
+      const height = staffFormat.staff.height ?? 160;
+      renderer.resize(width, height);
+      const context = renderer.getContext();
+      const staveX = staffFormat.staff.x ?? 10;
+      const staveY = staffFormat.staff.y ?? 30;
+      const stave = new VF.Stave(staveX, staveY, width - staveX - 10);
+      const clef = scaleStore?.instrument?.clef || staffFormat.staff.clef || 'treble';
+      stave.addClef(clef).setContext(context).draw();
+    } catch (e) {
+      // ignore errors and return silently
+    }
+    return;
+  }
   const limits = staffFormat.staff.ledgerLines || { above: 3, below: 3 };
   const optEnforce =
     scaleStore?.scaleSelections?.staffOptions?.enforceLedgerLimits;

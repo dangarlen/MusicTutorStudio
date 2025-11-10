@@ -64,7 +64,7 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "🚀 Push & Deploy to Netlify",
+			"label": "✈️✈️✈️ 🚀 Push & Deploy to Netlify",
 			"type": "shell",
 			"command": "powershell",
 			"args": [
@@ -97,6 +97,21 @@
 				"echo": true,
 				"reveal": "always",
 				"focus": false,
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "✈️✈️Copy libs",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Copy-Item -Path '.\\public\\libs\\*' -Destination '.\\public\\alpha-vue-SPA\\libs\\' -Recurse -Force; Get-ChildItem '.\\public\\alpha-vue-SPA\\libs' | Select-Object Name"
+			],
+			"presentation": {
+				"reveal": "always",
 				"panel": "shared"
 			},
 			"problemMatcher": []
@@ -137,7 +152,7 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Build Alpha Vue SPA",
+			"label": "✈️ Build Alpha Vue SPA",
 			"type": "shell",
 			"command": "powershell",
 			"args": [
@@ -145,6 +160,24 @@
 				"Bypass",
 				"-File",
 				"tools/build-alpha-vue-spa.ps1"
+			],
+			"presentation": {
+				"reveal": "always"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "✈️ Build Verify & Deploy (Rev 2.0)✈️",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"tools/build-verify-deploy.ps1"
 			],
 			"presentation": {
 				"reveal": "always"

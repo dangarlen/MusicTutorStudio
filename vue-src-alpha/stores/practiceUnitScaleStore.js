@@ -48,12 +48,35 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
   actions: {
     async loadInstruments() {
       try {
-        const response = await fetch(
-          `${import.meta.env.BASE_URL}data/instruments.json`
-        );
-        if (!response.ok) throw new Error("Failed to load instruments.json");
-        const data = await response.json();
-        this.instruments = data;
+        // Try multiple candidate locations so the app works both in dev (/) and
+        // when built to a subfolder (e.g. /alpha-vue-SPA/). This avoids a 404 that
+        // would leave the staff range empty.
+        const candidates = [
+          `${import.meta.env.BASE_URL}data/instruments.json`,
+          '/alpha-vue-SPA/data/instruments.json',
+          '/data/instruments.json',
+        ];
+        let data = null;
+        let lastErr = null;
+        for (const url of candidates) {
+          try {
+            // normalise double-slashes
+            const u = url.replace(/([^:]\/)\/+/g, '$1/');
+            const resp = await fetch(u);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
+            data = await resp.json();
+            // success — stop trying
+            this.instruments = data;
+            // debug helpful when diagnosing missing staff at runtime
+            // eslint-disable-next-line no-console
+            console.debug('[practiceUnitScaleStore] loaded instruments from', u, 'count=', Array.isArray(data)?data.length:0);
+            break;
+          } catch (e) {
+            lastErr = e;
+            // try next candidate
+          }
+        }
+        if (!data) throw lastErr || new Error('Failed to load instruments.json');
       } catch (e) {
         console.error("Instrument fetch error:", e);
       }

@@ -45,7 +45,9 @@ if ($html -match '<base href=".*".*>') {
     $html = [regex]::Replace($html, '<base href="[^"]*"\s*/?>', '<base href="/">')
 } else {
     # insert base into the head after the <head> tag using a replacement that preserves $1
-    $html = [regex]::Replace($html, '(?i)(<head[^>]*>)', '$1' + "`n    <base href=\"/\">")
+    # build the insert string separately to avoid quoting/escaping issues
+    $insert = "`n    <base href='/'>"
+    $html = [regex]::Replace($html, '(?i)(<head[^>]*>)', '$1' + $insert)
 }
 
 # Backup existing top-level index.html if present

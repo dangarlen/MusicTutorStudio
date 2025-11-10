@@ -29,6 +29,11 @@
           <span class="material-symbols-outlined" aria-hidden="true">download</span>
           Recall Saved Practice Unit
         </RouterLink>
+
+        <RouterLink to="/practice-pitch" class="mtsFormatPracticeButtons">
+          <span class="material-symbols-outlined" aria-hidden="true">hearing</span>
+          Pitch Practice
+        </RouterLink>
         
         <RouterLink to="/practice-notes" class="mtsFormatPracticeButtons">
           <span class="material-symbols-outlined" aria-hidden="true">sticky_note_2</span>
