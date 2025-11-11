@@ -33,7 +33,10 @@
             <div class="collapse-content mt-3">
               <div class="text-sm text-gray-600 mb-2">All notes within the current instrument range</div>
               <div class="text-xs text-gray-600 mb-2">{{ transpositionLabel }}</div>
-              <div id="range-staff" class="w-full h-24 bg-white"></div>
+              <div class="w-full">
+                <StaffPreview />
+              </div>
+              <div class="text-xs text-gray-500 mt-2">Mapped keys: <span class="font-mono">{{ staffMappedText }}</span></div>
             </div>
           </div>
 
@@ -68,6 +71,11 @@
                 <label class="font-semibold w-40">Max measures per line</label>
                 <input class="input input-sm w-24" type="number" v-model.number="maxMeasuresPerLine" min="1" max="8" />
                 <div class="text-xs text-gray-500">Affects VexFlow layout when supported</div>
+              </div>
+
+              <div class="mb-3 flex items-center gap-3">
+                <!-- Preview generation is handled by Create Scales; PracticePitch will render whatever is in the store.noteArray -->
+                <div class="text-xs text-gray-500">Preview is sourced from current practice store (use Create Scales to generate).</div>
               </div>
 
               <div class="text-xs text-gray-500">After changing these values, open the Staff Display to re-render if needed.</div>
@@ -153,12 +161,15 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
+import { useTestStaffNoteStore } from '../stores/testStaffNoteStore';
 import ToastStack from './ToastStack.vue';
 import Header from './Header.vue';
 import FooterStandard from './FooterStandard.vue';
+import StaffPreview from './StaffPreview.vue';
 import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore';
 
 const store = usePracticeUnitScaleStore();
+const testNotes = useTestStaffNoteStore();
 
 const detectedNote = ref('--');
 const detectedFreq = ref(0);
@@ -198,6 +209,8 @@ function pushToast(message, type = 'info', ms = 3000) {
   }, ms);
 }
 
+// PracticePitch no longer generates chromatic previews itself; it renders whatever is present in the store.noteArray.
+
 function dismissToast(id) {
   const idx = toasts.value.findIndex(x=>x.id===id);
   if (idx >= 0) toasts.value.splice(idx,1);
@@ -224,6 +237,40 @@ const maxMeasuresPerLine = ref(2);
 
 // Imported defaults captured from instruments.json when we load an instrument
 const importedDefaults = ref(null);
+// Last mapped keys (for display/debugging under the staff) — derived from store.noteArray so it mirrors Create Scales
+const staffMappedSample = computed(() => {
+  try {
+    if (Array.isArray(store.noteArray) && store.noteArray.length) {
+      return store.noteArray.map(n => {
+        const p = String(n.pitch || n.spn || '').trim();
+        const m = p.match(/^([A-Ga-g])([#b♭♯]?)(?:\/?)(\d+)$/);
+        if (!m) {
+          const parts = p.split('/').map(s => s.trim());
+          if (parts.length === 2) {
+            const mm = parts[0].match(/^([A-Ga-g])([#b♭♯]?)$/);
+            const oct = parts[1].match(/^(\d+)$/);
+            if (mm && oct) {
+              let acc = mm[2] || '';
+              if (acc === '♭') acc = 'b';
+              if (acc === '♯') acc = '#';
+              return mm[1].toLowerCase() + (acc || '') + '/' + oct[1];
+            }
+          }
+          return 'c/4';
+        }
+        let note = m[1].toLowerCase();
+        let acc = m[2] || '';
+        if (acc === '♭') acc = 'b';
+        if (acc === '♯') acc = '#';
+        const oct = m[3];
+        return note + (acc || '') + '/' + oct;
+      });
+    }
+  } catch (e) {}
+  return [];
+});
+
+const staffMappedText = computed(() => (Array.isArray(staffMappedSample.value) && staffMappedSample.value.length) ? staffMappedSample.value.join(', ') : '(none)');
 
 const startingOctaveDisplay = computed(() => `C${startingOctave.value}`);
 
@@ -260,6 +307,23 @@ function noteNameFromMidi(midi) {
   const n = midi % 12;
   const o = Math.floor(midi / 12) - 1;
   return `${names[n]}${o}`;
+}
+
+// Convert SPN like C4 or C/4 or C#4 or C♭4 to MIDI number (C4 -> 60)
+function spnToMidiGlobal(spn) {
+  try {
+    const s = String(spn || '').trim();
+    const m = s.match(/^([A-Ga-g])([#b♭♯]?)[\/]?(\d+)$/);
+    if (!m) return Number.NaN;
+    const note = m[1].toUpperCase();
+    let acc = m[2] || '';
+    if (acc === '♭') acc = 'b';
+    if (acc === '♯') acc = '#';
+    const oct = Number(m[3]);
+    const base = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 }[note] ?? 0;
+    const delta = acc === '#' ? 1 : acc === 'b' ? -1 : 0;
+    return (oct + 1) * 12 + base + delta;
+  } catch (e) { return Number.NaN; }
 }
 
 function freqToMidi(freq) {
@@ -372,22 +436,51 @@ function renderRangeStaff() {
     try { console.debug('[renderRangeStaff] semitone range', { startSemitone, endSemitone, transpositionOffset: transOff }); } catch(e){}
     if (endSemitone < startSemitone) { container.textContent = txt; return; }
 
-    const notes = [];
-    for (let i = startSemitone; i <= endSemitone; i++) {
-      // apply transposition for displayed (written) pitch
-      const disp = i + transOff;
-      const oct = Math.floor(disp/12);
-      const pc = ((disp % 12) + 12) % 12;
-      // choose name: prefer flats if original range used flats
-      const preferFlats = (ssp.acc === 'b' || esp.acc === 'b');
-      const nameMapSharps = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-      const nameMapFlats  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
-      const name = (preferFlats ? nameMapFlats[pc] : nameMapSharps[pc]);
-      const key = name.toLowerCase().replace('b','b') + '/' + oct;
-      notes.push({ key, acc: name.length === 2 ? name[1] : null });
+    let notes = [];
+    // If a noteArray exists in the store, use it as the source of truth for the staff preview.
+    if (Array.isArray(store.noteArray) && store.noteArray.length) {
+      try {
+        notes = store.noteArray.map(n => {
+          const p = String(n.pitch || n.spn || '').trim();
+          // Accept both C4 and C/4 forms, and support sharps/flats and unicode accidentals
+          const m = p.match(/^([A-Ga-g])([#b♭♯]?)(?:\/?)(\d+)$/);
+          if (!m) {
+            // Try splitting on slash as a fallback: e.g. 'C/4'
+            const parts = p.split('/').map(s => s.trim());
+            if (parts.length === 2) {
+              const mm = parts[0].match(/^([A-Ga-g])([#b♭♯]?)$/);
+              const oct = parts[1].match(/^(\d+)$/);
+              if (mm && oct) {
+                let note = mm[1].toLowerCase();
+                let acc = mm[2] || '';
+                if (acc === '♭') acc = 'b';
+                if (acc === '♯') acc = '#';
+                const key = note + (acc || '') + '/' + oct[1];
+                return { key, acc: acc || null };
+              }
+            }
+            // Unknown format — skip by returning a neutral placeholder that will be ignored by renderers
+            return { key: 'c/4', acc: null };
+          }
+          let note = m[1].toLowerCase();
+          let acc = m[2] || '';
+          if (acc === '♭') acc = 'b';
+          if (acc === '♯') acc = '#';
+          const oct = m[3];
+          const key = note + (acc || '') + '/' + oct;
+          return { key, acc: acc || null };
+        }).filter(Boolean);
+      } catch (e) {
+        notes = [];
+      }
+    } else {
+      // Do not auto-generate chromatic notes here. If no notes are present in the store,
+      // leave `notes` empty so we can draw an empty stave as a visual placeholder.
+      notes = [];
     }
 
-    try { console.debug('[renderRangeStaff] computed notes', { count: notes.length, sample: notes.slice(0,8) }); } catch(e){}
+  // staffMappedSample is derived from store.noteArray now; no direct assignment here.
+  try { console.debug('[renderRangeStaff] computed notes', { count: notes.length, sample: notes.slice(0,8) }); } catch(e){}
 
     // choose clef from instrument metadata if available (do this before fallback rendering)
     let clef = 'treble';
@@ -483,27 +576,20 @@ function renderRangeStaff() {
       }
     }
 
-    // small guard: if the container is not visible or has zero size, retry a few times
+    // small guard: if the container is not visible or has zero size, keep retrying until it becomes visible
     const tryAttr = 'data-render-attempts';
     const attempts = Number(container.getAttribute(tryAttr) || '0');
     const cw = container.clientWidth || 0;
     const ch = container.clientHeight || 0;
     // more verbose debug including current rangeText
     try { console.debug('[renderRangeStaff] container size', { cw, ch, attempts, range: rangeText.value }); } catch(e){}
-    // If container is hidden or very small, wait longer and retry more times (handles slow collapse animations)
+    // If container is hidden or very small, schedule a retry after a short delay.
     if (cw < 40 || ch < 24) {
-      if (attempts < 12) {
-        container.setAttribute(tryAttr, String(attempts + 1));
-        // schedule a longer retry after the collapse animation / layout
-        setTimeout(() => { try { renderRangeStaff(); } catch(e){} }, 200);
-        return;
-      } else {
-        // fallback to simple renderer if after retries nothing changed
-        drawSimpleStaff(container, notes, clef);
-        try { pushToast('Staff Display rendered (simple fallback - container too small)', 'info', 2500); } catch(e){}
-        try { container.removeAttribute(tryAttr); } catch(_){}
-        return;
-      }
+      // mark an attempt counter for telemetry but do not give up — wait for the collapse to open
+      container.setAttribute(tryAttr, String(attempts + 1));
+      // schedule a retry after a longer delay to allow UI transitions
+      setTimeout(() => { try { renderRangeStaff(); } catch(e){} }, 350);
+      return;
     }
 
     let VF = window && window.Vex && window.Vex.Flow ? window.Vex.Flow : null;
@@ -523,8 +609,25 @@ function renderRangeStaff() {
       }
       return;
     }
-
   console.debug('[renderRangeStaff] using VexFlow, maxMeasuresPerLine=', maxMeasuresPerLine.value);
+  // If there are no notes to render, draw an empty stave and return
+  if (!notes || notes.length === 0) {
+    try {
+      const rendererEmpty = new VF.Renderer(container, VF.Renderer.Backends.SVG);
+      const rwEmpty = Math.max(300, container.clientWidth || 600);
+      const rhEmpty = Math.max(80, container.clientHeight || 110);
+      rendererEmpty.resize(rwEmpty, rhEmpty);
+      const contextEmpty = rendererEmpty.getContext();
+      const staveEmpty = new VF.Stave(5, 0, rwEmpty);
+      staveEmpty.addClef(clef).setContext(contextEmpty).draw();
+    } catch (e) {
+      // fallback to simple SVG
+      drawSimpleStaff(container, notes, clef);
+    }
+    try { pushToast('Staff Display rendered (empty stave)', 'info', 1500); } catch(e){}
+    return;
+  }
+
   const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
   // prefer to size renderer to visible container dimensions when available
   const rw = Math.max(300, container.clientWidth || 600);
@@ -557,6 +660,8 @@ function renderRangeStaff() {
   }
 }
 
+// Chromatic generation removed from PracticePitch; use Create Scales or other flows to populate store.noteArray.
+
 async function tryLoadInstruments() {
   if (!store.instruments || store.instruments.length === 0) {
     await store.loadInstruments();
@@ -582,6 +687,25 @@ async function tryLoadInstruments() {
     /* ignore */
   }
   if (!inst && store.instruments && store.instruments.length) inst = store.instruments[0];
+  // If still no instrument resolved, try cookie-based preference (Preferences.vue persists to cookie)
+  try {
+    if (!inst) {
+      const parts = document.cookie.split(';').map(s => s.trim());
+      const prefix = 'instrument=';
+      let cookieInstrument = '';
+      for (const p of parts) {
+        if (p.startsWith(prefix)) { cookieInstrument = decodeURIComponent(p.slice(prefix.length)); break; }
+      }
+      if (cookieInstrument && Array.isArray(store.instruments) && store.instruments.length) {
+        let match = store.instruments.find(i => String(i.instrument || '') === cookieInstrument);
+        if (!match) {
+          const ci = cookieInstrument.toLowerCase();
+          match = store.instruments.find(i => typeof i.instrument === 'string' && (i.instrument.toLowerCase() === ci || i.instrument.toLowerCase().includes(ci) || i.instrument.toLowerCase().startsWith(ci)));
+        }
+        if (match) { inst = match; store.instrument = match; }
+      }
+    }
+  } catch(e) { /* ignore cookie resolution errors */ }
   if (inst && inst.standardRange) {
     try { console.debug('[tryLoadInstruments] selected instrument', inst.instrument || inst, 'standardRange=', inst.standardRange); } catch(e){}
   // set defaults for range override controls from instrument metadata when available
@@ -632,6 +756,8 @@ async function tryLoadInstruments() {
         rangeText.value = `${inst.standardRange.start} to ${inst.standardRange.end}`;
       }
     }
+    // After we've determined rangeText, do NOT auto-generate a chromatic preview here.
+    // PracticePitch will render whatever is already in `store.noteArray` (populated by Create Scales or other flows).
     // render the staff for this range
     setTimeout(()=>{ try { renderRangeStaff(); } catch(e){/* ignore */} }, 30);
   }
@@ -639,6 +765,100 @@ async function tryLoadInstruments() {
 
 onMounted(() => {
   tryLoadInstruments();
+});
+
+// Keep the Test Staff store (used by StaffPreview) in sync with the practice store.noteArray
+// StaffPreview reads `useTestStaffNoteStore().noteArray` so ensure it mirrors the canonical store
+watch(
+  () => store.noteArray,
+  (nv) => {
+    try {
+      // shallow clone entries to avoid accidental shared mutation
+      testNotes.noteArray = Array.isArray(nv) ? nv.map((x) => ({ ...x })) : [];
+    } catch (e) {
+      testNotes.noteArray = [];
+    }
+  },
+  { deep: true, immediate: true }
+);
+
+// Highlight detected note on the staff: set noteColor temporarily on the matching note in testNotes
+let highlightTimer = null;
+let lastHighlightedIdx = null;
+const prevColors = new Map();
+
+function highlightDetectedNote() {
+  try {
+    if (!testNotes || !Array.isArray(testNotes.noteArray) || !testNotes.noteArray.length)
+      return;
+    const det = String(detectedNote.value || '').trim();
+    if (!det) return;
+    // Compute MIDI for detected (best-effort)
+    const detMidi = Number.isFinite(Number(detectedFreq.value)) && detectedFreq.value > 0 ? Math.round(freqToMidi(detectedFreq.value)) : Number.NaN;
+
+    // Find best match: exact SPN match first, else closest MIDI distance
+    let bestIdx = -1;
+    for (let i = 0; i < testNotes.noteArray.length; i++) {
+      const n = testNotes.noteArray[i];
+      const p = String(n.pitch || n.spn || '').trim();
+      if (!p) continue;
+      // normalize: allow C/4 or C4
+      const normP = p.replace('/', '');
+      const normDet = det.replace('/', '');
+      if (normP.toLowerCase() === normDet.toLowerCase()) { bestIdx = i; break; }
+    }
+    if (bestIdx === -1 && Number.isFinite(detMidi)) {
+      // fallback: choose note with nearest MIDI
+      let bestDiff = Infinity;
+      for (let i = 0; i < testNotes.noteArray.length; i++) {
+        const n = testNotes.noteArray[i];
+        const p = String(n.pitch || n.spn || '');
+        const m = spnToMidiGlobal(p);
+        if (!Number.isFinite(m)) continue;
+        const d = Math.abs(m - detMidi);
+        if (d < bestDiff) { bestDiff = d; bestIdx = i; }
+      }
+    }
+
+    if (bestIdx >= 0) {
+      // apply highlight color (use green for in-tune, or orange if cents large)
+      const color = Math.abs(cents.value || 0) <= 10 ? 'green' : 'orange';
+      // clear previous highlight if different
+      if (lastHighlightedIdx != null && lastHighlightedIdx !== bestIdx) {
+        try {
+          const prev = prevColors.get(lastHighlightedIdx);
+          if (prev !== undefined && testNotes.noteArray[lastHighlightedIdx]) {
+            testNotes.noteArray[lastHighlightedIdx] = { ...testNotes.noteArray[lastHighlightedIdx], noteColor: prev };
+          }
+        } catch (e) {}
+        prevColors.delete(lastHighlightedIdx);
+      }
+
+      // store previous color so we can restore it
+      try {
+        if (!prevColors.has(bestIdx)) prevColors.set(bestIdx, testNotes.noteArray[bestIdx].noteColor || '');
+        testNotes.noteArray[bestIdx] = { ...testNotes.noteArray[bestIdx], noteColor: color };
+        lastHighlightedIdx = bestIdx;
+      } catch (e) {}
+
+      // schedule revert
+      if (highlightTimer) { clearTimeout(highlightTimer); highlightTimer = null; }
+      highlightTimer = setTimeout(() => {
+        try {
+          const prev = prevColors.get(bestIdx);
+          if (testNotes.noteArray[bestIdx]) testNotes.noteArray[bestIdx] = { ...testNotes.noteArray[bestIdx], noteColor: prev || '' };
+        } catch (e) {}
+        prevColors.delete(bestIdx);
+        lastHighlightedIdx = null;
+        highlightTimer = null;
+      }, 700);
+    }
+  } catch (e) { /* ignore */ }
+}
+
+// Watch detection state to highlight
+watch([() => detectedFreq.value, () => detectedNote.value, () => cents.value], () => {
+  try { highlightDetectedNote(); } catch (e) {}
 });
 
 // re-render staff when rangeText changes
@@ -650,6 +870,9 @@ watch(useRangeOverride, (v) => {
     else tryLoadInstruments();
   } catch(e){}
 });
+
+// Re-render staff when the underlying noteArray in the store changes
+watch(() => store.noteArray, () => { setTimeout(() => { try { renderRangeStaff(); } catch(e){} }, 30); }, { deep: true, immediate: true });
 
 // When startingOctave or octaveCount change while override active, update the range
 watch(startingOctave, () => { try { if (useRangeOverride.value) updateRangeFromOverride(); } catch(e){} });
