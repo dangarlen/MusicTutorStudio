@@ -36,6 +36,11 @@
           :instruments="store.instruments"
           v-model="store.practiceUnitHeader.instrument"
         />
+        <div v-if="usingInstrumentDefault" class="text-sm text-gray-600 mt-1">
+          Using instrument default starting octave: {{
+            store.practiceUnitHeader.instrument.defaultStartingOctave
+          }}
+        </div>
       </div>
 
       <!-- Scale Configuration Components -->
@@ -185,7 +190,12 @@ if (!store.scaleSelections) {
   store.scaleSelections = reactive({
     key: store.practiceUnitHeader.keySignature || "C",
     scaleType: store.practiceUnitHeader.contentType || "Major",
-    startingOctave: store.practiceUnitHeader.startingOctave || "C4",
+    startingOctave:
+      store.practiceUnitHeader.startingOctave ||
+      (store.practiceUnitHeader.instrument &&
+      store.practiceUnitHeader.instrument.defaultStartingOctave
+        ? store.practiceUnitHeader.instrument.defaultStartingOctave
+        : "C4"),
     octaveCount: store.practiceUnitHeader.numberOfOctaves || 1,
     maxMeasuresPerLine:
       store.practiceUnitHeader.staffDisplayOptions?.measuresPerLineMax || 2,
@@ -204,6 +214,24 @@ if (!store.scaleSelections) {
       ...store.practiceUnitHeader.staffDisplayOptions,
     },
   });
+}
+
+// If the scaleSelections startingOctave was derived from the instrument's
+// defaultStartingOctave during initialization, reflect that in the UI flag.
+// Reactive flag must be declared before we set it.
+const usingInstrumentDefault = ref(false);
+try {
+  if (
+    !store.practiceUnitHeader.startingOctave &&
+    store.practiceUnitHeader.instrument &&
+    store.practiceUnitHeader.instrument.defaultStartingOctave
+  ) {
+    usingInstrumentDefault.value = true;
+  } else {
+    usingInstrumentDefault.value = false;
+  }
+} catch {
+  usingInstrumentDefault.value = false;
 }
 
 // Sync scaleSelections changes back to unified header
@@ -839,20 +867,39 @@ watch(
     store.practiceUnitHeader.instrument,
   ],
   ([key, scaleType, instrument]) => {
-    if (key && scaleType) {
-      store.scaleSelections.startingOctave = getFirstNoteOfScale(
-        key,
-        scaleType
-      );
-    } else if (
-      instrument &&
-      instrument.standardRange &&
-      instrument.standardRange.start
-    ) {
-      store.scaleSelections.startingOctave = instrument.standardRange.start;
-    } else {
-      store.scaleSelections.startingOctave = "C4";
+    // Always prefer an explicit instrument.defaultStartingOctave when present
+    // (unless the practice unit header already specifies a startingOctave).
+    if (instrument && instrument.defaultStartingOctave && !store.practiceUnitHeader.startingOctave) {
+      store.scaleSelections.startingOctave = instrument.defaultStartingOctave;
+      usingInstrumentDefault.value = true;
+      return;
     }
+
+    // If the practice header already specifies a startingOctave, respect it.
+    if (store.practiceUnitHeader.startingOctave) {
+      store.scaleSelections.startingOctave = store.practiceUnitHeader.startingOctave;
+      usingInstrumentDefault.value = false;
+      return;
+    }
+
+    // If we reach here and a key+scale are selected, compute the first
+    // note of the scale (falls back to instrument.standardRange if present).
+    if (key && scaleType) {
+      store.scaleSelections.startingOctave = getFirstNoteOfScale(key, scaleType);
+      usingInstrumentDefault.value = false;
+      return;
+    }
+
+    // If instrument is present with a standardRange, use its start.
+    if (instrument && instrument.standardRange && instrument.standardRange.start) {
+      store.scaleSelections.startingOctave = instrument.standardRange.start;
+      usingInstrumentDefault.value = false;
+      return;
+    }
+
+    // Final fallback
+    store.scaleSelections.startingOctave = "C4";
+    usingInstrumentDefault.value = false;
   },
   { immediate: true }
 );

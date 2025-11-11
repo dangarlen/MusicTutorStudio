@@ -296,6 +296,17 @@ onMounted(async () => {
       }
     }
   } catch {}
+  // Initialize overlay controls: prefer practiceUnitHeader-stored overlays (so settings travel with units),
+  // otherwise fall back to legacy localStorage.
+  try {
+    const hdr = store.practiceUnitHeader?.staffDisplayOptions?.overlays;
+    if (hdr) {
+      overlayTooltipOnly.value = !!hdr.tooltipOnly;
+      overlayDisplayOption.value = String(hdr.displayOption || 'none');
+    } else {
+      loadOverlaySettings();
+    }
+  } catch (e) { loadOverlaySettings(); }
 });
 
 // Determine readable text color for DaisyUI badge backgrounds
@@ -448,6 +459,16 @@ function saveOverlaySettings() {
   };
   try {
     localStorage.setItem(OVERLAY_KEY, JSON.stringify(obj));
+    // Persist into practiceUnitHeader so overlays travel with exported units
+    try {
+      if (!store.practiceUnitHeader) store.practiceUnitHeader = {};
+      if (!store.practiceUnitHeader.staffDisplayOptions) store.practiceUnitHeader.staffDisplayOptions = {};
+      store.practiceUnitHeader.staffDisplayOptions.overlays = {
+        displayOption: String(overlayDisplayOption.value || 'none'),
+        tooltipOnly: !!overlayTooltipOnly.value,
+        enableClickToCycle: true,
+      };
+    } catch (e) { /* ignore */ }
   } catch {}
 }
 loadOverlaySettings();

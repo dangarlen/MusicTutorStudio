@@ -11,80 +11,94 @@
         <!-- Toast stack -->
         <ToastStack :toasts="toasts" @dismiss="dismissToast" />
         <div class="card bg-white p-4">
-          <h3 class="text-lg font-bold mb-2">Tuner</h3>
-          <div class="mb-3 text-sm text-gray-600">Range: {{ rangeText }}</div>
+          <div class="mt-4 collapse collapse-arrow border bg-base-100">
+            <input type="checkbox" />
+            <div class="collapse-title cursor-pointer font-semibold">Tuner</div>
+            <div class="collapse-content mt-3">
+              <div class="mb-3 text-sm text-gray-600">Range: {{ rangeText }}</div>
 
-          <div class="flex items-center gap-4 mb-4">
-            <button class="btn" :class="running ? 'btn-error' : 'btn-primary'" @click="toggleRunning">{{ running ? 'Stop' : 'Start' }}</button>
-            <label class="label flex items-center gap-2 ml-4">
-              <input type="checkbox" class="checkbox" v-model="useAubio" />
-              <span class="label-text">Use aubio (WASM) if available</span>
-            </label>
-          </div>
+              <div class="flex items-center gap-4 mb-4">
+                <button class="btn" :class="running ? 'btn-error' : 'btn-primary'" @click="toggleRunning">{{ running ? 'Stop' : 'Start' }}</button>
+              </div>
 
-          <div class="mb-2">
-            <div class="text-4xl font-bold">{{ detectedNote }}</div>
-            <div class="text-sm text-gray-600">{{ fmtFreq(detectedFreq) }} Hz • {{ centsDisplay() }}</div>
+              <div class="mb-2">
+                <div class="text-4xl font-bold">{{ detectedNote }}</div>
+                <div class="text-sm text-gray-600">{{ fmtFreq(detectedFreq) }} Hz • {{ centsDisplay() }}</div>
+              </div>
+            </div>
           </div>
 
           <div class="mt-4 collapse collapse-arrow border bg-base-100">
             <input type="checkbox" ref="staffCollapse" @change="onStaffCollapseChange" />
-            <div class="collapse-title cursor-pointer font-semibold">Staff Display</div>
+            <div class="collapse-title cursor-pointer font-semibold flex justify-between items-center">
+              <span>Staff Display</span>
+              <span v-if="staffDisplayHint" class="text-xs text-red-600 font-medium">{{ staffDisplayHint }}</span>
+            </div>
             <div class="collapse-content mt-3">
               <div class="text-sm text-gray-600 mb-2">All notes within the current instrument range</div>
               <div class="text-xs text-gray-600 mb-2">{{ transpositionLabel }}</div>
               <div class="w-full">
-                <StaffPreview />
+                <StaffPreview
+                  :practice-overlay-mode="overlayDisplayOption"
+                  :practice-overlay-tooltip-only="overlayTooltipOnly"
+                  :practice-enable-click-to-cycle="overlayEnableClickToCycle"
+                  :practice-color-cycle="practiceColorCycle"
+                />
               </div>
               <div class="text-xs text-gray-500 mt-2">Mapped keys: <span class="font-mono">{{ staffMappedText }}</span></div>
             </div>
           </div>
 
+          
+
           <div class="mt-4 collapse collapse-arrow border bg-base-100">
             <input type="checkbox" />
-            <div class="collapse-title cursor-pointer font-semibold">Scale Range Settings</div>
+            <div class="collapse-title cursor-pointer font-semibold">Practice Settings</div>
             <div class="collapse-content mt-3">
-              <div class="text-sm text-gray-600 mb-2">Override instrument range for the staff preview.</div>
-              <div class="mb-3 flex items-center gap-3">
-                <label class="font-semibold w-40">Use custom range</label>
-                <label class="flex items-center gap-2">
-                  <input type="checkbox" class="checkbox" v-model="useRangeOverride" />
-                  <span class="text-sm">Enable</span>
+              <div class="mb-2 font-semibold">Select One:</div>
+              <div class="flex flex-col gap-3">
+                <label class="flex items-start gap-3">
+                  <input type="radio" class="radio radio-primary mt-1" v-model="practiceMode" value="Free Play" />
+                  <div>
+                    <div class="font-medium">Free Play</div>
+                    <div class="text-xs text-gray-600">User plays freely; matching notes are highlighted on the staff. Ideal for scales.</div>
+                  </div>
+                </label>
+                <label class="flex items-start gap-3">
+                  <input type="radio" class="radio radio-primary mt-1" v-model="practiceMode" value="Follow Me" />
+                  <div>
+                    <div class="font-medium">Follow Me</div>
+                    <div class="text-xs text-gray-600">App highlights one note at a time, advancing after a tonal break.</div>
+                  </div>
+                </label>
+                <label class="flex items-start gap-3">
+                  <input type="radio" class="radio radio-primary mt-1" v-model="practiceMode" value="You Lead" />
+                  <div>
+                    <div class="font-medium">You Lead</div>
+                    <div class="text-xs text-gray-600">Notes are highlighted in sequence at a tempo-driven pace.</div>
+                  </div>
+                </label>
+                <label class="flex items-start gap-3">
+                  <input type="radio" class="radio radio-primary mt-1" v-model="practiceMode" value="Random" />
+                  <div>
+                    <div class="font-medium">Random</div>
+                    <div class="text-xs text-gray-600">App selects a random note; user plays it and receives tuning feedback.</div>
+                  </div>
+                </label>
+                <label class="flex items-start gap-3">
+                  <input type="radio" class="radio radio-primary mt-1" v-model="practiceMode" value="Hear & Match" />
+                  <div>
+                    <div class="font-medium">Hear & Match</div>
+                    <div class="text-xs text-gray-600">App plays a note; user must match it by ear. Visual feedback confirms accuracy.</div>
+                  </div>
                 </label>
               </div>
-
-              <div class="mb-3 flex items-center gap-3">
-                <label class="font-semibold w-40">Starting Octave</label>
-                <button class="btn btn-sm" @click="decrementStartingOctave">-</button>
-                <span class="px-3 py-1 border rounded bg-white text-gray-800 font-mono">{{ startingOctaveDisplay }}</span>
-                <button class="btn btn-sm" @click="incrementStartingOctave">+</button>
-              </div>
-
-              <div class="mb-3 flex items-center gap-3">
-                <label class="font-semibold w-40">Number of Octaves</label>
-                <button class="btn btn-sm" @click="decrementOctaveCount">-</button>
-                <span class="px-3 py-1 border rounded bg-white text-gray-800 font-mono">{{ octaveCount }}</span>
-                <button class="btn btn-sm" @click="incrementOctaveCount">+</button>
-              </div>
-
-              <div class="mb-3 flex items-center gap-3">
-                <label class="font-semibold w-40">Max measures per line</label>
-                <input class="input input-sm w-24" type="number" v-model.number="maxMeasuresPerLine" min="1" max="8" />
-                <div class="text-xs text-gray-500">Affects VexFlow layout when supported</div>
-              </div>
-
-              <div class="mb-3 flex items-center gap-3">
-                <!-- Preview generation is handled by Create Scales; PracticePitch will render whatever is in the store.noteArray -->
-                <div class="text-xs text-gray-500">Preview is sourced from current practice store (use Create Scales to generate).</div>
-              </div>
-
-              <div class="text-xs text-gray-500">After changing these values, open the Staff Display to re-render if needed.</div>
             </div>
           </div>
 
           <div class="mt-4 collapse collapse-arrow border bg-base-100">
             <input type="checkbox" />
-            <div class="collapse-title cursor-pointer font-semibold">Settings</div>
+            <div class="collapse-title cursor-pointer font-semibold">Sound Settings</div>
             <div class="collapse-content mt-3">
               <div class="mb-3">
                 <label class="label">A4 reference</label>
@@ -98,12 +112,24 @@
                 <label class="label">Onset threshold</label>
                 <input class="input input-sm w-32" v-model.number="onsetThreshold" />
               </div>
-              <div class="mb-3">
-                <label class="label flex items-center gap-2">
+              <div class="mb-3 flex items-center justify-between">
+                <div class="text-sm text-gray-700">Use aubio (WASM) if available</div>
+                <label class="label">
                   <input type="checkbox" class="checkbox" v-model="useAubio" />
-                  <span class="label-text">Use aubio (WASM) if available</span>
                 </label>
               </div>
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
               <div class="mb-3">
                 <button v-if="audioWorkletDisabled" class="btn btn-sm btn-outline" @click="resetAudioEngine">Reset audio engine (re-enable worklet)</button>
                 <div class="text-xs text-gray-500 mt-1">Clears a local setting and restarts audio so AudioWorklet can be retried.</div>
@@ -116,6 +142,8 @@
               </div>
             </div>
           </div>
+          
+          
 
           <div class="mt-4 collapse collapse-arrow border bg-base-100">
             <input type="checkbox" />
@@ -154,12 +182,16 @@
 
         
       </div>
+
+    <PracticeReturn />
+
     </main>
     <FooterStandard />
   </div>
 </template>
 
 <script setup>
+import PracticeReturn from "./PracticeReturn.vue";
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
 import { useTestStaffNoteStore } from '../stores/testStaffNoteStore';
 import ToastStack from './ToastStack.vue';
@@ -182,6 +214,9 @@ const onsetThreshold = ref(0.15);
 
 // UI state: running toggle
 const running = ref(false);
+
+// Practice mode selection for Practice Settings collapse
+const practiceMode = ref("Free Play");
 
 const bpm = ref(null);
 const onsets = ref([]);
@@ -228,12 +263,8 @@ let aubio = null; // placeholder for aubio runtime if loaded
 
 const rangeText = ref('');
 
-// Range override controls (copied from Scale Range Settings behavior)
-// Default to enabled so the staff shows the custom centered octave by default
-const useRangeOverride = ref(true);
-const startingOctave = ref(4);
-const octaveCount = ref(1);
-const maxMeasuresPerLine = ref(2);
+// Range display text (computed from instrument metadata)
+// The interactive Scale Range Settings UI was removed; we keep `rangeText` for display only.
 
 // Imported defaults captured from instruments.json when we load an instrument
 const importedDefaults = ref(null);
@@ -272,21 +303,71 @@ const staffMappedSample = computed(() => {
 
 const staffMappedText = computed(() => (Array.isArray(staffMappedSample.value) && staffMappedSample.value.length) ? staffMappedSample.value.join(', ') : '(none)');
 
-const startingOctaveDisplay = computed(() => `C${startingOctave.value}`);
+// Hint shown in the Staff Display title when there's nothing to render
+const staffDisplayHint = computed(() => {
+  try {
+    return (Array.isArray(store.noteArray) && store.noteArray.length) ? '' : 'Unable to display staff — Load Unit Practice';
+  } catch (e) { return 'Unable to display staff — Load Unit Practice' }
+});
 
-function incrementStartingOctave() { startingOctave.value = Math.min(8, startingOctave.value + 1); updateRangeFromOverride(); }
-function decrementStartingOctave() { startingOctave.value = Math.max(0, startingOctave.value - 1); updateRangeFromOverride(); }
-function incrementOctaveCount() { octaveCount.value = Math.min(8, octaveCount.value + 1); updateRangeFromOverride(); }
-function decrementOctaveCount() { octaveCount.value = Math.max(1, octaveCount.value - 1); updateRangeFromOverride(); }
+// Derive a color cycle from practice unit noteColorDesignation if present
+const practiceColorCycle = computed(() => {
+  try {
+    const m = store.practiceUnitHeader?.noteColorDesignation || {};
+    // return values in defined order if present
+    const order = ['red','blue','green','orange','gray','purple'];
+    const out = [];
+    for (const k of order) if (typeof m[k] === 'string' && m[k].trim()) out.push(m[k].trim());
+    return out.length ? out : ['black','blue','orange','green','purple','red','brown','gray'];
+  } catch (e) { return ['black','blue','orange','green','purple','red','brown','gray']; }
+});
 
-function updateRangeFromOverride() {
-  if (!useRangeOverride.value) return;
-  const start = `C${startingOctave.value}`;
-  const endOct = startingOctave.value + Math.max(1, octaveCount.value) - 1;
-  const end = `B${endOct}`;
-  rangeText.value = `${start} to ${end}`;
-  // re-render staff if visible
-  try { setTimeout(()=>renderRangeStaff(),50); } catch(e){}
+// For overlays, prefer settings stored on the practice unit so they travel with saved units.
+// StaffPreview will be passed values derived directly from the store.practiceUnitHeader.staffDisplayOptions.overlays object.
+
+// Compute overlay settings from practiceUnitHeader; provide defaults and migrate legacy localStorage values if present
+const overlayFromHeader = computed(() => {
+  try {
+    const sdo = store.practiceUnitHeader?.staffDisplayOptions || {};
+    const ov = sdo.overlays || null;
+    if (!ov) return { displayOption: 'none', tooltipOnly: false, enableClickToCycle: false };
+    return {
+      displayOption: String(ov.displayOption || 'none'),
+      tooltipOnly: !!ov.tooltipOnly,
+      enableClickToCycle: !!ov.enableClickToCycle,
+    };
+  } catch (e) { return { displayOption: 'none', tooltipOnly: false, enableClickToCycle: false }; }
+});
+
+const overlayDisplayOption = computed(() => overlayFromHeader.value.displayOption || 'none');
+const overlayTooltipOnly = computed(() => !!overlayFromHeader.value.tooltipOnly);
+const overlayEnableClickToCycle = computed(() => !!overlayFromHeader.value.enableClickToCycle);
+
+// Migrate legacy overlay settings from localStorage into the practiceUnitHeader so they travel with exported units.
+function migrateLegacyOverlays() {
+  try {
+    if (!store.practiceUnitHeader) store.practiceUnitHeader = {};
+    if (!store.practiceUnitHeader.staffDisplayOptions) store.practiceUnitHeader.staffDisplayOptions = {};
+    const sdo = store.practiceUnitHeader.staffDisplayOptions;
+    if (sdo.overlays) return; // already present
+    const raw = localStorage.getItem('practiceScales.overlay');
+    if (raw) {
+      try {
+        const obj = JSON.parse(raw) || {};
+        sdo.overlays = {
+          displayOption: String(obj.displayOption || 'none'),
+          tooltipOnly: !!obj.tooltipOnly,
+          enableClickToCycle: !!obj.enableClickToCycle,
+        };
+        store.practiceUnitHeader.staffDisplayOptions = { ...store.practiceUnitHeader.staffDisplayOptions, ...sdo };
+        // Persist migration result into local store so it gets exported with units
+      } catch (e) {
+        sdo.overlays = { displayOption: 'none', tooltipOnly: false, enableClickToCycle: false };
+      }
+    } else {
+      sdo.overlays = { displayOption: 'none', tooltipOnly: false, enableClickToCycle: false };
+    }
+  } catch (e) { /* ignore */ }
 }
 
 // expose toast stack component in template
@@ -609,7 +690,7 @@ function renderRangeStaff() {
       }
       return;
     }
-  console.debug('[renderRangeStaff] using VexFlow, maxMeasuresPerLine=', maxMeasuresPerLine.value);
+  console.debug('[renderRangeStaff] using VexFlow');
   // If there are no notes to render, draw an empty stave and return
   if (!notes || notes.length === 0) {
     try {
@@ -708,29 +789,6 @@ async function tryLoadInstruments() {
   } catch(e) { /* ignore cookie resolution errors */ }
   if (inst && inst.standardRange) {
     try { console.debug('[tryLoadInstruments] selected instrument', inst.instrument || inst, 'standardRange=', inst.standardRange); } catch(e){}
-  // set defaults for range override controls from instrument metadata when available
-    try {
-      if (inst.defaultStartingOctave) {
-        const m = String(inst.defaultStartingOctave).match(/^C?(\d+)/);
-        if (m) startingOctave.value = Number(m[1]);
-      } else if (inst.standardRange && inst.standardRange.start && inst.standardRange.end) {
-        // Compute a centered single-octave default within the instrument standardRange
-        const rstart = String(inst.standardRange.start || '').trim();
-        const rend = String(inst.standardRange.end || '').trim();
-        const m1 = rstart.match(/^([A-Ga-g])([#b♭♯]?)[\/]?(\d+)$/);
-        const m2 = rend.match(/^([A-Ga-g])([#b♭♯]?)[\/]?(\d+)$/);
-        if (m1 && m2) {
-          const startOct = Number(m1[3]);
-          const endOct = Number(m2[3]);
-          const mid = Math.floor((startOct + endOct) / 2);
-          startingOctave.value = Math.max(0, Math.min(8, mid));
-          octaveCount.value = 1; // single octave by default
-          try { console.debug('[tryLoadInstruments] centered single-octave default', { startOct, endOct, mid: startingOctave.value }); } catch(e){}
-        }
-      }
-      // keep octaveCount default at 1 (user can change via UI); do not auto-expand to full instrument span
-    } catch(e){}
-
     // capture imported defaults for debugging/UI display
     try {
       importedDefaults.value = {
@@ -739,25 +797,24 @@ async function tryLoadInstruments() {
         transposition: inst.transposition,
         standardRange: inst.standardRange,
         defaultStartingOctave: inst.defaultStartingOctave || null,
-        computedStartingOctave: startingOctave.value,
-        computedOctaveCount: octaveCount.value,
       };
       console.debug('[tryLoadInstruments] importedDefaults', importedDefaults.value);
     } catch (e) { /* ignore */ }
 
-    // If user enabled override, prefer that; otherwise use instrument standardRange
-    if (useRangeOverride.value) {
-      updateRangeFromOverride();
-    } else {
-      // Default to a centered single-octave view rather than the full instrument span
-      try {
-        rangeText.value = `C${startingOctave.value} to B${startingOctave.value}`;
-      } catch (e) {
+    // Compute a readable rangeText for display: prefer explicit standardRange, fallback to defaultStartingOctave
+    try {
+      if (inst.standardRange && inst.standardRange.start && inst.standardRange.end) {
         rangeText.value = `${inst.standardRange.start} to ${inst.standardRange.end}`;
+      } else if (inst.defaultStartingOctave) {
+        const m = String(inst.defaultStartingOctave).match(/^C?(\d+)/);
+        if (m) {
+          const s = `C${m[1]}`;
+          const e = `B${m[1]}`;
+          rangeText.value = `${s} to ${e}`;
+        }
       }
-    }
-    // After we've determined rangeText, do NOT auto-generate a chromatic preview here.
-    // PracticePitch will render whatever is already in `store.noteArray` (populated by Create Scales or other flows).
+    } catch (e) {}
+
     // render the staff for this range
     setTimeout(()=>{ try { renderRangeStaff(); } catch(e){/* ignore */} }, 30);
   }
@@ -765,6 +822,8 @@ async function tryLoadInstruments() {
 
 onMounted(() => {
   tryLoadInstruments();
+  // Ensure overlay settings are present on practiceUnitHeader (migrate legacy localStorage if needed)
+  try { migrateLegacyOverlays(); } catch (e) { /* ignore */ }
 });
 
 // Keep the Test Staff store (used by StaffPreview) in sync with the practice store.noteArray
@@ -864,19 +923,12 @@ watch([() => detectedFreq.value, () => detectedNote.value, () => cents.value], (
 // re-render staff when rangeText changes
 watch(rangeText, () => { setTimeout(() => { try { renderRangeStaff(); } catch(e){} }, 20); });
 
-watch(useRangeOverride, (v) => {
-  try {
-    if (v) updateRangeFromOverride();
-    else tryLoadInstruments();
-  } catch(e){}
-});
 
 // Re-render staff when the underlying noteArray in the store changes
 watch(() => store.noteArray, () => { setTimeout(() => { try { renderRangeStaff(); } catch(e){} }, 30); }, { deep: true, immediate: true });
 
 // When startingOctave or octaveCount change while override active, update the range
-watch(startingOctave, () => { try { if (useRangeOverride.value) updateRangeFromOverride(); } catch(e){} });
-watch(octaveCount, () => { try { if (useRangeOverride.value) updateRangeFromOverride(); } catch(e){} });
+
 
 onBeforeUnmount(() => {
   stop();
