@@ -93,6 +93,18 @@
                   </div>
                 </label>
               </div>
+              <div class="mt-4 flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                  <label class="label mb-0 mr-2"><span class="label-text">BPM</span></label>
+                  <input type="number" class="input input-sm w-20" v-model.number="youLeadTempo" min="60" max="240" />
+                </div>
+                <button class="btn btn-sm" @click="startPracticeMode" :disabled="practiceActive">Start</button>
+                <button class="btn btn-sm btn-ghost" @click="stopPracticeMode" :disabled="!practiceActive">Stop</button>
+                <div class="text-sm text-gray-600 ml-4">
+                  <span class="font-medium">Mode:</span> {{ practiceMode }}
+                  <span v-if="currentTargetIndex !== null"> • Target: {{ store.noteArray?.[currentTargetIndex]?.pitch || store.noteArray?.[currentTargetIndex]?.spn || '—' }}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -217,6 +229,190 @@ const running = ref(false);
 
 // Practice mode selection for Practice Settings collapse
 const practiceMode = ref("Free Play");
+
+// Practice mode runtime state
+const practiceActive = ref(false);
+const currentTargetIndex = ref(null);
+const practiceSequence = ref([]);
+let practiceIntervalId = null;
+let lastTargetIdx = null;
+const targetPrevColors = new Map();
+
+function clearCurrentTarget() {
+  try {
+    if (lastTargetIdx != null && testNotes.noteArray && testNotes.noteArray[lastTargetIdx]) {
+      const prev = targetPrevColors.get(lastTargetIdx);
+      testNotes.noteArray[lastTargetIdx] = { ...testNotes.noteArray[lastTargetIdx], noteColor: prev || '' };
+      targetPrevColors.delete(lastTargetIdx);
+    }
+  } catch (e) {}
+  lastTargetIdx = null;
+  currentTargetIndex.value = null;
+}
+
+// You Lead tempo control (BPM). Default to header tempo or 120.
+const youLeadTempo = ref(Number(store.practiceUnitHeader?.tempo) || 120);
+
+// Keep header in sync when tempo changes and update interval if You Lead is active
+watch(youLeadTempo, (nv) => {
+  try {
+    let bpmVal = Number(nv) || 120;
+    if (bpmVal < 60) bpmVal = 60;
+    if (bpmVal > 240) bpmVal = 240;
+    youLeadTempo.value = bpmVal;
+    if (!store.practiceUnitHeader) store.practiceUnitHeader = {};
+    store.practiceUnitHeader.tempo = bpmVal;
+    // if currently running in You Lead, update the interval
+    if (practiceActive.value && practiceMode.value === 'You Lead') {
+      if (practiceIntervalId) { clearInterval(practiceIntervalId); practiceIntervalId = null; }
+      const ms = (60 / Math.max(1, bpmVal)) * 1000;
+      practiceIntervalId = setInterval(() => { try { nextTarget(false); } catch(e){} }, ms);
+    }
+  } catch (e) {}
+}, { immediate: true });
+
+// Persist practiceMode into the practiceUnitHeader and react to runtime changes
+watch(() => practiceMode.value, (nv) => {
+  try {
+    if (!store.practiceUnitHeader) store.practiceUnitHeader = {};
+    store.practiceUnitHeader.practiceMode = nv;
+    // if already running, adapt behavior when switching modes
+    if (practiceActive.value) {
+      if (practiceIntervalId) { clearInterval(practiceIntervalId); practiceIntervalId = null; }
+      if (nv === 'You Lead') {
+        const ms = (60 / Math.max(1, Number(store.practiceUnitHeader.tempo || youLeadTempo.value || 120))) * 1000;
+        practiceIntervalId = setInterval(() => { try { nextTarget(false); } catch(e){} }, ms);
+      }
+    }
+  } catch (e) {}
+});
+
+function setTargetIndex(idx, color = 'blue') {
+  try {
+    // restore previous
+    if (lastTargetIdx != null && lastTargetIdx !== idx && testNotes.noteArray && testNotes.noteArray[lastTargetIdx]) {
+      const prev = targetPrevColors.get(lastTargetIdx);
+      testNotes.noteArray[lastTargetIdx] = { ...testNotes.noteArray[lastTargetIdx], noteColor: prev || '' };
+      targetPrevColors.delete(lastTargetIdx);
+    }
+    if (idx == null) { clearCurrentTarget(); return; }
+    if (!testNotes.noteArray || !testNotes.noteArray[idx]) { currentTargetIndex.value = null; lastTargetIdx = null; return; }
+    if (!targetPrevColors.has(idx)) targetPrevColors.set(idx, testNotes.noteArray[idx].noteColor || '');
+    testNotes.noteArray[idx] = { ...testNotes.noteArray[idx], noteColor: color };
+    currentTargetIndex.value = idx;
+    lastTargetIdx = idx;
+  } catch (e) {}
+}
+
+function nextTarget(randomize = false) {
+  try {
+    const n = Array.isArray(testNotes.noteArray) ? testNotes.noteArray.length : 0;
+    if (!n) return;
+    if (randomize) {
+      let idx = Math.floor(Math.random() * n);
+      // avoid immediate repeat
+      if (n > 1 && idx === lastTargetIdx) idx = (idx + 1) % n;
+      setTargetIndex(idx);
+      if (practiceMode.value === 'Hear & Match') playTargetNoteForIndex(idx);
+      return;
+    }
+    // sequential
+    let idx = lastTargetIdx == null ? 0 : (lastTargetIdx + 1) % n;
+    setTargetIndex(idx);
+    if (practiceMode.value === 'Hear & Match') playTargetNoteForIndex(idx);
+  } catch (e) {}
+}
+
+function handleCorrectMatch() {
+  try {
+    if (!practiceActive.value || currentTargetIndex.value == null) return;
+    switch (practiceMode.value) {
+      case 'Free Play':
+        // no sequencing in Free Play
+        break;
+      case 'Follow Me':
+        // advance on user's correct match
+        nextTarget(false);
+        break;
+      case 'You Lead':
+        // allow user to advance early
+        nextTarget(false);
+        break;
+      case 'Random':
+        nextTarget(true);
+        break;
+      case 'Hear & Match':
+        // after correct match, pick next (random)
+        nextTarget(true);
+        break;
+      default:
+        break;
+    }
+  } catch (e) {}
+}
+
+function startPracticeMode() {
+  try {
+    if (!Array.isArray(testNotes.noteArray) || testNotes.noteArray.length === 0) { pushToast('No notes loaded for practice. Load a practice unit or create a scale.', 'warn'); return; }
+    practiceActive.value = true;
+    // prepare sequence
+    practiceSequence.value = testNotes.noteArray.map((_, i) => i);
+    // clear any existing target
+    clearCurrentTarget();
+    if (practiceMode.value === 'Random' || practiceMode.value === 'Hear & Match') {
+      nextTarget(true);
+    } else if (practiceMode.value === 'Follow Me' || practiceMode.value === 'You Lead') {
+      nextTarget(false);
+    } else {
+      // Free Play no automatic targets, but still allow highlighting when user plays
+      currentTargetIndex.value = null;
+    }
+
+    // schedule You Lead tempo-based progression if selected
+    if (practiceMode.value === 'You Lead') {
+      const tempo = Number(store.practiceUnitHeader?.tempo) || 120;
+      const ms = (60 / Math.max(1, tempo)) * 1000;
+      if (practiceIntervalId) { clearInterval(practiceIntervalId); practiceIntervalId = null; }
+      practiceIntervalId = setInterval(() => { try { nextTarget(false); } catch(e){} }, ms);
+    }
+  } catch (e) { console.warn('startPracticeMode error', e); }
+}
+
+function stopPracticeMode() {
+  try {
+    practiceActive.value = false;
+    if (practiceIntervalId) { clearInterval(practiceIntervalId); practiceIntervalId = null; }
+    clearCurrentTarget();
+  } catch (e) {}
+}
+
+function midiToFreq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+function playTargetNoteForIndex(idx) {
+  try {
+    if (!testNotes.noteArray || !testNotes.noteArray[idx]) return;
+    const p = String(testNotes.noteArray[idx].pitch || testNotes.noteArray[idx].spn || '').trim();
+    const m = spnToMidiGlobal(p);
+    if (!Number.isFinite(m)) return;
+    const f = midiToFreq(m);
+    // ensure audioCtx exists
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) { audioCtx = null; }
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.16, audioCtx.currentTime + 0.01);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    // stop after 600ms
+    setTimeout(() => {
+      try { g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.06); o.stop(audioCtx.currentTime + 0.06); } catch (e) {}
+    }, 600);
+  } catch (e) {}
+}
 
 const bpm = ref(null);
 const onsets = ref([]);
@@ -879,7 +1075,7 @@ function highlightDetectedNote() {
       }
     }
 
-    if (bestIdx >= 0) {
+  if (bestIdx >= 0) {
       // apply highlight color (use green for in-tune, or orange if cents large)
       const color = Math.abs(cents.value || 0) <= 10 ? 'green' : 'orange';
       // clear previous highlight if different
@@ -911,6 +1107,13 @@ function highlightDetectedNote() {
         lastHighlightedIdx = null;
         highlightTimer = null;
       }, 700);
+
+      // If practice mode active and this detection matches the current target, handle it
+      try {
+        if (practiceActive.value && currentTargetIndex.value != null && bestIdx === currentTargetIndex.value) {
+          handleCorrectMatch();
+        }
+      } catch (e) {}
     }
   } catch (e) { /* ignore */ }
 }
