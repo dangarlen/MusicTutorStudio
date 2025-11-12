@@ -282,6 +282,18 @@ async function renderVexFlow() {
         const dySemis = midi - refMidi;
         const y = centerY - (dySemis * (spacing / 2));
         const x = leftPad + i * stepX;
+        // If the note object includes a halo flag, draw a soft yellow ellipse behind the note
+        if (it.halo) {
+          const halo = document.createElementNS(xmlns, 'ellipse');
+          halo.setAttribute('cx', String(x));
+          halo.setAttribute('cy', String(y));
+          halo.setAttribute('rx', String(10));
+          halo.setAttribute('ry', String(8));
+          halo.setAttribute('fill', String(it.haloColor || 'yellow'));
+          halo.setAttribute('opacity', '0.28');
+          halo.setAttribute('class', 'mts-note-halo');
+          svg.appendChild(halo);
+        }
         const circle = document.createElementNS(xmlns, 'ellipse');
         circle.setAttribute('cx', String(x));
         circle.setAttribute('cy', String(y));
@@ -918,12 +930,42 @@ watch(
 // Attach click listeners and optional tooltips to rendered notes
 function attachNoteInteractivity(originalIdxList, tooltipMap) {
   try {
+    // Remove any previously inserted halos so re-rendering doesn't duplicate them
+    try {
+      const existing = vfContainer.value.querySelectorAll('.mts-note-halo');
+      for (const e of existing) { try { e.remove(); } catch(_){} }
+    } catch(_){}
     const groups = vfContainer.value.querySelectorAll("g.vf-stavenote");
     const count = Math.min(groups.length, originalIdxList.length);
     for (let i = 0; i < count; i++) {
       const g = groups[i];
       const origIdx = originalIdxList[i];
       if (!g) continue;
+      // If the note has a halo flag, insert an SVG ellipse behind the group
+      try {
+        const n = notesStore.noteArray && Array.isArray(notesStore.noteArray) && notesStore.noteArray[origIdx] ? notesStore.noteArray[origIdx] : null;
+        if (n && n.halo) {
+          const parentSvg = vfContainer.value.querySelector('svg');
+          if (parentSvg && typeof g.getBBox === 'function') {
+            const bbox = g.getBBox();
+            const cx = bbox.x + bbox.width / 2;
+            const cy = bbox.y + bbox.height / 2;
+            const rx = Math.max(bbox.width * 0.9, 10);
+            const ry = Math.max(bbox.height * 1.4, 8);
+            const halo = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            halo.setAttribute('cx', String(cx));
+            halo.setAttribute('cy', String(cy));
+            halo.setAttribute('rx', String(rx));
+            halo.setAttribute('ry', String(ry));
+            halo.setAttribute('fill', String(n.haloColor || 'yellow'));
+            halo.setAttribute('opacity', '0.28');
+            halo.setAttribute('class', 'mts-note-halo');
+            try { g.parentNode.insertBefore(halo, g); } catch(_) { parentSvg.appendChild(halo); }
+          }
+        }
+      } catch (e) {
+        // non-fatal
+      }
       // Tooltip (title attribute) for tooltip-only overlay mode
       if (props.practiceOverlayTooltipOnly && tooltipMap?.has(origIdx)) {
         g.setAttribute("title", tooltipMap.get(origIdx));

@@ -270,7 +270,6 @@ function openEditPanelFromUnit(unit) {
     console.warn('Failed to load unit into active memory for preview', e);
   }
   showEditPanel.value = true;
-  previewOpen.value = true;
 }
 
 function editUnit(unit) {
@@ -320,7 +319,6 @@ function loadActiveIntoEditor() {
     headerObj.timeSignature = h.timeSignature || '';
     headerObj.tempo = h.tempo || 120;
     notes.value = Array.isArray(n) ? n.map((x) => ({ ...x })) : [];
-    previewOpen.value = true;
     // ensure staff preview store is populated
     notesStore.noteArray = notes.value.map((n) => ({ ...n }));
   } else {

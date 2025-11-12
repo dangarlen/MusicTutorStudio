@@ -11,6 +11,7 @@ import Lessons from "../components/Lessons.vue";
 import LessonsManage from "../components/LessonsManage.vue";
 import LessonsCreate from "../components/LessonsCreate.vue";
 import LessonsStart from "../components/LessonsStart.vue";
+import LessonsContinue from "../components/LessonsContinue.vue";
 import CreateExercise from "../components/CreateExercise.vue";
 import CreateLessons from "../components/CreateLessons.vue";
 import About from "../components/About.vue";
@@ -47,6 +48,7 @@ const routes = [
   // Route repointed: use the CreateLessons component at /lessons-create
   { path: "/lessons-create", name: "lessons-create", component: CreateLessons },
   { path: "/lessons-start", name: "lessons-start", component: LessonsStart },
+  { path: "/lessons-continue", name: "lessons-continue", component: LessonsContinue },
   { path: "/preferences", name: "preferences", component: Preferences },
   { path: "/create-scales", name: "create-scales", component: CreateScaleView },
   {

@@ -1,10 +1,16 @@
 // Pinia store for creating/saving Lessons
 import { defineStore } from "pinia";
 import supabase from "../scripts/supabaseClient.js";
+import { usePracticeUnitScaleStore } from './practiceUnitScaleStore';
 
 export const useLessonStore = defineStore("lessonStore", {
   state: () => ({
-    lessonName: "",
+  lessonName: "",
+  // Active lesson runtime flags (set when a lesson is started)
+  activeLessonName: "",
+  activeLessonId: null,
+  lessonActive: false,
+  activeLessonUnit: null, // the practice unit object currently loaded for the lesson
     availableUnits: [], // fetched from Supabase
     availableLessons: [], // user's lessons list
     loading: false,
@@ -281,6 +287,46 @@ export const useLessonStore = defineStore("lessonStore", {
         console.warn("[lessonStore] fetchLessonUnits failed", e);
         throw e;
       }
+    },
+
+    // Activate a lesson by id/name and load a selected practice unit into the
+    // canonical practiceUnitScaleStore so the practice views can render it.
+    // New signature: activateLesson(lessonId, lessonName, unit)
+    activateLesson(lessonId, lessonName, unit) {
+      try {
+        // Basic flexibility: allow older call sites that passed (lessonName, unit)
+        if (typeof lessonId === 'string' && typeof lessonName === 'object' && unit === undefined) {
+          // called as activateLesson(lessonName, unit)
+          unit = lessonName;
+          lessonName = lessonId;
+          lessonId = null;
+        }
+        if (!lessonName || !unit) throw new Error('lessonName and unit required');
+        // Set runtime flags on this store
+        this.activeLessonId = lessonId || null;
+        this.activeLessonName = lessonName;
+        this.lessonActive = true;
+        this.activeLessonUnit = unit;
+
+        // Also load the unit into the shared practiceUnitScaleStore
+        const puStore = usePracticeUnitScaleStore();
+        const unitJson = unit.unit_json || unit;
+        if (unitJson.practiceUnitHeader) {
+          puStore.practiceUnitHeader = { ...puStore.practiceUnitHeader, ...unitJson.practiceUnitHeader };
+        }
+        if (Array.isArray(unitJson.noteArray)) {
+          puStore.noteArray = unitJson.noteArray.map(n => ({ ...n }));
+        }
+      } catch (e) {
+        console.warn('[lessonStore] activateLesson failed', e);
+        throw e;
+      }
+    },
+
+    deactivateLesson() {
+      this.activeLessonName = "";
+      this.lessonActive = false;
+      this.activeLessonUnit = null;
     },
 
     // Replace lesson units for a lesson with provided ordered array of practice_unit_ids

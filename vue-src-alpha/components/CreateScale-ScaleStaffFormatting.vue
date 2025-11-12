@@ -73,6 +73,7 @@
             <input
               type="checkbox"
               v-model="localSelections.staffOptions.accidentals"
+              checked
             />
             Accidentals
             <span

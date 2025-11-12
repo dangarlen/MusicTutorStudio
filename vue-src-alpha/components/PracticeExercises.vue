@@ -132,9 +132,8 @@ function loadUnit(unit) {
       return;
     }
     practiceStore.loadPracticeUnit(unit.unit_json);
-    // Auto-expand the 'Behind the Curtain' JSON viewer so users can inspect
-    // the loaded practice unit immediately.
-    expandJson.value = true;
+  // Do not auto-expand the JSON viewer when loading a unit — keep the
+  // 'Behind the Curtain' section collapsed so users are not surprised.
     alert(`Loaded: ${unit.name}`);
   } catch (e) {
     console.warn("[PracticeExercises] loadUnit exception", e);

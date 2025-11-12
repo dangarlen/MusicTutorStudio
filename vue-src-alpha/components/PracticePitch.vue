@@ -7,6 +7,27 @@
         <span class="text-2xl font-bold">Pitch Practice</span>
       </div>
 
+        <!-- Lesson / Unit header (shows active lesson/unit or indicates none) -->
+        <div class="mb-4">
+          <div v-if="lessonActive" class="mb-4 flex items-center justify-between gap-4">
+            <div class="badge badge-primary">Active lesson: {{ activeLessonName }}</div>
+            <div class="flex-1 text-center">
+              <div v-if="practiceUnitName"
+                class="text-sm text-gray-500 mx-auto max-w-lg truncate overflow-hidden whitespace-nowrap"
+                :title="practiceUnitName"
+              >
+                Unit: {{ practiceUnitName }}
+              </div>
+              <div class="text-xs text-gray-500 mt-1" aria-hidden="true">{{ liveAnnounce }}</div>
+              <div aria-live="polite" class="sr-only">{{ liveAnnounce }}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="btn btn-sm btn-warning" @click="endLesson">End Lesson</button>
+            </div>
+          </div>
+          <div v-else class="mb-4 text-sm text-gray-500">No active lesson or unit.</div>
+        </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Toast stack -->
         <ToastStack :toasts="toasts" @dismiss="dismissToast" />
@@ -211,9 +232,27 @@ import Header from './Header.vue';
 import FooterStandard from './FooterStandard.vue';
 import StaffPreview from './StaffPreview.vue';
 import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore';
+import { useLessonStore } from '../stores/lessonStore.js';
+import useAnnouncer from '../composables/useAnnouncer';
 
 const store = usePracticeUnitScaleStore();
 const testNotes = useTestStaffNoteStore();
+const lesson = useLessonStore();
+const { liveAnnounce, announce } = useAnnouncer();
+
+const activeLessonName = computed(() => lesson.activeLessonName || '');
+const lessonActive = computed(() => !!lesson.lessonActive);
+const practiceUnitName = computed(() => {
+  try {
+    return (
+      store.practiceUnitHeader?.practiceName ||
+      lesson.activeLessonUnit?.name ||
+      ''
+    );
+  } catch (e) {
+    return '';
+  }
+});
 
 const detectedNote = ref('--');
 const detectedFreq = ref(0);
@@ -832,6 +871,21 @@ function renderRangeStaff() {
           circle.setAttribute('cy', String(y));
           circle.setAttribute('rx', '6');
           circle.setAttribute('ry', '4');
+          // draw halo behind note if the corresponding note object indicates it
+          try {
+            const sourceNote = (Array.isArray(store.noteArray) && store.noteArray[i]) ? store.noteArray[i] : null;
+            if (sourceNote && sourceNote.halo) {
+              const halo = document.createElementNS(xmlns, 'ellipse');
+              halo.setAttribute('cx', String(x));
+              halo.setAttribute('cy', String(y));
+              halo.setAttribute('rx', String(10));
+              halo.setAttribute('ry', String(8));
+              halo.setAttribute('fill', String(sourceNote.haloColor || 'yellow'));
+              halo.setAttribute('opacity', '0.28');
+              halo.setAttribute('class', 'mts-note-halo');
+              svg.appendChild(halo);
+            }
+          } catch (e) {}
           circle.setAttribute('fill', '#222');
           circle.setAttribute('stroke', '#222');
           svg.appendChild(circle);
@@ -1041,6 +1095,7 @@ watch(
 let highlightTimer = null;
 let lastHighlightedIdx = null;
 const prevColors = new Map();
+const prevHalos = new Map();
 
 function highlightDetectedNote() {
   try {
@@ -1076,33 +1131,60 @@ function highlightDetectedNote() {
     }
 
   if (bestIdx >= 0) {
-      // apply highlight color (use green for in-tune, or orange if cents large)
-      const color = Math.abs(cents.value || 0) <= 10 ? 'green' : 'orange';
-      // clear previous highlight if different
+      // apply a yellow halo around the detected note while also applying a
+      // temporary tuning color (green/orange). We preserve any existing
+      // noteColor and halo state so both can be restored.
+      const haloColor = 'yellow';
+      const tuneColor = Math.abs(cents.value || 0) <= 10 ? 'green' : 'orange';
+      // clear previous halo and tuning color if different
       if (lastHighlightedIdx != null && lastHighlightedIdx !== bestIdx) {
         try {
-          const prev = prevColors.get(lastHighlightedIdx);
-          if (prev !== undefined && testNotes.noteArray[lastHighlightedIdx]) {
-            testNotes.noteArray[lastHighlightedIdx] = { ...testNotes.noteArray[lastHighlightedIdx], noteColor: prev };
+          const prevH = prevHalos.get(lastHighlightedIdx);
+          if (prevH !== undefined && testNotes.noteArray[lastHighlightedIdx]) {
+            if (prevH && prevH.halo) testNotes.noteArray[lastHighlightedIdx] = { ...testNotes.noteArray[lastHighlightedIdx], halo: prevH.halo, haloColor: prevH.haloColor };
+            else {
+              const copy = { ...testNotes.noteArray[lastHighlightedIdx] };
+              delete copy.halo; delete copy.haloColor;
+              testNotes.noteArray[lastHighlightedIdx] = copy;
+            }
+          }
+          const prevC = prevColors.get(lastHighlightedIdx);
+          if (prevC !== undefined && testNotes.noteArray[lastHighlightedIdx]) {
+            testNotes.noteArray[lastHighlightedIdx] = { ...testNotes.noteArray[lastHighlightedIdx], noteColor: prevC };
           }
         } catch (e) {}
+        prevHalos.delete(lastHighlightedIdx);
         prevColors.delete(lastHighlightedIdx);
       }
 
-      // store previous color so we can restore it
+      // store previous halo and previous noteColor so we can restore them
       try {
+        if (!prevHalos.has(bestIdx)) prevHalos.set(bestIdx, { halo: !!testNotes.noteArray[bestIdx].halo, haloColor: testNotes.noteArray[bestIdx].haloColor || '' });
         if (!prevColors.has(bestIdx)) prevColors.set(bestIdx, testNotes.noteArray[bestIdx].noteColor || '');
-        testNotes.noteArray[bestIdx] = { ...testNotes.noteArray[bestIdx], noteColor: color };
+        testNotes.noteArray[bestIdx] = { ...testNotes.noteArray[bestIdx], halo: true, haloColor, noteColor: tuneColor };
         lastHighlightedIdx = bestIdx;
       } catch (e) {}
 
-      // schedule revert
+      // schedule revert of halo and tuning color (restore both to previous values)
       if (highlightTimer) { clearTimeout(highlightTimer); highlightTimer = null; }
       highlightTimer = setTimeout(() => {
         try {
-          const prev = prevColors.get(bestIdx);
-          if (testNotes.noteArray[bestIdx]) testNotes.noteArray[bestIdx] = { ...testNotes.noteArray[bestIdx], noteColor: prev || '' };
+          const prevH = prevHalos.get(bestIdx);
+          if (testNotes.noteArray[bestIdx]) {
+            if (prevH && prevH.halo) {
+              testNotes.noteArray[bestIdx] = { ...testNotes.noteArray[bestIdx], halo: prevH.halo, haloColor: prevH.haloColor };
+            } else {
+              const copy = { ...testNotes.noteArray[bestIdx] };
+              delete copy.halo; delete copy.haloColor;
+              testNotes.noteArray[bestIdx] = copy;
+            }
+          }
+          const prevC2 = prevColors.get(bestIdx);
+          if (typeof prevC2 !== 'undefined' && testNotes.noteArray[bestIdx]) {
+            testNotes.noteArray[bestIdx] = { ...testNotes.noteArray[bestIdx], noteColor: prevC2 };
+          }
         } catch (e) {}
+        prevHalos.delete(bestIdx);
         prevColors.delete(bestIdx);
         lastHighlightedIdx = null;
         highlightTimer = null;

@@ -18,6 +18,7 @@
                 <button class="btn btn-sm" @click="refresh">Refresh</button>
               </div>
             </div>
+            <div class="text-xs text-gray-600 mt-2">A Lesson is a collection of Practice Units and may include Scales, Exercises, or both — assemble units to build a lesson.</div>
 
             <div v-if="store.lessonsLoading" class="p-4">
               <span class="loading loading-spinner loading-md"></span>

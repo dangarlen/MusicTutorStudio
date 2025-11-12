@@ -44,6 +44,24 @@
             </div>
           </div>
 
+          <div :class="['collapse border rounded', { 'collapse-open': open.faq }]">
+            <div class="collapse-title text-lg font-semibold" role="button" tabindex="0" @click="toggleSection('faq')" @keydown.enter.prevent="toggleSection('faq')" @keydown.space.prevent="toggleSection('faq')">❓ FAQ — Creating an Exercise (from MuseScore)</div>
+            <div class="collapse-content text-sm">
+              <ol class="list-decimal pl-5 space-y-1">
+                <li>Open your MuseScore arrangement.</li>
+                <li>Choose File → Export.</li>
+                <li>Select the parts you want to export.</li>
+                <li>Set Export Settings: <strong>MusicXML | Uncompressed (*.musicxml)</strong>, <em>All Layout</em>.</li>
+                <li>Click Export… then choose a location and click <strong>[Save]</strong> (example filename: <code>_E_TubaXmas_26_Hark_The_Herald_Angles_Sing.musicxml</code>).</li>
+                <li>In the Music Tutor Studio site, navigate to <strong>Create Exercise</strong>.</li>
+                <li>Open the <strong>MusicXML</strong> collapse.</li>
+                <li>Click <strong>[CHOOSE FILE]</strong> and navigate to where the MusicXML file was saved.</li>
+                <li>Select the MusicXML file.</li>
+                <li>Click <strong>OPEN</strong> to upload. The parser will run and a preview appears in the Create Exercise workspace.</li>
+              </ol>
+            </div>
+          </div>
+
           <div :class="['collapse border rounded', { 'collapse-open': open.contributors }]">
             <div class="collapse-title text-lg font-semibold" role="button" tabindex="0" @click="toggleSection('contributors')" @keydown.enter.prevent="toggleSection('contributors')" @keydown.space.prevent="toggleSection('contributors')">🧑‍💻 Contributors</div>
             <div class="collapse-content">
@@ -154,6 +172,7 @@ const tools = ref([]);
 const open = reactive({
   overview: false,
   core: false,
+  faq: false,
   contributors: false,
   programmed: false,
   docs: false,

@@ -556,22 +556,83 @@ function parseMusicXML(xmlText) {
   const notesOut = [];
   if (part) {
     const noteNodes = part.querySelectorAll("measure > note");
-    for (const n of noteNodes) {
-      if (n.querySelector("rest")) return; // skip rests
-      // chord handling: skip secondary chord notes (only take the first in each chord group)
-      if (n.querySelector("chord")) return;
-      const step = n.querySelector("pitch > step")?.textContent?.trim() || "";
-      const alter = Number.parseInt(
-        n.querySelector("pitch > alter")?.textContent?.trim() || "0",
-        10
-      );
-      const octave =
-        n.querySelector("pitch > octave")?.textContent?.trim() || "4";
-      const type = n.querySelector("type")?.textContent?.trim() || "quarter";
-      const spn = toSpn(step, alter, octave);
-      const dots = n.querySelectorAll("dot").length;
-      const dur = typeToToken(type, dots);
-      if (spn && dur) notesOut.push({ pitch: spn, duration: dur });
+    console.log('[CreateExercise] parseMusicXML found noteNodes:', noteNodes.length);
+    // helper: convert spn (C#4) to numeric for pitch comparisons
+    const spnToNumber = (spn) => {
+      if (!spn) return -Infinity;
+      const m = String(spn).match(/^([A-G])([#b]*)(\d+)$/);
+      if (!m) return -Infinity;
+      const letter = m[1];
+      const acc = m[2] || "";
+      const oct = Number.parseInt(m[3], 10);
+      const baseMap = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+      let pc = baseMap[letter] ?? 0;
+      for (const a of acc) {
+        if (a === "#") pc += 1;
+        else if (a === "b") pc -= 1;
+      }
+      return oct * 12 + pc;
+    };
+
+    for (let i = 0; i < noteNodes.length; i++) {
+      const n = noteNodes[i];
+      if (i < 5) console.log('[CreateExercise] note node sample', i, n.outerHTML?.slice(0,200));
+
+      // handle rests: include as rest tokens (duration + 'r') so VexFlow
+      // recognizes them. Use a placeholder pitch consistent with other code.
+      if (n.querySelector("rest")) {
+        const type = n.querySelector("type")?.textContent?.trim() || "quarter";
+        const dots = n.querySelectorAll("dot").length;
+        const dur = typeToToken(type, dots);
+        if (dur) {
+          notesOut.push({ pitch: "B/4", duration: dur + "r" });
+        }
+        continue;
+      }
+
+      // Build a chord group: a base note (no <chord/>) followed by any
+      // consecutive notes that have <chord/>. We'll simplify chords by
+      // selecting the highest pitched member and marking it orange so the
+      // user can spot that a chord was simplified.
+      const chordGroup = [n];
+      let j = i + 1;
+      while (j < noteNodes.length && noteNodes[j].querySelector("chord")) {
+        chordGroup.push(noteNodes[j]);
+        j += 1;
+      }
+      // advance outer loop to skip processed chord members
+      i = j - 1;
+
+      // map chord group to spn/dur objects
+      const mapped = chordGroup
+        .map((node) => {
+          const step = node.querySelector("pitch > step")?.textContent?.trim() || "";
+          const alter = Number.parseInt(
+            node.querySelector("pitch > alter")?.textContent?.trim() || "0",
+            10
+          );
+          const octave = node.querySelector("pitch > octave")?.textContent?.trim() || "4";
+          const type = node.querySelector("type")?.textContent?.trim() || "quarter";
+          const spn = toSpn(step, alter, octave);
+          const dots = node.querySelectorAll("dot").length;
+          const dur = typeToToken(type, dots);
+          return spn && dur ? { spn, dur } : null;
+        })
+        .filter(Boolean);
+
+      if (!mapped.length) continue;
+
+      if (mapped.length === 1) {
+        // single note (not a chord)
+        notesOut.push({ pitch: mapped[0].spn, duration: mapped[0].dur });
+      } else {
+        // Simplify chord: pick highest pitched member
+        let best = mapped[0];
+        for (const mnode of mapped) {
+          if (spnToNumber(mnode.spn) > spnToNumber(best.spn)) best = mnode;
+        }
+        notesOut.push({ pitch: best.spn, duration: best.dur, noteColor: "orange" });
+      }
     }
   }
 
@@ -906,92 +967,6 @@ function saveExercise() {
     console.warn("[CreateExercise] saveExercise failed", e);
     alert("Failed to save exercise.");
   }
-}
-
-function triggerRecallFileDialog() {
-  if (recallFileInput.value) {
-    recallFileInput.value.click();
-  }
-}
-
-function handleRecallFileChange(ev) {
-  const file = ev?.target?.files?.[0];
-  if (!file) return;
-  file
-    .text()
-    .then((text) => {
-      try {
-        const data = JSON.parse(text);
-
-        // Check if unified format (2-section) or legacy (3-section with practiceUnitExercise)
-        if (data.practiceUnitHeader && Array.isArray(data.noteArray)) {
-          const h = data.practiceUnitHeader;
-
-          // Check if legacy format (has practiceUnitExercise section)
-          if (data.practiceUnitExercise) {
-            // Convert legacy to unified
-            const ex = data.practiceUnitExercise;
-            h.contentType = ex.exerciseType || "Passage";
-            h.techniqueFocus = ex.techniqueFocus || [];
-            h.tagSource = ex.tagSource || "user";
-            h.repetitionCount = ex.repetitionCount || 1;
-            h.sourceMusicXML = ex.sourceMusicXML || "";
-            h.instrumentOverride = ex.instrument || "";
-            // Ensure N/A fields are set
-            h.direction = h.direction || "";
-            h.startingOctave = h.startingOctave || "";
-            h.numberOfOctaves = h.numberOfOctaves ?? null;
-            h.rangeStart = h.rangeStart ?? null;
-            h.rangeEnd = h.rangeEnd ?? null;
-            h.composer = h.composer || "";
-            h.sourceWork = h.sourceWork || "";
-            // Remove legacy section
-            delete data.practiceUnitExercise;
-          }
-
-          // Populate stores
-          if (data.noteArray) {
-            store.noteArray = data.noteArray.map((n) => ({ ...n }));
-            testStaffStore.noteArray = data.noteArray.map((n) => ({ ...n }));
-            originalNoteArray.value = data.noteArray.map((n) => ({ ...n }));
-            octaveTranspositionCount.value = 0;
-          }
-
-          importedTitle.value = h.practiceName || "";
-          importedKey.value = h.keySignature || "C";
-          importedTime.value = h.timeSignature || "4/4";
-          musicXmlFileName.value = h.sourceMusicXML || "";
-
-          store.scaleSelections = store.scaleSelections || {};
-          store.scaleSelections.key = importedKey.value;
-          store.scaleSelections.timeSignature = importedTime.value;
-          store.title = importedTitle.value;
-
-          if (h.instrument) {
-            store.instrument = h.instrument;
-          }
-
-          currentPracticeUnit.value = data;
-          seedEditFieldsFromUnit();
-          refreshCurrentUnitJson();
-          exerciseName.value = importedTitle.value || "Recalled Exercise";
-
-          alert(
-            data.practiceUnitExercise
-              ? "Exercise loaded (legacy format converted)"
-              : "Exercise loaded (unified format)"
-          );
-        } else {
-          alert(
-            "Invalid practice unit format. Expected practiceUnitHeader and noteArray."
-          );
-        }
-      } catch (e) {
-        console.warn("[CreateExercise] Recall parse failed", e);
-        alert("Failed to parse recalled JSON file.");
-      }
-    })
-    .catch(() => alert("Failed to read recall file."));
 }
 
 // SAVE to Database (Supabase)

@@ -9,6 +9,31 @@
   <span class="text-2xl">Practice</span>
       </div>
 
+        <!-- Active Lesson Indicator (shows when a lesson is active) -->
+        <div v-if="lessonActive" class="mb-4 flex items-center justify-between gap-4">
+          <!-- Left: Active lesson badge -->
+          <div class="flex items-center gap-3">
+            <div class="badge badge-primary">Active lesson: {{ activeLessonName }}</div>
+          </div>
+
+          <!-- Center: Active Unit / live announcement (centered) -->
+          <div class="flex-1 text-center">
+            <div v-if="practiceUnitName"
+              class="text-sm text-gray-500 mx-auto max-w-lg truncate overflow-hidden whitespace-nowrap"
+              :title="practiceUnitName"
+            >
+              Unit: {{ practiceUnitName }}
+            </div>
+            <div class="text-xs text-gray-500 mt-1" aria-hidden="true">{{ liveAnnounce }}</div>
+            <div aria-live="polite" class="sr-only">{{ liveAnnounce }}</div>
+          </div>
+
+          <!-- Right: End Lesson button -->
+          <div class="flex items-center gap-2">
+            <button class="btn btn-sm btn-warning" @click="endLesson">End Lesson</button>
+          </div>
+        </div>
+
       <!-- Scale Preview START -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
@@ -218,25 +243,72 @@
             >{{ JSON.stringify(practiceUnitPreview, null, 2) }}</pre
           >
         </div>
-      </div>
+  </div>
 
-      <PracticeReturn />
+  <!-- aria-live region for lesson announcements -->
+  <div aria-live="polite" class="sr-only">{{ liveAnnounce }}</div>
+
+  <!-- Practice action row: Pitch Practice | Return to Practice | Continue Lesson (conditional) -->
+  <div class="flex items-center justify-center gap-4 mt-6">
+    <RouterLink to="/practice-pitch" class="mtsFormatPracticeButtons">
+      <span class="material-symbols-outlined" aria-hidden="true">hearing</span>
+      Pitch Practice
+    </RouterLink>
+
+    <RouterLink to="/practice" class="mtsFormatPracticeButtons">
+      <span class="material-symbols-outlined align-middle mr-2" aria-hidden="true">music_note</span>
+      Return to Practice
+    </RouterLink>
+
+    <RouterLink
+      v-if="lessonActive"
+      :to="{ path: '/lessons-start', query: { openLessonId: activeLessonId } }"
+      class="mtsFormatPracticeButtons"
+    >
+      <span class="material-symbols-outlined" aria-hidden="true">skip_next</span>
+      Continue Lesson
+    </RouterLink>
+  </div>
     </main>
     <FooterStandard />
   </div>
 </template>
 <script setup>
-import PracticeReturn from "./PracticeReturn.vue";
+import { RouterLink } from "vue-router";
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import StaffPreview from "./StaffPreview.vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
+import { useLessonStore } from "../stores/lessonStore.js";
 import { computed, onMounted, reactive, watch, ref } from "vue";
+import useAnnouncer from "../composables/useAnnouncer";
 import { composePracticeUnit } from "../scripts/composePracticeUnit";
 
 const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
+const lesson = useLessonStore();
+const activeLessonName = computed(() => lesson.activeLessonName || '');
+const lessonActive = computed(() => !!lesson.lessonActive);
+const activeLessonId = computed(() => lesson.activeLessonId || null);
+const { liveAnnounce, announce } = useAnnouncer();
+const practiceUnitName = computed(() => {
+  try {
+    return (
+      store.practiceUnitHeader?.practiceName ||
+      lesson.activeLessonUnit?.name ||
+      (store.practiceUnitHeader && store.practiceUnitHeader.practiceName) ||
+      ""
+    );
+  } catch (e) {
+    return "";
+  }
+});
+
+function endLesson() {
+  lesson.deactivateLesson();
+  announce('Lesson ended');
+}
 onMounted(async () => {
   await store.loadInstruments();
   // Ensure note arrays exist and initial sync for StaffPreview rendering
@@ -425,12 +497,12 @@ watch(
       store.noteArray = [];
       return;
     }
-    // Initialize test store if empty (do not overwrite user edits once present)
-    if (
-      !Array.isArray(testStaffStore.noteArray) ||
-      testStaffStore.noteArray.length === 0
-    ) {
-      testStaffStore.noteArray = arr.map((n) => ({ ...n }));
+    // Always mirror the canonical noteArray into the test staff store so
+    // the StaffPreview and the human-readable preview text remain in sync.
+    try {
+      testStaffStore.noteArray = Array.isArray(arr) ? arr.map((n) => ({ ...n })) : [];
+    } catch (e) {
+      testStaffStore.noteArray = [];
     }
   },
   { deep: true, immediate: true }
