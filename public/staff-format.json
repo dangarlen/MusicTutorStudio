@@ -2,11 +2,11 @@
   "staff": {
     "x": 10,
     "y": 60,
-    "width": 500,
+    "width": 650,
     "height": 200,
     "clef": "treble",
     "backgroundColor": "#f3f4f6",
-    "containerPadding": 10,
+    "containerPadding": 12,
     "containerBorderRadius": 12,
     "containerShadow": "0 2px 8px 0 rgba(0,0,0,0.07)",
     "verticalCenter": false,
@@ -16,7 +16,10 @@
       "below": 3
     },
     "noteSpacing": {
-      "mode": "default"
+      "mode": "default",
+      "pixelsPerNote": 65,
+      "minSpacing": 45,
+      "maxSpacing": 100
     }
   },
   "noteColors": ["black", "blue", "orange", "green"]

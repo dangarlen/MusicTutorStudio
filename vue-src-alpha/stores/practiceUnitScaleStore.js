@@ -44,6 +44,10 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
     title: "Create Scale",
     instruments: [],
     scaleSelections: null, // Deprecated; migrate to practiceUnitHeader fields
+    // Quick practice session tracking
+    recentlyPracticed: [], // Array of practice units for quick access
+    hasUnsavedChanges: false, // Track if current unit differs from saved state
+    lastSavedSnapshot: null // Snapshot of last saved state for comparison
   }),
   actions: {
     async loadInstruments() {
@@ -119,6 +123,25 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
       if (Array.isArray(unit.noteArray)) {
         this.noteArray = unit.noteArray.map((n) => ({ ...n }));
       }
+      // Update tracking
+      this.hasUnsavedChanges = false;
+      this.lastSavedSnapshot = JSON.stringify(this.composePracticeUnit());
+    },
+    // Quick practice session management
+    activateForPractice(unit, mode = 'quick') {
+      this.loadPracticeUnit(unit);
+      // Add to recently practiced (keep last 10)
+      const existing = this.recentlyPracticed.findIndex(u => u.practiceUnitId === unit.practiceUnitHeader?.practiceUnitId);
+      if (existing >= 0) this.recentlyPracticed.splice(existing, 1);
+      this.recentlyPracticed.unshift({ ...unit, practicedAt: new Date().toISOString(), mode });
+      if (this.recentlyPracticed.length > 10) this.recentlyPracticed.pop();
+    },
+    markAsChanged() {
+      this.hasUnsavedChanges = true;
+    },
+    checkForUnsavedChanges() {
+      const current = JSON.stringify(this.composePracticeUnit());
+      return current !== this.lastSavedSnapshot;
     },
   },
 });

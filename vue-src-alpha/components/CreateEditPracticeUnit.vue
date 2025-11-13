@@ -56,7 +56,7 @@
       </div>
 
       <!-- Your Saved Practice Units (edit icon) -->
-      <div class="max-w-2xl mx-auto mb-4">
+      <div class="max-w-4xl mx-auto mb-4">
         <div class="card bg-base-100 shadow-sm">
           <div class="card-body">
             <h3 class="card-title">Your Saved Practice Units</h3>
@@ -97,7 +97,7 @@
       </div>
 
       <!-- Edit Panel: structured header + noteArray editor -->
-      <div v-if="showEditPanel" class="max-w-3xl mx-auto mb-6">
+      <div v-if="showEditPanel" class="max-w-4xl mx-auto mb-6">
         <div class="card bg-base-100 shadow-sm">
           <div class="card-body">
             <div class="flex items-center justify-between">
@@ -165,7 +165,7 @@
     </main>
 
       <!-- Behind the Curtain: practiceUnit.json -->
-      <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-6 rounded-xl max-w-3xl mx-auto">
+      <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-6 rounded-xl max-w-4xl mx-auto">
         <input type="checkbox" class="peer" />
         <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">Behind the Curtain: practiceUnit.json</div>
         <div class="collapse-content px-4 pb-4">

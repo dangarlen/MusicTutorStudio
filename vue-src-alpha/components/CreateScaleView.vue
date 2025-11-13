@@ -77,7 +77,30 @@
         </div>
       </div>
     </main>
-    <div style="max-width: 400px; margin: 2em auto">
+    <div class="flex flex-col gap-4" style="max-width: 400px; margin: 2em auto">
+      <!-- Practice Now Section -->
+      <div class="border-2 border-dashed border-blue-300 p-4 rounded-lg bg-blue-50">
+        <h3 class="font-semibold text-blue-800 mb-2">🎵 Quick Practice</h3>
+        <div class="text-sm text-blue-600 mb-3">
+          Test your scale immediately without saving to a lesson
+        </div>
+        <button
+          class="btn btn-primary w-full mb-2"
+          @click="practiceNow"
+          :disabled="!store.practiceUnitHeader.instrument"
+        >
+          <span class="material-symbols-outlined mr-2">play_circle</span>
+          Practice This Scale Now
+        </button>
+        <div v-if="!store.practiceUnitHeader.instrument" class="text-xs text-orange-600">
+          Please select an instrument first
+        </div>
+        <div class="text-xs text-gray-500">
+          {{ hasUnsavedChanges ? '⚠️ Unsaved changes' : '✅ Current version' }}
+        </div>
+      </div>
+      
+      <!-- Navigation -->
       <button
         class="mtsFormatCreatorButtons flex items-center gap-2"
         @click="$router.push('/creator')"
@@ -95,6 +118,23 @@
 </template>
 
 <script setup>
+import { ref, watch, onMounted, reactive, computed } from "vue";
+import { useRouter } from 'vue-router';
+import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
+import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
+import supabase from "../scripts/supabaseClient.js";
+import Header from "./Header.vue";
+import FooterStandard from "./FooterStandard.vue";
+import InstrumentDropdown from "./InstrumentDropdown.vue";
+import StaffPreview from "./StaffPreview.vue";
+import CreateScaleScaleSelector from "./CreateScale-ScaleSelector.vue";
+import CreateScaleScaleRange from "./CreateScale-ScaleRange.vue";
+import CreateScaleScaleDurationDirection from "./CreateScale-ScaleDurationDirection.vue";
+import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
+const store = usePracticeUnitScaleStore();
+const router = useRouter();
+const testStaffStore = useTestStaffNoteStore();
+
 // --- Copy Scale SPN to clipboard ---
 function copyScaleSPN() {
   console.log("function copyScaleSPN called.");
@@ -120,11 +160,6 @@ function copyScaleSPN() {
     alert("No scale generated to copy.");
   }
 }
-
-import { ref, watch, onMounted, reactive, computed } from "vue";
-import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
-import supabase from "../scripts/supabaseClient.js";
-const store = usePracticeUnitScaleStore();
 
 // State for recall modal
 const showRecallModal = ref(false);
@@ -782,15 +817,7 @@ async function handleRecallFileChange(event) {
     alert("Error loading file: " + err.message);
   }
 }
-import Header from "./Header.vue";
-import FooterStandard from "./FooterStandard.vue";
-import InstrumentDropdown from "./InstrumentDropdown.vue";
-import StaffPreview from "./StaffPreview.vue";
-import CreateScaleScaleSelector from "./CreateScale-ScaleSelector.vue";
-import CreateScaleScaleRange from "./CreateScale-ScaleRange.vue";
-import CreateScaleScaleDurationDirection from "./CreateScale-ScaleDurationDirection.vue";
-import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
-import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
+
 // Defensive: ensure scaleSelections is always initialized before watcher
 if (!store.scaleSelections) {
   store.scaleSelections = reactive({
@@ -1229,6 +1256,129 @@ function getCookie(key) {
     if (p.startsWith(prefix)) return decodeURIComponent(p.slice(prefix.length));
   }
   return "";
+}
+
+// Practice Now functionality
+const hasUnsavedChanges = computed(() => {
+  try {
+    return store.checkForUnsavedChanges();
+  } catch (e) {
+    return false;
+  }
+});
+
+async function practiceNow() {
+  try {
+    console.log('practiceNow called');
+    console.log('Store state:', store);
+    console.log('Store scaleSelections:', store.scaleSelections);
+    console.log('Store practiceUnitHeader:', store.practiceUnitHeader);
+    
+    // Initialize scaleSelections if not present
+    if (!store.scaleSelections) {
+      console.log('Initializing scaleSelections');
+      // Use the existing reactive pattern from the file
+      store.scaleSelections = reactive({
+        key: store.practiceUnitHeader.keySignature || "C",
+        scaleType: store.practiceUnitHeader.contentType || "Major",
+        startingOctave: store.practiceUnitHeader.startingOctave || "C4",
+        octaveCount: store.practiceUnitHeader.numberOfOctaves || 1,
+        direction: store.practiceUnitHeader.direction || "ascending",
+        noteDuration: "quarter",
+        timeSignature: "4/4",
+      });
+    }
+    
+    // Check if we have scale selections
+    const sel = store.scaleSelections;
+    if (!sel || !store.practiceUnitHeader.instrument) {
+      alert('Please select an instrument and configure the scale first.');
+      return;
+    }
+    
+    console.log('Scale selections:', sel);
+    console.log('Instrument:', store.practiceUnitHeader.instrument);
+    
+    // Generate scale with current settings (reuse logic from saveScale)
+    const key = sel.key || "C";
+    const scaleType = sel.scaleType || "major";
+    const startingOctave = sel.startingOctave || "C4";
+    const octaveCount = sel.octaveCount || 1;
+    const direction = sel.direction || "Ascending";
+    const noteDuration = sel.noteDuration || "quarter";
+    
+    console.log('Scale params:', { key, scaleType, startingOctave, octaveCount, direction, noteDuration });
+    
+    // Clear and regenerate noteArray
+    store.noteArray = [];
+    
+    // Build scale (simplified version)
+    const scaleIntervals = {
+      major: [2, 2, 1, 2, 2, 2, 1],
+      minor: [2, 1, 2, 2, 1, 2, 2],
+      chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    };
+    
+    let intervals = scaleIntervals[scaleType] || scaleIntervals["major"];
+    let startMidi = spnToMidi(startingOctave);
+    let scaleNotes = [startMidi];
+    
+    for (let o = 0; o < octaveCount; ++o) {
+      let midi = o === 0 ? startMidi : scaleNotes[scaleNotes.length - 1] + intervals[intervals.length - 1];
+      for (let i = 0; i < intervals.length; ++i) {
+        midi += intervals[i];
+        scaleNotes.push(midi);
+      }
+    }
+    
+    scaleNotes = scaleNotes.slice(0, octaveCount * 7 + 1);
+    if (direction.toLowerCase().startsWith("desc")) scaleNotes = scaleNotes.slice().reverse();
+    
+    const durationMap = { quarter: "q", eighth: "e", half: "h", whole: "w" };
+    const generatedNotes = scaleNotes.map((midi) => {
+      const spn = midiToSpn(midi).replace("/", "");
+      return {
+        pitch: spn,
+        duration: durationMap[noteDuration] || "q",
+        noteVisible: true,
+        noteColor: "black",
+        overlay: "",
+        overlayObject: {},
+        rangeStatus: "within",
+      };
+    });
+    
+    store.noteArray = generatedNotes;
+    console.log('Generated notes:', generatedNotes);
+    
+    // Update header for quick practice
+    const defaultName = scaleName.value || buildDefaultScaleName();
+    store.practiceUnitHeader.practiceName = defaultName + " (Quick Practice)";
+    store.practiceUnitHeader.practiceUnitId = "quick-" + Date.now();
+    store.practiceUnitHeader.lastModified = new Date().toISOString();
+    store.practiceUnitHeader.practiceUnitType = "Scale";
+    
+    // Activate for practice
+    const practiceUnit = store.composePracticeUnit();
+    console.log('Composed practice unit:', practiceUnit);
+    
+    store.activateForPractice(practiceUnit, 'quick');
+    console.log('Activated for practice, navigating to /practice-scales');
+    
+    // Navigate to practice
+    console.log('About to navigate to /practice-active-unit');
+    try {
+      await router.push('/practice-active-unit');
+      console.log('Navigation completed');
+    } catch (navError) {
+      console.error('Navigation failed:', navError);
+      // Fallback: try window location
+      window.location.href = '/#/practice-active-unit';
+    }
+  } catch (e) {
+    console.error('Practice Now failed:', e);
+    alert('Failed to start quick practice. Error: ' + e.message + '. Check console for details.');
+  }
 }
 
 // SAVE to Database (Supabase)

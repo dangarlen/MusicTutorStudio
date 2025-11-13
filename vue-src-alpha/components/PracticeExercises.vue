@@ -10,7 +10,7 @@
       </div>
 
       <!-- Your Saved Practice Units (load into active memory) -->
-      <div class="max-w-2xl mx-auto mb-4">
+      <div class="max-w-4xl mx-auto mb-4">
         <div class="card bg-base-100 shadow-sm">
           <div class="card-body">
             <h3 class="card-title">Your Saved Practice Units</h3>
@@ -62,7 +62,7 @@
       </div>
 
       <!-- Behind the Curtain: show active practiceUnit JSON -->
-      <div class="max-w-2xl mx-auto mt-4">
+      <div class="max-w-4xl mx-auto mt-4">
         <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mt-4 rounded-xl">
           <input type="checkbox" class="peer" v-model="expandJson" />
           <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center">

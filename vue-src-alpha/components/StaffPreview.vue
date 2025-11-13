@@ -263,9 +263,20 @@ async function renderVexFlow() {
       if (clefName === 'bass') refMidi = 52;
       else if (clefName === 'alto') refMidi = 60;
       const centerY = top + 2 * spacing;
-      const leftPad = 10;
-      const availableW = Math.max(40, w - leftPad - 10);
-      const stepX = availableW / Math.max(1, noteObjs.length);
+      const leftPad = 15;
+      const rightPad = 15;
+      const availableW = Math.max(60, w - leftPad - rightPad);
+      // Use improved spacing algorithm: minimum spacing with gentle scaling
+      const minSpacing = 45;
+      const maxSpacing = 100;
+      let stepX = availableW / Math.max(1, noteObjs.length);
+      // Clamp to reasonable spacing bounds
+      stepX = Math.max(minSpacing, Math.min(maxSpacing, stepX));
+      // If notes would overflow, adjust available width
+      const totalWidth = (noteObjs.length - 1) * stepX;
+      if (totalWidth > availableW) {
+        stepX = availableW / Math.max(1, noteObjs.length - 1);
+      }
       function keyToMidi(key) {
         const m = String(key).match(/^([a-g])(#|b)?\/(\d+)$/i);
         if (!m) return 60;
@@ -334,8 +345,8 @@ async function renderVexFlow() {
     return;
   }
 
-  const width = staffFormat.staff.width ?? 560;
-  let height = staffFormat.staff.height ?? 160;
+  const width = staffFormat.staff.width ?? 650;
+  let height = staffFormat.staff.height ?? 200;
   const renderer = new VF.Renderer(vfContainer.value, VF.Renderer.Backends.SVG);
   renderer.resize(width, height);
   const context = renderer.getContext();
@@ -407,7 +418,7 @@ async function renderVexFlow() {
   if (!arr.length) {
     try {
       const renderer = new VF.Renderer(vfContainer.value, VF.Renderer.Backends.SVG);
-      const width = staffFormat.staff.width ?? 560;
+      const width = staffFormat.staff.width ?? 650;
       const height = staffFormat.staff.height ?? 160;
       renderer.resize(width, height);
       const context = renderer.getContext();
@@ -610,12 +621,18 @@ async function renderVexFlow() {
           ? stave.getX() + stave.getWidth() - 12
           : left + Math.max(0, availableWidth - 12);
       const innerWidth = Math.max(10, right - left);
-      let step = Number(staffFormat.staff?.noteSpacing?.pixelsPerNote ?? 50);
-      if (!Number.isFinite(step) || step <= 0) step = 50;
-      // If the sequence would exceed the available width, optionally clamp step to fit (keeps fixed look while avoiding overflow)
+      let step = Number(staffFormat.staff?.noteSpacing?.pixelsPerNote ?? 65);
+      if (!Number.isFinite(step) || step <= 0) step = 65;
+      
+      // Apply spacing bounds from configuration
+      const minSpacing = Number(staffFormat.staff?.noteSpacing?.minSpacing ?? 45);
+      const maxSpacing = Number(staffFormat.staff?.noteSpacing?.maxSpacing ?? 100);
+      step = Math.max(minSpacing, Math.min(maxSpacing, step));
+      
+      // If the sequence would exceed the available width, scale down gracefully
       const needed = step * (vfNotes.length - 1);
-      if (needed > innerWidth) {
-        step = innerWidth / Math.max(1, vfNotes.length - 1);
+      if (needed > innerWidth && vfNotes.length > 1) {
+        step = Math.max(minSpacing, innerWidth / (vfNotes.length - 1));
       }
       // Create tick contexts, then override x positions
       formatter.format([voice], availableWidth);

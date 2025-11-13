@@ -25,7 +25,11 @@
               <button class="btn btn-sm btn-warning" @click="endLesson">End Lesson</button>
             </div>
           </div>
-          <div v-else class="mb-4 text-sm text-gray-500">No active lesson or unit.</div>
+          <div v-else-if="!practiceUnitName" class="mb-4 text-sm text-gray-500">No active lesson or unit.</div>
+          <div v-else class="mb-4 text-center">
+            <div class="badge badge-success">Quick Practice Mode</div>
+            <div class="text-sm text-gray-500 mt-1">{{ practiceUnitName }}</div>
+          </div>
         </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -46,6 +50,18 @@
                 <div class="text-4xl font-bold">{{ detectedNote }}</div>
                 <div class="text-sm text-gray-600">{{ fmtFreq(detectedFreq) }} Hz • {{ centsDisplay() }}</div>
               </div>
+            </div>
+          </div>
+
+          <div class="mt-4 collapse collapse-arrow border bg-base-100">
+            <input type="checkbox" />
+            <div class="collapse-title cursor-pointer font-semibold">🎹 Virtual Keyboard (Testing)</div>
+            <div class="collapse-content mt-3">
+              <div class="text-sm text-gray-600 mb-3">Simulate tone input for testing pitch detection</div>
+              <VirtualKeyboard 
+                :on-tone-start="simulateToneInput"
+                :on-tone-stop="stopSimulatedTone"
+              />
             </div>
           </div>
 
@@ -231,6 +247,7 @@ import ToastStack from './ToastStack.vue';
 import Header from './Header.vue';
 import FooterStandard from './FooterStandard.vue';
 import StaffPreview from './StaffPreview.vue';
+import VirtualKeyboard from './VirtualKeyboard.vue';
 import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore';
 import { useLessonStore } from '../stores/lessonStore.js';
 import useAnnouncer from '../composables/useAnnouncer';
@@ -646,6 +663,30 @@ function freqToMidi(freq) {
   return 69 + 12 * Math.log2(freq / a4.value);
 }
 
+// Virtual keyboard simulation functions
+function simulateToneInput(toneData) {
+  // Directly set the detected values to simulate microphone input
+  detectedFreq.value = toneData.frequency;
+  detectedNote.value = toneData.note;
+  
+  // Calculate cents for display
+  const nearestMidi = Math.round(toneData.midi);
+  const nearestFreq = midiToFreq(nearestMidi);
+  const centsOff = 1200 * Math.log2(toneData.frequency / nearestFreq);
+  cents.value = centsOff;
+  
+  console.log(`[VirtualKeyboard] Simulating tone: ${toneData.note} @ ${toneData.frequency.toFixed(1)}Hz (${centsOff.toFixed(1)} cents)`);
+}
+
+function stopSimulatedTone() {
+  // Reset to no-detection state
+  detectedFreq.value = 0;
+  detectedNote.value = '--';
+  cents.value = 0;
+  
+  console.log('[VirtualKeyboard] Stopped simulated tone');
+}
+
 function quantizeDuration(durationSec, bpmVal) {
   if (!bpmVal) return null;
   const quarterSec = 60 / bpmVal;
@@ -856,10 +897,21 @@ function renderRangeStaff() {
 
         const centerY = top + 2 * spacing; // middle line
 
-        // draw notes spaced horizontally
-        const leftPad = 30;
-        const availableW = Math.max(40, w - leftPad - 10);
-        const stepX = availableW / Math.max(1, noteObjs.length);
+        // draw notes spaced horizontally with improved spacing
+        const leftPad = 35;
+        const rightPad = 15;
+        const availableW = Math.max(60, w - leftPad - rightPad);
+        // Use improved spacing algorithm: minimum spacing with gentle scaling
+        const minSpacing = 45;
+        const maxSpacing = 100;
+        let stepX = availableW / Math.max(1, noteObjs.length);
+        // Clamp to reasonable spacing bounds
+        stepX = Math.max(minSpacing, Math.min(maxSpacing, stepX));
+        // If notes would overflow, adjust spacing
+        const totalWidth = (noteObjs.length - 1) * stepX;
+        if (totalWidth > availableW && noteObjs.length > 1) {
+          stepX = availableW / Math.max(1, noteObjs.length - 1);
+        }
         for (let i = 0; i < noteObjs.length; i++) {
           const it = noteObjs[i];
           const midi = noteObjToMidi(it);

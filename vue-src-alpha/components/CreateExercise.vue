@@ -9,7 +9,7 @@
         <span class="text-2xl font-bold">Create Exercise</span>
       </div>
 
-      <div class="max-w-3xl mx-auto mb-4">
+      <div class="max-w-4xl mx-auto mb-4">
         <AuthStatusBanner />
       </div>
       <!-- Preview -->
@@ -312,6 +312,27 @@
         </div>
       </div>
 
+      <!-- Practice Now Section -->
+      <div class="max-w-md mx-auto mb-6">
+        <div class="border-2 border-dashed border-blue-300 p-4 rounded-lg bg-blue-50">
+          <h3 class="font-semibold text-blue-800 mb-2">🎵 Quick Practice</h3>
+          <div class="text-sm text-blue-600 mb-3">
+            Test your exercise immediately without saving to a lesson
+          </div>
+          <button
+            class="btn btn-primary w-full mb-2"
+            @click="practiceNow"
+            :disabled="!store.noteArray || store.noteArray.length === 0"
+          >
+            <span class="material-symbols-outlined mr-2">play_circle</span>
+            Practice This Exercise Now
+          </button>
+          <div class="text-xs text-gray-500">
+            {{ store.noteArray?.length || 0 }} notes ready
+          </div>
+        </div>
+      </div>
+
       <CreatorReturn />
     </main>
     <FooterStandard />
@@ -326,6 +347,7 @@ import AuthStatusBanner from "./AuthStatusBanner.vue";
 import InstrumentDropdown from "./InstrumentDropdown.vue";
 import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
 import { ref, computed, reactive, onMounted } from "vue";
+import { useRouter } from 'vue-router';
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
 import supabase from "../scripts/supabaseClient.js";
@@ -333,6 +355,49 @@ import supabase from "../scripts/supabaseClient.js";
 
 const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
+const router = useRouter();
+
+// Practice Now functionality
+async function practiceNow() {
+  try {
+    console.log('CreateExercise practiceNow called');
+    console.log('Current noteArray:', store.noteArray);
+    if (!store.noteArray || store.noteArray.length === 0) {
+      alert('Please import or create some notes first.');
+      return;
+    }
+    
+    if (!store.practiceUnitHeader.instrument) {
+      alert('Please select an instrument first.');
+      return;
+    }
+    
+    // Update header for quick practice
+    const exerciseName = store.practiceUnitHeader.practiceName || 'Exercise';
+    store.practiceUnitHeader.practiceName = exerciseName + ' (Quick Practice)';
+    store.practiceUnitHeader.practiceUnitId = 'quick-' + Date.now();
+    store.practiceUnitHeader.lastModified = new Date().toISOString();
+    store.practiceUnitHeader.practiceUnitType = 'Exercise';
+    
+    // Activate for practice
+    const practiceUnit = store.composePracticeUnit();
+    store.activateForPractice(practiceUnit, 'quick');
+    
+    // Navigate to practice
+    console.log('About to navigate to /practice-active-unit');
+    try {
+      await router.push('/practice-active-unit');
+      console.log('Navigation completed');
+    } catch (navError) {
+      console.error('Navigation failed:', navError);
+      // Fallback: try window location
+      window.location.href = '/#/practice-active-unit';
+    }
+  } catch (e) {
+    console.error('Practice Now failed:', e);
+    alert('Failed to start quick practice. Error: ' + e.message + '. Check console for details.');
+  }
+}
 
 // Initialize scaleSelections if not present (needed for Staff Formatting component)
 if (!store.scaleSelections) {

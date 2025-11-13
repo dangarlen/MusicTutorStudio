@@ -26,7 +26,11 @@
             <button class="btn btn-sm btn-warning" @click="endLesson">End Lesson</button>
           </div>
         </div>
-        <div v-else class="mb-4 text-sm text-gray-500">No active lesson or unit.</div>
+        <div v-else-if="!practiceUnitName" class="mb-4 text-sm text-gray-500">No active lesson or unit.</div>
+        <div v-else class="mb-4 text-center">
+          <div class="badge badge-success">Quick Practice Mode</div>
+          <div class="text-sm text-gray-500 mt-1">{{ practiceUnitName }}</div>
+        </div>
       </div>
       <div
         class="flex flex-col gap-6 max-w-xs mx-auto mt-8"
