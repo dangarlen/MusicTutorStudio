@@ -23,7 +23,7 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
       User: "", // Supabase user id (or other user identifier)
       shareMusic: false, // true = Share; false = Personal Use ONLY
       // Scale-specific unified fields
-      contentType: "Major", // scaleType: Major/Minor/Chromatic
+      contentType: "major", // scaleType: Major/Minor/Chromatic
       direction: "ascending",
       startingOctave: "C4",
       numberOfOctaves: 1,

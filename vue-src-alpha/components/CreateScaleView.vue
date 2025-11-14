@@ -224,7 +224,7 @@ async function insertNewPracticeUnit(row) {
 if (!store.scaleSelections) {
   store.scaleSelections = reactive({
     key: store.practiceUnitHeader.keySignature || "C",
-    scaleType: store.practiceUnitHeader.contentType || "Major",
+    scaleType: store.practiceUnitHeader.contentType || "major",
     startingOctave:
       store.practiceUnitHeader.startingOctave ||
       (store.practiceUnitHeader.instrument &&
@@ -1302,12 +1302,16 @@ async function practiceNow() {
     // Generate scale with current settings (reuse logic from saveScale)
     const key = sel.key || "C";
     const scaleType = sel.scaleType || "major";
-    const startingOctave = sel.startingOctave || "C4";
+    const octaveSetting = sel.startingOctave || "C4";
     const octaveCount = sel.octaveCount || 1;
     const direction = sel.direction || "Ascending";
     const noteDuration = sel.noteDuration || "quarter";
     
-    console.log('Scale params:', { key, scaleType, startingOctave, octaveCount, direction, noteDuration });
+    // Extract octave number from octaveSetting and combine with selected key
+    const octaveNum = octaveSetting.replace(/[^0-9]/g, '') || "4";
+    const startingNote = key + octaveNum;
+    
+    console.log('Scale params:', { key, scaleType, octaveSetting, startingNote, octaveCount, direction, noteDuration });
     
     // Clear and regenerate noteArray
     store.noteArray = [];
@@ -1320,7 +1324,7 @@ async function practiceNow() {
     };
     
     let intervals = scaleIntervals[scaleType] || scaleIntervals["major"];
-    let startMidi = spnToMidi(startingOctave);
+    let startMidi = spnToMidi(startingNote);
     let scaleNotes = [startMidi];
     
     for (let o = 0; o < octaveCount; ++o) {
@@ -1357,6 +1361,17 @@ async function practiceNow() {
     store.practiceUnitHeader.practiceUnitId = "quick-" + Date.now();
     store.practiceUnitHeader.lastModified = new Date().toISOString();
     store.practiceUnitHeader.practiceUnitType = "Scale";
+    store.practiceUnitHeader.keySignature = key;
+    
+    // Update scale metadata to match what was actually generated
+    store.scaleSelections = {
+      ...store.scaleSelections,
+      key: key,
+      scaleType: scaleType,
+      startingOctave: startingNote,
+      octaveCount: octaveCount,
+      direction: direction
+    };
     
     // Activate for practice
     const practiceUnit = store.composePracticeUnit();
@@ -1617,5 +1632,15 @@ onMounted(async () => {
       if (match) store.practiceUnitHeader.instrument = match;
     }
   } catch {}
+  
+  // Fallback: If still no instrument, select the first available one
+  if (
+    !store.practiceUnitHeader.instrument &&
+    Array.isArray(store.instruments) &&
+    store.instruments.length > 0
+  ) {
+    console.log('[CreateScaleView] No instrument selected, using first available:', store.instruments[0].instrument);
+    store.practiceUnitHeader.instrument = store.instruments[0];
+  }
 });
 </script>

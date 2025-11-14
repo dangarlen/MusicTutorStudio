@@ -34,6 +34,32 @@
           </div>
         </div>
 
+        <!-- Quick Practice Mode (shows when no lesson is active but practice unit is loaded) -->
+        <div v-else-if="!lessonActive && practiceUnitName" class="mb-4">
+          <div class="p-3 bg-blue-50 rounded-lg border-2 border-dashed border-blue-300 text-center">
+            <div class="flex items-center justify-center gap-2 mb-2">
+              <div class="badge badge-info">Preview Practice</div>
+              <div class="tooltip tooltip-bottom" data-tip="You're testing this content without saving it to a lesson. Create a lesson to track progress and organize practice units.">
+                <span class="material-symbols-outlined text-blue-600 text-sm cursor-help">help</span>
+              </div>
+            </div>
+            <div class="text-sm text-blue-700">
+              Testing without saving to lesson
+            </div>
+            <div class="text-sm text-gray-600 mt-1 font-medium">{{ practiceUnitName }}</div>
+            
+            <!-- Save suggestion -->
+            <div class="flex gap-2 mt-3 justify-center">
+              <button class="btn btn-xs btn-primary" @click="navigateToSave">
+                💾 Save This Practice Unit
+              </button>
+              <button class="btn btn-xs btn-outline" @click="exitQuickPractice">
+                ← Back to Creator
+              </button>
+            </div>
+          </div>
+        </div>
+
       <!-- Scale Preview START -->
       <div
         class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
@@ -274,7 +300,7 @@
   </div>
 </template>
 <script setup>
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import StaffPreview from "./StaffPreview.vue";
@@ -288,6 +314,7 @@ import { composePracticeUnit } from "../scripts/composePracticeUnit";
 const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
 const lesson = useLessonStore();
+const router = useRouter();
 const activeLessonName = computed(() => lesson.activeLessonName || '');
 const lessonActive = computed(() => !!lesson.lessonActive);
 const activeLessonId = computed(() => lesson.activeLessonId || null);
@@ -308,6 +335,14 @@ const practiceUnitName = computed(() => {
 function endLesson() {
   lesson.deactivateLesson();
   announce('Lesson ended');
+}
+
+function navigateToSave() {
+  router.push('/create-practice-unit-view?from=save');
+}
+
+function exitQuickPractice() {
+  router.push('/creator');
 }
 onMounted(async () => {
   await store.loadInstruments();
@@ -610,7 +645,7 @@ const staffFormattingText = computed(() => {
 const practiceUnitPreview = computed(() =>
   composePracticeUnit({
     scaleStore: store,
-    notesStore: testStaffStore,
+    notesStore: store,  // Use store instead of testStaffStore to get the correct noteArray
     name: "Practice Scale",
   })
 );

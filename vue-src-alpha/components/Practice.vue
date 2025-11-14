@@ -27,9 +27,29 @@
           </div>
         </div>
         <div v-else-if="!practiceUnitName" class="mb-4 text-sm text-gray-500">No active lesson or unit.</div>
-        <div v-else class="mb-4 text-center">
-          <div class="badge badge-success">Quick Practice Mode</div>
-          <div class="text-sm text-gray-500 mt-1">{{ practiceUnitName }}</div>
+        <div v-else class="mb-4">
+          <div class="p-3 bg-blue-50 rounded-lg border-2 border-dashed border-blue-300 text-center">
+            <div class="flex items-center justify-center gap-2 mb-2">
+              <div class="badge badge-info">Preview Practice</div>
+              <div class="tooltip tooltip-bottom" data-tip="You're testing this content without saving it to a lesson. Create a lesson to track progress and organize practice units.">
+                <span class="material-symbols-outlined text-blue-600 text-sm cursor-help">help</span>
+              </div>
+            </div>
+            <div class="text-sm text-blue-700">
+              Testing without saving to lesson
+            </div>
+            <div class="text-sm text-gray-600 mt-1 font-medium">{{ practiceUnitName }}</div>
+            
+            <!-- Save suggestion -->
+            <div class="flex gap-2 mt-3 justify-center">
+              <button class="btn btn-xs btn-primary" @click="navigateToSave">
+                💾 Save This Practice Unit
+              </button>
+              <button class="btn btn-xs btn-outline" @click="exitQuickPractice">
+                ← Back to Creator
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -72,7 +92,7 @@
 <script setup>
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore';
 import { useLessonStore } from '../stores/lessonStore.js';
 import useAnnouncer from '../composables/useAnnouncer';
@@ -80,6 +100,7 @@ import { computed } from 'vue';
 
 const store = usePracticeUnitScaleStore();
 const lesson = useLessonStore();
+const router = useRouter();
 const { liveAnnounce, announce } = useAnnouncer();
 
 const activeLessonName = computed(() => lesson.activeLessonName || '');
@@ -99,5 +120,19 @@ const practiceUnitName = computed(() => {
 function endLesson() {
   lesson.deactivateLesson();
   announce('Lesson ended');
+}
+
+// Navigation functions for Quick Practice Mode
+function navigateToSave() {
+  console.log('Navigating to save practice unit');
+  router.push('/create-practice-unit-view?from=save');
+}
+
+function exitQuickPractice() {
+  console.log('Exiting quick practice mode');
+  const creatorRoute = store.practiceUnitHeader.practiceUnitType === 'Scale' 
+    ? '/create-scales' 
+    : '/create-exercises';
+  router.push(creatorRoute);
 }
 </script>

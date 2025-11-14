@@ -121,58 +121,163 @@
         </div>
       </div>
 
-      <!-- 💾 Practice Unit Snapshot Manager -->
+      <!-- 🗄️ Database Storage & Management -->
       <div
-        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
+        class="collapse collapse-arrow bg-blue-50 border border-blue-300 mb-4 rounded-xl"
       >
-        <input type="checkbox" class="peer" />
+        <input type="checkbox" class="peer" :checked="shouldAutoExpandDatabase" />
         <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">
-          <span>💾 Practice Unit Snapshot Manager</span>
+          <span>🗄️ Database Storage & Management</span>
+          <span v-if="shouldAutoExpandDatabase" class="text-sm font-normal text-blue-600 ml-2">(Auto-expanded)</span>
         </div>
         <div class="collapse-content px-4">
-          <!-- User Help Note -->
+          <!-- Clear Action Guide -->
           <div
-            class="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm text-gray-700"
+            class="bg-blue-100 border border-blue-300 rounded p-3 mb-3 text-sm"
           >
-            <strong class="text-blue-800">Save/Update Options:</strong>
-            <ul class="list-disc list-inside mt-1 space-y-1">
-              <li>
-                <strong>SAVE to Database</strong> –
-                <span v-if="!store.practiceUnitHeader?.practiceUnitId"
-                  >Creates a new record (first time)</span
-                ><span v-else>Disabled after first save</span>.
-              </li>
-              <li>
-                <strong>UPDATE in Database</strong> –
-                <span v-if="store.practiceUnitHeader?.practiceUnitId"
-                  >Updates the existing record (after first save)</span
-                ><span v-else>Disabled until first save</span>.
-              </li>
-              <li>
-                <strong>SAVE as New</strong> – Always creates a brand new copy
-                with a fresh ID. Use to make a variation or backup.
-              </li>
-              <li>
-                <strong>Export/Import JSON</strong> – Download or upload
-                practice units as standalone files for sharing or backup outside
-                the database.
-              </li>
-            </ul>
+            <div v-if="!isSignedIn" class="text-orange-700 font-semibold">
+              🔐 Sign in required – Visit Preferences to enable database saves
+            </div>
+            <div v-else class="text-gray-700">
+              <div v-if="isNewPracticeUnit" class="mb-2 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+                <strong class="text-blue-800">💾 Ready to Save</strong><br>
+                This practice unit hasn't been saved yet. Click <strong>"Save to My Library"</strong> to store it permanently.
+              </div>
+              <div v-if="isExistingPracticeUnit" class="mb-2 p-2 bg-green-50 rounded border-l-4 border-green-400">
+                <strong class="text-green-800">🔄 Already Saved</strong><br>
+                This practice unit exists in your library. Click <strong>"Update My Copy"</strong> to save any changes.
+              </div>
+              <div class="mb-2 p-2 bg-purple-50 rounded border-l-4 border-purple-400">
+                <strong class="text-purple-800">✨ Make a Variation</strong><br>
+                Want to create a new version? Click <strong>"Save as New Practice Unit"</strong> to keep both versions.
+              </div>
+              <div class="p-2 bg-gray-50 rounded border-l-4 border-gray-400">
+                <strong class="text-gray-800">📋 Load Different Unit</strong><br>
+                Browse your saved practice units with <strong>"Browse My Library"</strong>.
+              </div>
+            </div>
           </div>
+          
           <div class="flex gap-4 mb-4 flex-wrap">
-            <button class="btn btn-warning" @click="exportToJson">
-              Export to JSON file
+            <!-- Smart Button Logic: Show appropriate actions based on state -->
+            <div class="flex flex-col gap-2 w-full">
+              <div v-if="!isSignedIn" class="alert alert-warning">
+                <span>Please sign in on Preferences to save to database</span>
+              </div>
+              
+              <div v-if="isSignedIn" class="space-y-4">
+                <!-- Primary Action: Save or Update (enhanced when coming from save intent) -->
+                <div class="grid grid-cols-1 gap-3">
+                  <button
+                    v-if="isNewPracticeUnit"
+                    :class="[
+                      'btn btn-lg flex flex-col items-center p-6 h-auto transition-all duration-300',
+                      shouldHighlightPrimary 
+                        ? 'btn-primary ring-4 ring-blue-300 ring-opacity-50 shadow-xl scale-105' 
+                        : 'btn-primary'
+                    ]"
+                    @click="saveToDatabase"
+                  >
+                    <span class="text-3xl mb-2">💾</span>
+                    <span class="font-bold text-lg">Save to My Library</span>
+                    <span class="text-sm opacity-75">Store this practice unit permanently</span>
+                    <span v-if="cameFromSave" class="text-xs bg-blue-200 px-2 py-1 rounded mt-1">← Click here to save!</span>
+                  </button>
+                  
+                  <button
+                    v-if="isExistingPracticeUnit"
+                    :class="[
+                      'btn btn-lg flex flex-col items-center p-6 h-auto transition-all duration-300',
+                      shouldHighlightPrimary 
+                        ? 'btn-primary ring-4 ring-blue-300 ring-opacity-50 shadow-xl scale-105' 
+                        : 'btn-primary'
+                    ]"
+                    @click="saveToDatabase"
+                  >
+                    <span class="text-3xl mb-2">🔄</span>
+                    <span class="font-bold text-lg">Update My Copy</span>
+                    <span class="text-sm opacity-75">Save changes to existing unit</span>
+                    <span v-if="cameFromSave" class="text-xs bg-blue-200 px-2 py-1 rounded mt-1">← Click here to update!</span>
+                  </button>
+                </div>
+                
+                <!-- Secondary Actions Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <!-- Save as New (conditionally shown) -->
+                  <button
+                    v-if="showSaveAsNew"
+                    class="btn btn-accent btn-lg flex flex-col items-center p-4 h-auto"
+                    @click="saveAsNewToDatabase"
+                  >
+                    <span class="text-2xl mb-1">✨</span>
+                    <span class="font-bold">Save as New Practice Unit</span>
+                    <span class="text-xs opacity-75">Create a variation or backup copy</span>
+                  </button>
+                
+                  <!-- Browse Library (always shown but positioned based on context) -->
+                  <button 
+                    :class="[
+                      'btn btn-outline btn-lg flex flex-col items-center p-4 h-auto',
+                      !showSaveAsNew ? 'md:col-span-2' : ''
+                    ]"
+                    @click="openRecallModal"
+                  >
+                    <span class="text-2xl mb-1">📋</span>
+                    <span class="font-bold">Browse My Library</span>
+                    <span class="text-xs opacity-75">Load a different practice unit</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📁 Practice Unit File Import/Export -->
+      <div
+        class="collapse collapse-arrow bg-green-50 border border-green-300 mb-4 rounded-xl"
+      >
+        <input type="checkbox" class="peer" :checked="shouldAutoExpandFileOps" />
+        <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">
+          <span>📁 Practice Unit File Import/Export</span>
+        </div>
+        <div class="collapse-content px-4">
+          <!-- File Operations Guide -->
+          <div
+            class="bg-green-100 border border-green-300 rounded p-3 mb-3 text-sm text-gray-700"
+          >
+            <p class="font-semibold text-green-800 mb-2">Share & Backup with Files</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div class="p-2 bg-green-50 rounded border-l-4 border-green-400">
+                <strong class="text-green-800">📤 Download File</strong><br>
+                <span class="text-xs">Save as .json file to share with others or backup offline</span>
+              </div>
+              <div class="p-2 bg-green-50 rounded border-l-4 border-green-400">
+                <strong class="text-green-800">📥 Upload File</strong><br>
+                <span class="text-xs">Load a .json practice unit file someone shared with you</span>
+              </div>
+            </div>
+            <p class="text-xs text-green-700 mt-2 font-medium">
+              💡 Files work without sign-in and can be shared via email, cloud storage, etc.
+            </p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button 
+              class="btn btn-warning btn-lg flex flex-col items-center p-4 h-auto"
+              @click="exportToJson"
+            >
+              <span class="text-2xl mb-1">📤</span>
+              <span class="font-bold">Download as File</span>
+              <span class="text-xs opacity-75">Save .json file to your computer</span>
             </button>
             <button
-              class="mtsFormatCreatorButtons flex items-center gap-2 mt-4"
+              class="btn btn-info btn-lg flex flex-col items-center p-4 h-auto"
               @click="triggerImportFileDialog"
             >
-              <span
-                class="material-symbols-outlined align-middle mr-2"
-                aria-hidden="true"
-                >upload_file</span
-              >
-              Import from JSON file
+              <span class="text-2xl mb-1">📥</span>
+              <span class="font-bold">Upload File</span>
+              <span class="text-xs opacity-75">Load .json practice unit file</span>
             </button>
             <input
               ref="importFileInput"
@@ -181,26 +286,6 @@
               style="display: none"
               @change="handleImportFileChange"
             />
-            <button
-              class="btn btn-primary mt-4"
-              @click="saveToDatabase"
-              :disabled="store.practiceUnitHeader?.practiceUnitId"
-            >
-              SAVE to Database
-            </button>
-            <button
-              class="btn btn-primary mt-4"
-              @click="saveToDatabase"
-              v-if="store.practiceUnitHeader?.practiceUnitId"
-            >
-              UPDATE in Database
-            </button>
-            <button class="btn btn-accent mt-4" @click="saveAsNewToDatabase">
-              SAVE as New
-            </button>
-            <button class="btn btn-outline mt-4" @click="openRecallModal">
-              RECALL from Database
-            </button>
           </div>
         </div>
       </div>
@@ -305,6 +390,7 @@
 
 <script setup>
 import { onMounted, computed, ref, onBeforeUnmount } from "vue";
+import { useRoute } from "vue-router";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import supabase from "../scripts/supabaseClient.js";
 import Header from "./Header.vue";
@@ -312,6 +398,7 @@ import FooterStandard from "./FooterStandard.vue";
 import StaffPreview from "./StaffPreview.vue";
 
 const store = usePracticeUnitScaleStore();
+const route = useRoute();
 
 // ----- Snapshot Manager State -----
 const showRecallModal = ref(false);
@@ -319,6 +406,35 @@ const availableUnits = ref([]);
 const loadingUnits = ref(false);
 const recallFilterText = ref("");
 const importFileInput = ref(null);
+
+// ----- Auto-expand logic -----
+const shouldAutoExpandDatabase = ref(false);
+const shouldAutoExpandFileOps = ref(false);
+
+// Check if user came from save suggestion (auto-expand database section)
+function checkAutoExpand() {
+  const fromSave = route.query.from === 'save' || route.query.action === 'save';
+  const fromQuickPractice = store.practiceUnitHeader?.practiceUnitId?.startsWith('quick-');
+  shouldAutoExpandDatabase.value = fromSave || fromQuickPractice;
+}
+
+// ----- Save Intent & Context Detection -----
+const cameFromSave = computed(() => {
+  return route.query.from === 'save' || route.query.action === 'save';
+});
+
+const showSaveAsNew = computed(() => {
+  // Only show "Save as New" if:
+  // 1. User is signed in, AND
+  // 2. This is an existing practice unit (has real ID, not quick-*), OR
+  // 3. User didn't come from save intent (browsing/managing existing units)
+  return isSignedIn.value && (isExistingPracticeUnit.value || !cameFromSave.value);
+});
+
+const shouldHighlightPrimary = computed(() => {
+  // Highlight primary save action when user came with save intent
+  return cameFromSave.value && isSignedIn.value;
+});
 
 // ----- Supabase Helper Functions -----
 async function upsertPracticeUnit(row) {
@@ -335,6 +451,8 @@ async function insertNewPracticeUnit(row) {
 
 onMounted(async () => {
   await store.loadInstruments();
+  loadUserSession();
+  checkAutoExpand();
 });
 
 // ----- Determine Practice Unit Type -----
@@ -348,6 +466,66 @@ const instrumentName = computed(() => {
   if (!inst) return "Unknown";
   return inst.instrument || "Unknown";
 });
+
+// ----- Smart Button Logic -----
+const isNewPracticeUnit = computed(() => {
+  const id = store.practiceUnitHeader?.practiceUnitId;
+  // Consider it new if no ID, or if ID starts with "quick-" (from Practice Now)
+  return !id || id.startsWith("quick-");
+});
+
+const isExistingPracticeUnit = computed(() => {
+  const id = store.practiceUnitHeader?.practiceUnitId;
+  // Consider it existing if it has an ID that doesn't start with "quick-"
+  return id && !id.startsWith("quick-");
+});
+
+// ----- User Session Management -----
+const currentUser = ref(null);
+const isSignedIn = computed(() => !!currentUser.value);
+
+// Load user session from localStorage on mount
+function loadUserSession() {
+  try {
+    const saved = localStorage.getItem('mts_user_session');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.user && parsed.expiresAt > Date.now()) {
+        currentUser.value = parsed.user;
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to load saved user session:', e);
+  }
+  // If no valid saved session, check Supabase
+  checkSupabaseSession();
+}
+
+// Check current Supabase session
+async function checkSupabaseSession() {
+  try {
+    const { data: sessData } = await supabase.auth.getSession();
+    if (sessData?.session?.user) {
+      const user = sessData.session.user;
+      currentUser.value = user;
+      // Save session to localStorage (expires in 24h)
+      const sessionData = {
+        user: user,
+        expiresAt: Date.now() + (24 * 60 * 60 * 1000)
+      };
+      localStorage.setItem('mts_user_session', JSON.stringify(sessionData));
+    }
+  } catch (e) {
+    console.warn('Failed to check Supabase session:', e);
+  }
+}
+
+// Clear user session
+function clearUserSession() {
+  currentUser.value = null;
+  localStorage.removeItem('mts_user_session');
+}
 
 const noteCount = computed(() => {
   return store.noteArray?.length || 0;
@@ -757,10 +935,19 @@ async function handleImportFileChange(event) {
 // SAVE to Database (Supabase)
 async function saveToDatabase() {
   try {
+    // Check persistent user session first
+    if (!currentUser.value) {
+      alert("Please sign in on Preferences before saving to database.");
+      return;
+    }
+    
+    // Double-check with Supabase session
     const { data: sessData, error: sessErr } = await supabase.auth.getSession();
     const session = sessData?.session;
     if (sessErr || !session?.user?.id) {
-      alert("Please sign in on Preferences before saving to database.");
+      // Clear invalid session and prompt sign-in
+      clearUserSession();
+      alert("Your session has expired. Please sign in again on Preferences.");
       return;
     }
 
@@ -810,10 +997,19 @@ async function saveToDatabase() {
 // SAVE as New to Database (always creates a new GUID)
 async function saveAsNewToDatabase() {
   try {
+    // Check persistent user session first
+    if (!currentUser.value) {
+      alert("Please sign in on Preferences before saving to database.");
+      return;
+    }
+    
+    // Double-check with Supabase session
     const { data: sessData, error: sessErr } = await supabase.auth.getSession();
     const session = sessData?.session;
     if (sessErr || !session?.user?.id) {
-      alert("Please sign in on Preferences before saving to database.");
+      // Clear invalid session and prompt sign-in
+      clearUserSession();
+      alert("Your session has expired. Please sign in again on Preferences.");
       return;
     }
 
@@ -865,10 +1061,19 @@ async function saveAsNewToDatabase() {
 // RECALL from Database - open modal to select from list
 async function openRecallModal() {
   try {
+    // Check persistent user session first
+    if (!currentUser.value) {
+      alert("Please sign in on Preferences before accessing saved units.");
+      return;
+    }
+    
+    // Double-check with Supabase session
     const { data: sessData } = await supabase.auth.getSession();
     const session = sessData?.session;
     if (!session?.user?.id) {
-      alert("Sign in first to recall from database.");
+      // Clear invalid session and prompt sign-in
+      clearUserSession();
+      alert("Your session has expired. Please sign in again on Preferences.");
       return;
     }
 
