@@ -86,24 +86,23 @@ import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore';
 import { useLessonStore } from '../stores/lessonStore.js';
+import { useActiveUnitStatus } from '../composables/useActiveUnitStatus.js';
 import useAnnouncer from '../composables/useAnnouncer';
 import { computed } from 'vue';
 
 const store = usePracticeUnitScaleStore();
 const lesson = useLessonStore();
+const { 
+  hasActiveUnit,
+  activeUnitDisplayName,
+  isInLessonMode,
+  isInQuickPracticeMode,
+  statusIndicator 
+} = useActiveUnitStatus();
 const { liveAnnounce, announce } = useAnnouncer();
 
+// Legacy compatibility
 const activeLessonName = computed(() => lesson.activeLessonName || '');
-const lessonActive = computed(() => !!lesson.lessonActive);
-const practiceUnitName = computed(() => {
-  try {
-    return (
-      store.practiceUnitHeader?.practiceName ||
-      lesson.activeLessonUnit?.name ||
-      ''
-    );
-  } catch (e) {
-    return '';
-  }
-});
+const lessonActive = computed(() => isInLessonMode.value);
+const practiceUnitName = computed(() => activeUnitDisplayName.value);
 </script>

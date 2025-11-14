@@ -307,6 +307,7 @@ import StaffPreview from "./StaffPreview.vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
 import { useLessonStore } from "../stores/lessonStore.js";
+import { useActiveUnitStatus } from "../composables/useActiveUnitStatus.js";
 import { computed, onMounted, reactive, watch, ref } from "vue";
 import useAnnouncer from "../composables/useAnnouncer";
 import { composePracticeUnit } from "../scripts/composePracticeUnit";
@@ -315,22 +316,20 @@ const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
 const lesson = useLessonStore();
 const router = useRouter();
-const activeLessonName = computed(() => lesson.activeLessonName || '');
-const lessonActive = computed(() => !!lesson.lessonActive);
-const activeLessonId = computed(() => lesson.activeLessonId || null);
+const { 
+  hasActiveUnit,
+  activeUnitDisplayName,
+  isInLessonMode,
+  isInQuickPracticeMode,
+  statusIndicator 
+} = useActiveUnitStatus();
 const { liveAnnounce, announce } = useAnnouncer();
-const practiceUnitName = computed(() => {
-  try {
-    return (
-      store.practiceUnitHeader?.practiceName ||
-      lesson.activeLessonUnit?.name ||
-      (store.practiceUnitHeader && store.practiceUnitHeader.practiceName) ||
-      ""
-    );
-  } catch (e) {
-    return "";
-  }
-});
+
+// Legacy compatibility
+const activeLessonName = computed(() => lesson.activeLessonName || '');
+const lessonActive = computed(() => isInLessonMode.value);
+const activeLessonId = computed(() => lesson.activeLessonId || null);
+const practiceUnitName = computed(() => activeUnitDisplayName.value);
 
 function endLesson() {
   lesson.deactivateLesson();

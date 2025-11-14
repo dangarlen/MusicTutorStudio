@@ -2,6 +2,7 @@
 import { defineStore } from "pinia";
 import supabase from "../scripts/supabaseClient.js";
 import { usePracticeUnitScaleStore } from './practiceUnitScaleStore';
+import { useAppStateStore } from './appStateStore.js';
 
 export const useLessonStore = defineStore("lessonStore", {
   state: () => ({
@@ -317,6 +318,11 @@ export const useLessonStore = defineStore("lessonStore", {
         if (Array.isArray(unitJson.noteArray)) {
           puStore.noteArray = unitJson.noteArray.map(n => ({ ...n }));
         }
+
+        // Sync with AppState for global coordination
+        const appState = useAppStateStore();
+        appState.loadActiveUnit(unit, 'lesson');
+        console.log('[LessonStore] Activated lesson and synced with AppState:', { lessonName, unit });
       } catch (e) {
         console.warn('[lessonStore] activateLesson failed', e);
         throw e;
@@ -327,6 +333,11 @@ export const useLessonStore = defineStore("lessonStore", {
       this.activeLessonName = "";
       this.lessonActive = false;
       this.activeLessonUnit = null;
+
+      // Clear AppState coordination
+      const appState = useAppStateStore();
+      appState.clearActiveUnit();
+      console.log('[LessonStore] Deactivated lesson and cleared AppState');
     },
 
     // Replace lesson units for a lesson with provided ordered array of practice_unit_ids

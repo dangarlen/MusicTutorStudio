@@ -25,7 +25,12 @@
               <button class="btn btn-sm btn-warning" @click="endLesson">End Lesson</button>
             </div>
           </div>
-          <div v-else-if="!practiceUnitName" class="mb-4 text-sm text-gray-500">No active lesson or unit.</div>
+          <EmptyStateMessage 
+            v-else-if="!hasActiveUnit"
+            :context="{ page: 'practice-pitch', hasActiveUnit, isInLessonMode }"
+            size="medium"
+            :showActions="true"
+          />
           <div v-else class="mb-4">
             <div class="p-3 bg-blue-50 rounded-lg border-2 border-dashed border-blue-300 text-center">
               <div class="flex items-center justify-center gap-2 mb-2">
@@ -56,14 +61,35 @@
         <!-- Toast stack -->
         <ToastStack :toasts="toasts" @dismiss="dismissToast" />
         <div class="card bg-white p-4">
+          <div class="alert alert-info mb-4">
+            <span class="material-symbols-outlined">lightbulb</span>
+            <div>
+              <div class="font-medium">Choose Your Input Method</div>
+              <div class="text-sm">
+                <strong>Virtual Keyboard:</strong> Test pitch detection without a microphone<br>
+                <strong>Tuner:</strong> Live pitch detection from your instrument (requires microphone)
+              </div>
+            </div>
+          </div>
           <div class="mt-4 collapse collapse-arrow border bg-base-100">
             <input type="checkbox" />
             <div class="collapse-title cursor-pointer font-semibold">Tuner</div>
             <div class="collapse-content mt-3">
+              <div class="alert alert-warning mb-3" v-if="!running">
+                <span class="material-symbols-outlined">mic</span>
+                <div>
+                  <div class="font-medium">Microphone Access Required</div>
+                  <div class="text-sm">Live pitch detection requires microphone permission. Your browser will ask for permission when you start the tuner.</div>
+                </div>
+              </div>
               <div class="mb-3 text-sm text-gray-600">Range: {{ rangeText }}</div>
 
               <div class="flex items-center gap-4 mb-4">
                 <button class="btn" :class="running ? 'btn-error' : 'btn-primary'" @click="toggleRunning">{{ running ? 'Stop' : 'Start' }}</button>
+                <button class="btn btn-outline btn-sm" @click="showPermissionHelp">
+                  <span class="material-symbols-outlined mr-2">help</span>
+                  Permission Help
+                </button>
               </div>
 
               <div class="mb-2">
@@ -77,7 +103,13 @@
             <input type="checkbox" />
             <div class="collapse-title cursor-pointer font-semibold">🎹 Virtual Keyboard (Testing)</div>
             <div class="collapse-content mt-3">
-              <div class="text-sm text-gray-600 mb-3">Simulate tone input for testing pitch detection</div>
+              <div class="alert alert-info mb-3">
+                <span class="material-symbols-outlined">info</span>
+                <div>
+                  <div class="font-medium">No microphone required!</div>
+                  <div class="text-sm">This virtual keyboard simulates tone input for testing pitch detection without needing microphone access.</div>
+                </div>
+              </div>
               <VirtualKeyboard 
                 :on-tone-start="simulateToneInput"
                 :on-tone-stop="stopSimulatedTone"
@@ -269,29 +301,30 @@ import Header from './Header.vue';
 import FooterStandard from './FooterStandard.vue';
 import StaffPreview from './StaffPreview.vue';
 import VirtualKeyboard from './VirtualKeyboard.vue';
+import EmptyStateMessage from './EmptyStateMessage.vue';
 import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore';
 import { useLessonStore } from '../stores/lessonStore.js';
+import { useActiveUnitStatus } from '../composables/useActiveUnitStatus.js';
 import useAnnouncer from '../composables/useAnnouncer';
 
 const store = usePracticeUnitScaleStore();
 const testNotes = useTestStaffNoteStore();
 const lesson = useLessonStore();
 const router = useRouter();
+const { 
+  hasActiveUnit,
+  activeUnitDisplayName,
+  isInLessonMode,
+  isInQuickPracticeMode,
+  statusIndicator,
+  getEmptyStateMessage 
+} = useActiveUnitStatus();
 const { liveAnnounce, announce } = useAnnouncer();
 
+// Legacy compatibility
 const activeLessonName = computed(() => lesson.activeLessonName || '');
-const lessonActive = computed(() => !!lesson.lessonActive);
-const practiceUnitName = computed(() => {
-  try {
-    return (
-      store.practiceUnitHeader?.practiceName ||
-      lesson.activeLessonUnit?.name ||
-      ''
-    );
-  } catch (e) {
-    return '';
-  }
-});
+const lessonActive = computed(() => isInLessonMode.value);
+const practiceUnitName = computed(() => activeUnitDisplayName.value);
 
 const detectedNote = ref('--');
 const detectedFreq = ref(0);
@@ -580,8 +613,11 @@ const staffMappedText = computed(() => (Array.isArray(staffMappedSample.value) &
 // Hint shown in the Staff Display title when there's nothing to render
 const staffDisplayHint = computed(() => {
   try {
-    return (Array.isArray(store.noteArray) && store.noteArray.length) ? '' : 'Unable to display staff — Load Unit Practice';
-  } catch (e) { return 'Unable to display staff — Load Unit Practice' }
+    if (Array.isArray(store.noteArray) && store.noteArray.length) return '';
+    return getEmptyStateMessage({ page: 'practice-pitch', hasActiveUnit: hasActiveUnit.value, isInLessonMode: isInLessonMode.value });
+  } catch (e) { 
+    return getEmptyStateMessage({ page: 'practice-pitch', hasActiveUnit: false, isInLessonMode: false });
+  }
 });
 
 // Derive a color cycle from practice unit noteColorDesignation if present
@@ -1309,6 +1345,15 @@ onBeforeUnmount(() => {
 
 function start() {
   if (audioCtx) return; // already running
+  
+  // Check if getUserMedia is available
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    pushToast('Microphone access is not available in this browser. Please use a modern browser with HTTPS.', 'error', 8000);
+    return;
+  }
+  
+  pushToast('Requesting microphone access for live pitch detection...', 'info', 3000);
+  
   navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
     .then(async (stream) => {
       mediaStream = stream;
@@ -1560,7 +1605,16 @@ function start() {
     })
     .catch((err) => {
       console.error('Mic error', err);
-      alert('Microphone access required for Pitch Practice.');
+      
+      // Provide better user guidance based on error type
+      let message = 'Microphone access is required for live pitch detection.';
+      if (err.name === 'NotAllowedError') {
+        message = 'Microphone permission was denied. Please allow microphone access in your browser settings to use live pitch detection.';
+      } else if (err.name === 'NotFoundError') {
+        message = 'No microphone found. Please connect a microphone to use live pitch detection.';
+      }
+      
+      pushToast(message, 'warning', 8000);
       running.value = false;
     });
 }
@@ -1571,6 +1625,10 @@ function toggleRunning() {
   } else {
     start();
   }
+}
+
+function showPermissionHelp() {
+  pushToast('To enable microphone access: 1) Look for the microphone icon in your browser address bar, 2) Click it and select "Allow", 3) Refresh the page if needed.', 'info', 10000);
 }
 
 function loadScript(url) {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>State Management Test</title>
+</head>
+<body>
+    <div id="test-output">
+        <h2>Testing State Management...</h2>
+        <div id="results"></div>
+    </div>
+    
+    <script type="module">
+        // Simple test to verify our state management works
+        console.log('Starting state management test...');
+        
+        // Test that our files can be imported
+        try {
+            // This will test if our state management setup is working
+            const response = await fetch('/types/index.js');
+            if (response.ok) {
+                console.log('✓ types/index.js is accessible');
+                document.getElementById('results').innerHTML += '<p>✓ types/index.js accessible</p>';
+            } else {
+                console.log('✗ types/index.js not accessible');
+                document.getElementById('results').innerHTML += '<p>✗ types/index.js not accessible</p>';
+            }
+        } catch (e) {
+            console.log('✗ Error accessing types/index.js:', e);
+            document.getElementById('results').innerHTML += '<p>✗ Error accessing types/index.js</p>';
+        }
+        
+        try {
+            const response = await fetch('/stores/appStateStore.js');
+            if (response.ok) {
+                console.log('✓ stores/appStateStore.js is accessible');
+                document.getElementById('results').innerHTML += '<p>✓ stores/appStateStore.js accessible</p>';
+            } else {
+                console.log('✗ stores/appStateStore.js not accessible');
+                document.getElementById('results').innerHTML += '<p>✗ stores/appStateStore.js not accessible</p>';
+            }
+        } catch (e) {
+            console.log('✗ Error accessing stores/appStateStore.js:', e);
+            document.getElementById('results').innerHTML += '<p>✗ Error accessing stores/appStateStore.js</p>';
+        }
+        
+        console.log('State management test completed');
+    </script>
+</body>
+</html>

@@ -26,7 +26,12 @@
             <button class="btn btn-sm btn-warning" @click="endLesson">End Lesson</button>
           </div>
         </div>
-        <div v-else-if="!practiceUnitName" class="mb-4 text-sm text-gray-500">No active lesson or unit.</div>
+        <EmptyStateMessage 
+          v-else-if="!hasActiveUnit"
+          :context="{ page: 'practice-hub', hasActiveUnit, isInLessonMode }"
+          size="medium"
+          :showActions="true"
+        />
         <div v-else class="mb-4">
           <div class="p-3 bg-blue-50 rounded-lg border-2 border-dashed border-blue-300 text-center">
             <div class="flex items-center justify-center gap-2 mb-2">
@@ -92,30 +97,30 @@
 <script setup>
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
+import EmptyStateMessage from "./EmptyStateMessage.vue";
 import { RouterLink, useRouter } from "vue-router";
 import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore';
 import { useLessonStore } from '../stores/lessonStore.js';
+import { useActiveUnitStatus } from '../composables/useActiveUnitStatus.js';
 import useAnnouncer from '../composables/useAnnouncer';
 import { computed } from 'vue';
 
 const store = usePracticeUnitScaleStore();
 const lesson = useLessonStore();
 const router = useRouter();
+const { 
+  hasActiveUnit,
+  activeUnitDisplayName,
+  isInLessonMode,
+  isInQuickPracticeMode,
+  statusIndicator 
+} = useActiveUnitStatus();
 const { liveAnnounce, announce } = useAnnouncer();
 
+// Legacy compatibility
 const activeLessonName = computed(() => lesson.activeLessonName || '');
-const lessonActive = computed(() => !!lesson.lessonActive);
-const practiceUnitName = computed(() => {
-  try {
-    return (
-      store.practiceUnitHeader?.practiceName ||
-      lesson.activeLessonUnit?.name ||
-      ''
-    );
-  } catch (e) {
-    return '';
-  }
-});
+const lessonActive = computed(() => isInLessonMode.value);
+const practiceUnitName = computed(() => activeUnitDisplayName.value);
 
 function endLesson() {
   lesson.deactivateLesson();

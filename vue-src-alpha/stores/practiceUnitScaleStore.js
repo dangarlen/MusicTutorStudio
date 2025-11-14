@@ -1,50 +1,18 @@
 import { defineStore } from "pinia";
+import { useAppStateStore } from './appStateStore.js';
+import { validatePracticeUnit, createDefaultPracticeUnitHeader } from '../types/index.js';
 
 export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
   state: () => ({
     // Unified practiceUnitHeader fields
-    practiceUnitHeader: {
-      practiceName: "",
-      practiceUnitId: "",
-      lastModified: "",
-      practiceUnitType: "Scale",
-      tempo: 120,
-      keySignature: "C",
-      timeSignature: "4/4",
-      instrument: null,
-      staffDisplayOptions: {
-        showAccidentals: true,
-        showOverlays: true,
-        measuresPerLineMax: 2,
-      },
-      sourceURL: "",
-      noteColorDesignation: {},
-      // User ownership & privacy
-      User: "", // Supabase user id (or other user identifier)
-      shareMusic: false, // true = Share; false = Personal Use ONLY
-      // Scale-specific unified fields
-      contentType: "major", // scaleType: Major/Minor/Chromatic
-      direction: "ascending",
-      startingOctave: "C4",
-      numberOfOctaves: 1,
-      // N/A for Scale (initialized as null/""/[])
-      rangeStart: null,
-      rangeEnd: null,
-      composer: "",
-      sourceWork: "",
-      techniqueFocus: [],
-      tagSource: "",
-      repetitionCount: null,
-      sourceMusicXML: "",
-      instrumentOverride: "",
-    },
+    practiceUnitHeader: createDefaultPracticeUnitHeader(),
     // noteArray
     noteArray: [],
     // UI state (not part of practiceUnit schema)
     title: "Create Scale",
     instruments: [],
     scaleSelections: null, // Deprecated; migrate to practiceUnitHeader fields
-    // Quick practice session tracking
+    // Legacy tracking (moved to AppState but kept for compatibility)
     recentlyPracticed: [], // Array of practice units for quick access
     hasUnsavedChanges: false, // Track if current unit differs from saved state
     lastSavedSnapshot: null // Snapshot of last saved state for comparison
@@ -129,19 +97,67 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
     },
     // Quick practice session management
     activateForPractice(unit, mode = 'quick') {
+      console.log('[PracticeUnitScaleStore] Activating for practice:', { unit, mode });
+      
+      // Load into local state
       this.loadPracticeUnit(unit);
-      // Add to recently practiced (keep last 10)
+      
+      // Sync with AppState for global coordination
+      const appState = useAppStateStore();
+      appState.loadActiveUnit(unit, mode);
+      
+      // Legacy compatibility - keep local tracking
       const existing = this.recentlyPracticed.findIndex(u => u.practiceUnitId === unit.practiceUnitHeader?.practiceUnitId);
       if (existing >= 0) this.recentlyPracticed.splice(existing, 1);
       this.recentlyPracticed.unshift({ ...unit, practicedAt: new Date().toISOString(), mode });
       if (this.recentlyPracticed.length > 10) this.recentlyPracticed.pop();
     },
+    
     markAsChanged() {
       this.hasUnsavedChanges = true;
+      // Sync with AppState
+      const appState = useAppStateStore();
+      if (appState.hasActiveUnit) {
+        appState.markActiveUnitChanged();
+      }
     },
+    
     checkForUnsavedChanges() {
       const current = JSON.stringify(this.composePracticeUnit());
-      return current !== this.lastSavedSnapshot;
+      const hasChanges = current !== this.lastSavedSnapshot;
+      
+      // Sync with AppState
+      const appState = useAppStateStore();
+      if (appState.hasActiveUnit && appState.hasUnsavedChanges !== hasChanges) {
+        if (hasChanges) {
+          appState.markActiveUnitChanged();
+        } else {
+          appState.markActiveUnitSaved();
+        }
+      }
+      
+      return hasChanges;
+    },
+    
+    // New method to sync current state to AppState
+    syncToAppState() {
+      const appState = useAppStateStore();
+      const currentUnit = this.composePracticeUnit();
+      
+      if (validatePracticeUnit(currentUnit)) {
+        appState.updateActiveUnit(currentUnit);
+        console.log('[PracticeUnitScaleStore] Synced to AppState');
+      }
+    },
+    
+    // New method to load from AppState
+    loadFromAppState() {
+      const appState = useAppStateStore();
+      
+      if (appState.hasActiveUnit) {
+        this.loadPracticeUnit(appState.activeUnit.unit);
+        console.log('[PracticeUnitScaleStore] Loaded from AppState');
+      }
     },
   },
 });

@@ -25,6 +25,7 @@ import SaveToPracticeUnitExport from "../components/SaveToPracticeUnitExport.vue
 import RecallJsonFromPinia from "../components/RecallJsonFromPinia.vue";
 import ImportPracticeUnitExport from "../components/ImportPracticeUnitExport.vue";
 import EditPracticeUnitScaleInMemory from "../components/EditPracticeUnitScaleInMemory.vue";
+import DebugState from "../components/DebugState.vue";
 
 const routes = [
   { path: "/", name: "home", component: Home },
@@ -106,6 +107,11 @@ const routes = [
     path: "/edit-practice-unit-scale-in-memory",
     name: "edit-practice-unit-scale-in-memory",
     component: EditPracticeUnitScaleInMemory,
+  },
+  {
+    path: "/debug-state",
+    name: "debug-state",
+    component: DebugState,
   },
 ];
 
