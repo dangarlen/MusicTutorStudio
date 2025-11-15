@@ -61,61 +61,118 @@
         <!-- Toast stack -->
         <ToastStack :toasts="toasts" @dismiss="dismissToast" />
         <div class="card bg-white p-4">
-          <div class="alert alert-info mb-4">
-            <span class="material-symbols-outlined">lightbulb</span>
-            <div>
-              <div class="font-medium">Choose Your Input Method</div>
-              <div class="text-sm">
-                <strong>Virtual Keyboard:</strong> Test pitch detection without a microphone<br>
-                <strong>Tuner:</strong> Live pitch detection from your instrument (requires microphone)
+          <!-- Always Visible Detected Note Display -->
+          <div class="mb-6">
+            <div class="card bg-gray-50 border border-gray-200 p-6 text-center">
+              <div class="flex items-center justify-center gap-3 mb-4">
+                <span class="material-symbols-outlined text-gray-600 text-2xl">music_note</span>
+                <h3 class="text-xl font-bold text-gray-700">Detected Note</h3>
+              </div>
+              <div class="mb-4">
+                <div class="text-6xl font-bold text-gray-800 mb-2">{{ detectedNote }}</div>
+                <div class="text-lg text-gray-600">{{ fmtFreq(detectedFreq) }} Hz • {{ centsDisplay() }}</div>
+              </div>
+              <div class="text-sm text-gray-500">
+                <span v-if="inputMode === 'instrument' && running">Live microphone input</span>
+                <span v-else-if="inputMode === 'virtual-keyboard'">Virtual keyboard input</span>
+                <span v-else-if="inputMode === 'instrument' && !running">Start microphone to see live input</span>
+                <span v-else>No input active</span>
               </div>
             </div>
           </div>
-          <div class="mt-4 collapse collapse-arrow border bg-base-100">
-            <input type="checkbox" />
-            <div class="collapse-title cursor-pointer font-semibold">Tuner</div>
-            <div class="collapse-content mt-3">
-              <div class="alert alert-warning mb-3" v-if="!running">
-                <span class="material-symbols-outlined">mic</span>
-                <div>
-                  <div class="font-medium">Microphone Access Required</div>
-                  <div class="text-sm">Live pitch detection requires microphone permission. Your browser will ask for permission when you start the tuner.</div>
+
+          <!-- Input Method Selection Header -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-lg font-semibold">Input Method</h2>
+              <div class="flex items-center gap-2">
+                <button 
+                  class="btn btn-sm"
+                  :class="inputMode === 'instrument' ? 'btn-primary' : 'btn-outline'"
+                  @click="selectInputMethod('instrument')"
+                >
+                  <span class="material-symbols-outlined mr-1">mic</span>
+                  {{ currentInstrumentName }}
+                </button>
+                <button 
+                  class="btn btn-sm"
+                  :class="inputMode === 'virtual-keyboard' ? 'btn-primary' : 'btn-outline'"
+                  @click="selectInputMethod('virtual-keyboard')"
+                >
+                  <span class="material-symbols-outlined mr-1">piano</span>
+                  Virtual Keyboard
+                </button>
+              </div>
+            </div>
+            
+            <!-- Current method indicator -->
+            <div class="text-sm text-gray-600">
+              <span v-if="inputMode === 'instrument'">
+                Using microphone input for {{ currentInstrumentName }}
+                <span class="text-xs text-amber-600 ml-1">(microphone permission required)</span>
+              </span>
+              <span v-else>
+                Using virtual keyboard for testing (no microphone needed)
+              </span>
+            </div>
+          </div>
+
+          <!-- Progressive Disclosure: Show only active input method -->
+          
+          <!-- Live Microphone Input -->
+          <div v-if="inputMode === 'instrument'" class="mb-6">
+            <div class="card bg-blue-50 border border-blue-200 p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-blue-600">mic</span>
+                <h3 class="font-semibold">Live Tuner</h3>
+                <div v-if="running" class="badge badge-success badge-sm">
+                  <span class="material-symbols-outlined text-xs mr-1">radio_button_checked</span>
+                  Listening
                 </div>
               </div>
+              
               <div class="mb-3 text-sm text-gray-600">Range: {{ rangeText }}</div>
 
               <div class="flex items-center gap-4 mb-4">
-                <button class="btn" :class="running ? 'btn-error' : 'btn-primary'" @click="toggleRunning">{{ running ? 'Stop' : 'Start' }}</button>
+                <button 
+                  class="btn btn-lg"
+                  :class="running ? 'btn-error' : 'btn-primary'" 
+                  @click="toggleRunning"
+                >
+                  <span class="material-symbols-outlined mr-2">{{ running ? 'stop' : 'mic' }}</span>
+                  {{ running ? 'Stop Microphone' : 'Start Microphone' }}
+                </button>
                 <button class="btn btn-outline btn-sm" @click="showPermissionHelp">
                   <span class="material-symbols-outlined mr-2">help</span>
                   Permission Help
                 </button>
               </div>
-
-              <div class="mb-2">
-                <div class="text-4xl font-bold">{{ detectedNote }}</div>
-                <div class="text-sm text-gray-600">{{ fmtFreq(detectedFreq) }} Hz • {{ centsDisplay() }}</div>
-              </div>
             </div>
           </div>
 
-          <div class="mt-4 collapse collapse-arrow border bg-base-100">
-            <input type="checkbox" />
-            <div class="collapse-title cursor-pointer font-semibold">🎹 Virtual Keyboard (Testing)</div>
-            <div class="collapse-content mt-3">
-              <div class="alert alert-info mb-3">
-                <span class="material-symbols-outlined">info</span>
-                <div>
-                  <div class="font-medium">No microphone required!</div>
-                  <div class="text-sm">This virtual keyboard simulates tone input for testing pitch detection without needing microphone access.</div>
-                </div>
+          <!-- Virtual Keyboard Input -->
+          <div v-if="inputMode === 'virtual-keyboard'" class="mb-6">
+            <div class="card bg-green-50 border border-green-200 p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-green-600">piano</span>
+                <h3 class="font-semibold">Virtual Keyboard</h3>
+                <div class="badge badge-success badge-sm">Ready</div>
               </div>
+              
+              <div class="text-xs text-gray-500 mb-3 text-center">
+                {{ currentInstrumentName }} • Starting octave {{ virtualKeyboardOctave }}
+              </div>
+              
               <VirtualKeyboard 
                 :on-tone-start="simulateToneInput"
                 :on-tone-stop="stopSimulatedTone"
+                :initial-octave="virtualKeyboardOctave"
+                :key="inputMethodKey"
               />
             </div>
           </div>
+
+
 
           <div class="mt-4 collapse collapse-arrow border bg-base-100">
             <input type="checkbox" ref="staffCollapse" @change="onStaffCollapseChange" />
@@ -337,6 +394,10 @@ const onsetThreshold = ref(0.15);
 
 // UI state: running toggle
 const running = ref(false);
+
+// Input method management
+const inputMode = ref('instrument'); // 'instrument' | 'virtual-keyboard'
+const inputMethodKey = ref(0); // Force VirtualKeyboard re-render when switching
 
 // Practice mode selection for Practice Settings collapse
 const practiceMode = ref("Free Play");
@@ -723,17 +784,25 @@ function freqToMidi(freq) {
 
 // Virtual keyboard simulation functions
 function simulateToneInput(toneData) {
-  // Directly set the detected values to simulate microphone input
+  // Directly set the detected values to simulate microphone input with pitch adjustment
   detectedFreq.value = toneData.frequency;
   detectedNote.value = toneData.note;
   
-  // Calculate cents for display
-  const nearestMidi = Math.round(toneData.midi);
-  const nearestFreq = midiToFreq(nearestMidi);
-  const centsOff = 1200 * Math.log2(toneData.frequency / nearestFreq);
-  cents.value = centsOff;
+  // Use the provided cents offset from virtual keyboard pitch adjustment
+  if (toneData.cents !== undefined) {
+    cents.value = toneData.cents;
+  } else {
+    // Fallback: calculate cents for display
+    const nearestMidi = Math.round(toneData.midi);
+    const nearestFreq = midiToFreq(nearestMidi);
+    const centsOff = 1200 * Math.log2(toneData.frequency / nearestFreq);
+    cents.value = centsOff;
+  }
   
-  console.log(`[VirtualKeyboard] Simulating tone: ${toneData.note} @ ${toneData.frequency.toFixed(1)}Hz (${centsOff.toFixed(1)} cents)`);
+  // Update needle position based on cents
+  needlePosition.value = Math.max(0, Math.min(100, 50 + (cents.value/100)*50));
+  
+  console.log(`[VirtualKeyboard] Simulating tone: ${toneData.note} @ ${toneData.frequency.toFixed(1)}Hz (${cents.value.toFixed(1)} cents, needle: ${needlePosition.value.toFixed(1)})`);
 }
 
 function stopSimulatedTone() {
@@ -757,6 +826,19 @@ function exitQuickPractice() {
     ? '/create-scales' 
     : '/create-exercises';
   router.push(creatorRoute);
+}
+
+// Select input method and update virtual keyboard accordingly
+function selectInputMethod(method) {
+  inputMode.value = method;
+  
+  if (method === 'virtual-keyboard') {
+    // Force VirtualKeyboard to re-render with new octave
+    inputMethodKey.value += 1;
+    pushToast(`Switched to virtual keyboard (octave ${virtualKeyboardOctave.value} for ${currentInstrumentName.value})`, 'success', 3000);
+  } else {
+    pushToast(`Switched to ${currentInstrumentName.value} microphone input`, 'info', 3000);
+  }
 }
 
 function quantizeDuration(durationSec, bpmVal) {
@@ -805,15 +887,47 @@ function transpositionToSemitones(t) {
 
 const transpositionLabel = computed(() => {
   try {
-    const inst = store.practiceUnitHeader?.instrument || store.instrument || (store.instruments && store.instruments[0]);
+    // Determine instrument source and context
+    const practiceUnitInst = store.practiceUnitHeader?.instrument;
+    const globalInst = store.instrument || (store.instruments && store.instruments[0]);
+    const inst = practiceUnitInst || globalInst;
+    
+    if (!inst) return '';
+    
     const t = inst?.transposition || 'C';
     const semis = transpositionToSemitones(t);
     const intervalMap = { 0: 'P1', 2: 'M2', 7: 'P5', 9: 'M6' };
     const iv = intervalMap[semis] || (semis > 0 ? `+${semis}` : `${semis}`);
+    
     // normalize display of special chars
     const tDisplay = String(t).replace('Bb','B♭').replace('Eb','E♭');
-    return `Transposition: ${tDisplay} → written = sounding + ${iv} (${semis >= 0 ? '+' : ''}${semis} semitones)`;
+    
+    // Show context: whether using practice unit's instrument or global selection
+    const instrumentName = inst?.instrument || 'Unknown';
+    const context = practiceUnitInst ? `(Practice Unit: ${instrumentName})` : `(Selected: ${instrumentName})`;
+    
+    if (semis === 0) {
+      return `Non-transposing instrument ${context}`;
+    }
+    
+    return `Transposition: ${tDisplay} → written = sounding + ${iv} (${semis >= 0 ? '+' : ''}${semis} semitones) ${context}`;
   } catch (e) { return '' }
+});
+
+// Current instrument name for display
+const currentInstrumentName = computed(() => {
+  const inst = store.practiceUnitHeader?.instrument || store.instrument || (store.instruments && store.instruments[0]);
+  return inst?.instrument || 'Unknown Instrument';
+});
+
+// Virtual keyboard octave based on current instrument
+const virtualKeyboardOctave = computed(() => {
+  const inst = store.practiceUnitHeader?.instrument || store.instrument || (store.instruments && store.instruments[0]);
+  if (!inst?.defaultStartingOctave) return 4; // fallback
+  
+  // Parse defaultStartingOctave like "C3" or "C0" to get octave number
+  const octaveMatch = inst.defaultStartingOctave.match(/(\d+)$/);
+  return octaveMatch ? parseInt(octaveMatch[1], 10) : 4;
 });
 
 // Render a simple staff showing every chromatic note between the instrument range
@@ -1604,18 +1718,40 @@ function start() {
       }
     })
     .catch((err) => {
-      console.error('Mic error', err);
+      console.error('Microphone error:', err.name, err.message, err);
       
-      // Provide better user guidance based on error type
+      // Provide detailed user guidance based on error type
       let message = 'Microphone access is required for live pitch detection.';
+      let toastType = 'warning';
+      
       if (err.name === 'NotAllowedError') {
-        message = 'Microphone permission was denied. Please allow microphone access in your browser settings to use live pitch detection.';
+        message = 'Microphone permission was denied. Click the 🔒 icon in your browser address bar and allow microphone access, then try again.';
+        toastType = 'error';
       } else if (err.name === 'NotFoundError') {
-        message = 'No microphone found. Please connect a microphone to use live pitch detection.';
+        message = 'No microphone detected. Please: 1) Connect a microphone or headset 2) Check system audio settings 3) Close other apps using the microphone 4) Try the Virtual Keyboard instead.';
+        toastType = 'error';
+      } else if (err.name === 'NotReadableError') {
+        message = 'Microphone is busy or hardware error. Please close other apps using the microphone and try again.';
+        toastType = 'error';
+      } else if (err.name === 'AbortError') {
+        message = 'Microphone access was aborted. Please try again.';
+      } else if (err.name === 'TypeError') {
+        message = 'Browser microphone support issue. Please use a modern browser (Chrome, Firefox, Safari) with HTTPS.';
+        toastType = 'error';
+      } else {
+        message = `Microphone error (${err.name}): ${err.message || 'Unknown error'}. Try using the Virtual Keyboard instead.`;
+        toastType = 'error';
       }
       
-      pushToast(message, 'warning', 8000);
+      pushToast(message, toastType, 10000);
       running.value = false;
+      
+      // Automatically suggest virtual keyboard for microphone issues
+      if (err.name === 'NotFoundError' || err.name === 'NotReadableError') {
+        setTimeout(() => {
+          pushToast('💡 Tip: Use Virtual Keyboard below for testing without a microphone!', 'info', 5000);
+        }, 2000);
+      }
     });
 }
 
@@ -1628,7 +1764,25 @@ function toggleRunning() {
 }
 
 function showPermissionHelp() {
-  pushToast('To enable microphone access: 1) Look for the microphone icon in your browser address bar, 2) Click it and select "Allow", 3) Refresh the page if needed.', 'info', 10000);
+  // Check if we can enumerate devices to provide better guidance
+  if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+    navigator.mediaDevices.enumerateDevices()
+      .then(devices => {
+        const audioInputs = devices.filter(device => device.kind === 'audioinput');
+        console.log('Available audio inputs:', audioInputs);
+        
+        if (audioInputs.length === 0) {
+          pushToast('🎤 No microphone detected. Please connect a microphone or headset and refresh the page. Or use Virtual Keyboard below!', 'warning', 12000);
+        } else {
+          pushToast(`🎤 Microphone Setup Help:\n1) Click the 🔒 or 🎤 icon in your browser address bar\n2) Select "Allow" for microphone access\n3) Choose your microphone: ${audioInputs[0].label || 'Default microphone'}\n4) Refresh the page if needed\n\n💡 Alternative: Use Virtual Keyboard below (no microphone required)`, 'info', 15000);
+        }
+      })
+      .catch(() => {
+        pushToast('🎤 Microphone Permission Help:\n1) Click the 🔒 icon in your browser address bar\n2) Select "Allow" for microphone access\n3) Refresh the page if needed\n4) Make sure a microphone is connected\n\n💡 Alternative: Use Virtual Keyboard below!', 'info', 12000);
+      });
+  } else {
+    pushToast('🎤 Your browser may not support microphone access. Please use a modern browser (Chrome, Firefox, Safari) or try the Virtual Keyboard below!', 'warning', 10000);
+  }
 }
 
 function loadScript(url) {

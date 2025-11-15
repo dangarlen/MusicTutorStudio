@@ -17,6 +17,19 @@
             <div class="text-xs text-gray-500 mb-2">
               Filter and load a saved practice unit into Active Unit memory
             </div>
+            
+            <!-- Active Unit Status Indicator -->
+            <div v-if="hasActiveUnit" class="alert alert-success mb-3">
+              <span class="material-symbols-outlined">check_circle</span>
+              <div>
+                <div class="font-medium">Active Practice Unit</div>
+                <div class="text-sm">{{ activeUnitDisplayName }}</div>
+              </div>
+            </div>
+            <div v-else class="alert alert-info mb-3">
+              <span class="material-symbols-outlined">info</span>
+              <div class="text-sm">No practice unit currently active. Load one below to start practicing.</div>
+            </div>
 
             <div v-if="lesson.error" class="alert alert-warning mb-2">
               <span>{{ lesson.error }}</span>
@@ -44,15 +57,33 @@
               </div>
               <ul v-else class="p-2 space-y-1">
                 <li v-for="unit in filteredUnits" :key="unit.practice_unit_id">
-                  <div class="flex items-center justify-between w-full p-2 rounded border" :style="'background-color: white; border-color: #e5e7eb;'">
-                    <div class="flex items-center gap-2 flex-1">
-                      <span class="badge badge-outline">{{ unit.type }}</span>
-                      <span class="font-medium">{{ unit.name }}</span>
-                      <span class="text-xs text-gray-500" v-if="instrumentLabel(unit)">• {{ instrumentLabel(unit) }}</span>
+                  <div 
+                    class="flex items-center justify-between w-full p-2 rounded border hover:bg-gray-50 transition-colors" 
+                    :style="'background-color: white; border-color: #e5e7eb;'"
+                    :title="createTooltipText(unit)"
+                  >
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                      <span class="badge badge-outline flex-shrink-0">{{ unit.type }}</span>
+                      <span class="font-medium truncate">{{ unit.name }}</span>
+                      <span class="text-xs text-gray-500 flex-shrink-0" v-if="instrumentLabel(unit)">• {{ instrumentLabel(unit) }}</span>
                     </div>
-                    <button class="btn btn-sm btn-circle" @click="loadUnit(unit)" :title="`Load '${unit.name}' into Active Unit`">
-                      <span class="material-symbols-outlined text-base">download</span>
-                    </button>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                      <div class="text-right">
+                        <div class="text-xs text-gray-500" v-if="unit.last_modified">
+                          {{ formatTimestamp(unit.last_modified, 'compact') }}
+                        </div>
+                        <div class="text-xs text-gray-400" v-if="unit.last_modified">
+                          {{ formatTimestamp(unit.last_modified, 'relative') }}
+                        </div>
+                      </div>
+                      <button 
+                        class="btn btn-sm btn-circle" 
+                        @click="loadUnit(unit)" 
+                        :title="`Load '${unit.name}' into Active Unit`"
+                      >
+                        <span class="material-symbols-outlined text-base">download</span>
+                      </button>
+                    </div>
                   </div>
                 </li>
               </ul>
@@ -86,9 +117,11 @@ import FooterStandard from "./FooterStandard.vue";
 import { ref, computed, onMounted } from "vue";
 import { useLessonStore } from "../stores/lessonStore.js";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
+import { useActiveUnitStatus } from "../composables/useActiveUnitStatus.js";
 
 const lesson = useLessonStore();
 const practiceStore = usePracticeUnitScaleStore();
+const { hasActiveUnit, activeUnitDisplayName } = useActiveUnitStatus();
 
 const filterText = ref("");
 
@@ -98,6 +131,85 @@ function instrumentLabel(u) {
   if (typeof val === "string") return val;
   if (typeof val === "object") return val.instrument || val.name || "";
   return "";
+}
+
+// Format timestamp for display
+function formatTimestamp(timestamp, format = 'compact') {
+  if (!timestamp) return '';
+  
+  try {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return '';
+    
+    if (format === 'compact') {
+      // Compact format: "Nov 14, 2:30 PM"
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+    } else if (format === 'tooltip') {
+      // Detailed format for tooltip: "November 14, 2025 at 2:30:45 PM"
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long', 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    } else if (format === 'relative') {
+      // Relative time: "2 hours ago", "3 days ago"
+      const now = new Date();
+      const diffMs = now - date;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffMinutes = Math.floor(diffMs / (1000 * 60));
+      
+      if (diffDays > 0) {
+        return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+      } else if (diffHours > 0) {
+        return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      } else if (diffMinutes > 0) {
+        return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
+      } else {
+        return 'Just now';
+      }
+    }
+  } catch (e) {
+    console.warn('Error formatting timestamp:', e);
+    return '';
+  }
+}
+
+// Create tooltip text with all available metadata
+function createTooltipText(unit) {
+  const parts = [];
+  
+  if (unit.name) {
+    parts.push(`Name: ${unit.name}`);
+  }
+  
+  if (unit.type) {
+    parts.push(`Type: ${unit.type}`);
+  }
+  
+  const instrument = instrumentLabel(unit);
+  if (instrument) {
+    parts.push(`Instrument: ${instrument}`);
+  }
+  
+  if (unit.last_modified) {
+    parts.push(`Last Modified: ${formatTimestamp(unit.last_modified, 'tooltip')}`);
+    parts.push(`(${formatTimestamp(unit.last_modified, 'relative')})`);
+  }
+  
+  if (unit.practice_unit_id) {
+    parts.push(`ID: ${unit.practice_unit_id}`);
+  }
+  
+  return parts.join('\n');
 }
 
 const filteredUnits = computed(() => {
@@ -131,13 +243,23 @@ function loadUnit(unit) {
       alert("Invalid practice unit data.");
       return;
     }
+    
+    console.log('[PracticeExercises] Loading unit for practice:', unit.name);
+    
+    // Load the unit data into the store
     practiceStore.loadPracticeUnit(unit.unit_json);
-  // Do not auto-expand the JSON viewer when loading a unit — keep the
-  // 'Behind the Curtain' section collapsed so users are not surprised.
-    alert(`Loaded: ${unit.name}`);
+    
+    // Activate it for practice mode (this syncs with AppStateStore)
+    practiceStore.activateForPractice(unit.unit_json, 'saved');
+    
+    console.log('[PracticeExercises] Unit activated for practice mode');
+    
+    // Provide user feedback
+    alert(`Loaded: ${unit.name}\n\nYou can now practice this unit on any practice page.`);
+    
   } catch (e) {
-    console.warn("[PracticeExercises] loadUnit exception", e);
-    alert("Failed to load practice unit.");
+    console.error("[PracticeExercises] loadUnit exception", e);
+    alert("Failed to load practice unit: " + e.message);
   }
 }
 
@@ -145,4 +267,49 @@ onMounted(() => {
   lesson.fetchPracticeUnits().catch((e) => console.warn("Failed to load practice units", e));
 });
 </script>
+
+<style scoped>
+/* Enhanced tooltip styling for practice units */
+.tooltip-enhanced {
+  position: relative;
+}
+
+.tooltip-enhanced:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: pre-line;
+  z-index: 1000;
+  max-width: 300px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-enhanced:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(0, 0, 0, 0.9);
+  z-index: 1001;
+}
+
+/* Improve layout responsiveness */
+@media (max-width: 640px) {
+  .practice-unit-timestamp {
+    display: none;
+  }
+}
+</style>
 
