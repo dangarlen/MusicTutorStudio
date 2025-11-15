@@ -164,7 +164,8 @@
               </div>
               
               <VirtualKeyboard 
-                :on-tone-start="simulateToneInput"
+                ref="virtualKeyboardRef"
+                :on-tone-start="handleVirtualKeyboardTone"
                 :on-tone-stop="stopSimulatedTone"
                 :initial-octave="virtualKeyboardOctave"
                 :key="inputMethodKey"
@@ -398,6 +399,7 @@ const running = ref(false);
 // Input method management
 const inputMode = ref('instrument'); // 'instrument' | 'virtual-keyboard'
 const inputMethodKey = ref(0); // Force VirtualKeyboard re-render when switching
+const virtualKeyboardRef = ref(null); // Reference to VirtualKeyboard component
 
 // Practice mode selection for Practice Settings collapse
 const practiceMode = ref("Free Play");
@@ -803,6 +805,23 @@ function simulateToneInput(toneData) {
   needlePosition.value = Math.max(0, Math.min(100, 50 + (cents.value/100)*50));
   
   console.log(`[VirtualKeyboard] Simulating tone: ${toneData.note} @ ${toneData.frequency.toFixed(1)}Hz (${cents.value.toFixed(1)} cents, needle: ${needlePosition.value.toFixed(1)})`);
+}
+
+// Handle virtual keyboard tone with loopback support
+function handleVirtualKeyboardTone(toneData) {
+  const virtualKeyboard = virtualKeyboardRef.value;
+  const isLoopbackMode = virtualKeyboard?.loopbackMode;
+  
+  if (isLoopbackMode && running.value) {
+    // Loopback mode: audio is playing AND mic is listening
+    // The actual pitch detection will happen via microphone input
+    // Just log that we're in loopback testing mode
+    console.log(`[Loopback] Playing ${toneData.note} @ ${toneData.frequency.toFixed(1)}Hz - listening via microphone`);
+    // Don't call simulateToneInput - let the real mic detect the audio
+  } else {
+    // Normal virtual keyboard mode: simulate the tone input directly
+    simulateToneInput(toneData);
+  }
 }
 
 function stopSimulatedTone() {

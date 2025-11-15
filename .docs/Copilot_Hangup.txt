@@ -1,0 +1,15 @@
+If Copilot stops responding:
+
+Reload the VS Code window (Ctrl+Shift+P → "Developer: Reload Window")
+Sign out and back in to the Copilot extension (Ctrl+Shift+P → "GitHub Copilot: Sign Out", then sign back in)
+Check the Copilot output panel (View → Output → select "GitHub Copilot" from dropdown) for error messages
+Verify your GitHub token hasn't expired or been revoked in account settings
+To prevent hangs:
+
+Keep conversation summaries brief rather than extremely long exchanges (though ours is well-documented)
+If a response takes >30 seconds, interrupt and try rephrasing the request
+Avoid pasting extremely large code blocks in single messages; reference files instead
+For this project specifically:
+
+I have full context from our conversation history, so you can jump directly to the next task without re-explaining background
+Ready to move forward—shall we get back to diagnosing the virtual keyboard audio issue, or is there something else you'd like to tackle?
