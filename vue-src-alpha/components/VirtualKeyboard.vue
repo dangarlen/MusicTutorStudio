@@ -30,7 +30,24 @@
         </button>
       </div>
 
-      <!-- Audio Playback Control -->
+      <!-- Keyboard Key Selection -->
+      <div class="flex justify-center items-center gap-3 mb-3">
+        <span class="text-sm font-medium text-gray-600">Key:</span>
+        <button 
+          class="btn btn-sm"
+          :class="keyboardKey === 'C' ? 'btn-primary' : 'btn-outline'"
+          @click="keyboardKey = 'C'"
+        >
+          C (Concert)
+        </button>
+        <button 
+          class="btn btn-sm"
+          :class="keyboardKey === 'instrument' ? 'btn-primary' : 'btn-outline'"
+          @click="keyboardKey = 'instrument'"
+        >
+          {{ instrumentTransposition }}
+        </button>
+      </div>
       <div class="flex justify-center items-center gap-3 mb-3">
         <label class="flex items-center gap-2 cursor-pointer">
           <input 
@@ -115,6 +132,9 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
+import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore'
+
+const useStore = () => usePracticeUnitScaleStore()
 
 const props = defineProps({
   onToneStart: Function,
@@ -133,6 +153,35 @@ const loopbackMode = ref(false)
 const currentNote = ref('')
 const currentFreq = ref(0)
 const currentMidi = ref(null)
+const keyboardKey = ref('C') // 'C' or 'instrument'
+
+// Keyboard key display - computed to be reactive
+const instrumentTransposition = computed(() => {
+  const store = useStore()
+  
+  // Get instrument from either direct store.instrument or practiceUnitHeader
+  const instrumentObj = store.instrument || store.practiceUnitHeader?.instrument
+  if (!instrumentObj) {
+    console.log('[VirtualKeyboard] No instrument object for display')
+    return 'Key of [Instrument]'
+  }
+  
+  // Get the instrument name
+  const instrumentName = typeof instrumentObj === 'string' 
+    ? instrumentObj 
+    : instrumentObj.instrument
+  
+  // Find the instrument in the loaded instruments array
+  const inst = store.instruments?.find(i => i.instrument === instrumentName)
+  if (inst?.transposition) {
+    const display = `Key of ${inst.transposition}`
+    console.log(`[VirtualKeyboard] Display: ${display}`)
+    return display
+  }
+  
+  console.log(`[VirtualKeyboard] No transposition found for display`)
+  return 'Key of [Instrument]'
+})
 
 // Audio context
 let audioContext = null
@@ -173,6 +222,59 @@ function midiToNoteName(midiNote) {
   return notes[noteNum] + octaveNum
 }
 
+// Get transposition semitones for current instrument
+function getInstrumentTranspositionSemitones() {
+  if (keyboardKey.value !== 'instrument') return 0
+  
+  const store = useStore()
+  
+  // Get instrument from either direct store.instrument or practiceUnitHeader
+  const instrumentObj = store.instrument || store.practiceUnitHeader?.instrument
+  if (!instrumentObj) {
+    console.log('[VirtualKeyboard] No instrument object found in store')
+    return 0
+  }
+  
+  // Get the instrument name - could be a string or an object with .instrument property
+  const instrumentName = typeof instrumentObj === 'string' 
+    ? instrumentObj 
+    : instrumentObj.instrument
+  
+  if (!instrumentName) {
+    console.log('[VirtualKeyboard] No instrument name found')
+    return 0
+  }
+  
+  // Find the instrument in the loaded instruments array
+  const inst = store.instruments?.find(i => i.instrument === instrumentName)
+  if (!inst?.transposition) {
+    console.log(`[VirtualKeyboard] No transposition found for instrument: ${instrumentName}`)
+    return 0
+  }
+  
+  console.log(`[VirtualKeyboard] Found instrument: ${instrumentName}, transposition: ${inst.transposition}`)
+  
+  // Parse transposition (e.g., "Bb" = -2 semitones, "Eb" = -3, "F" = 5)
+  const transpositionMap = {
+    'C': 0,
+    'Db': -1, 'D♭': -1,
+    'D': 2,
+    'Eb': -3, 'E♭': -3,
+    'E': 4,
+    'F': 5,
+    'Gb': -6, 'G♭': -6,
+    'G': 7,
+    'Ab': -9, 'A♭': -9,
+    'A': 9,
+    'Bb': -2, 'B♭': -2,
+    'B': 11
+  }
+  
+  const semitones = transpositionMap[inst.transposition] || 0
+  console.log(`[VirtualKeyboard] Transposition semitones for ${inst.transposition}: ${semitones}`)
+  return semitones
+}
+
 // Initialize audio context
 function initAudio() {
   if (!audioContext) {
@@ -189,7 +291,15 @@ function playNote(midi) {
   // Stop any existing note
   stopNote()
   
-  const freq = midiToFreq(midi)
+  // Apply transposition if "Key of [Instrument]" is selected
+  const transpositionSemitones = getInstrumentTranspositionSemitones()
+  const displayMidi = midi
+  // For transposing instruments: if transposition = -2 (Bb), subtract from MIDI to get lower pitch
+  const playMidi = midi + transpositionSemitones
+  
+  console.log(`[VirtualKeyboard] playNote: keyboardKey=${keyboardKey.value}, displayMidi=${displayMidi}, transposition=${transpositionSemitones}, playMidi=${playMidi}`)
+  
+  const freq = midiToFreq(playMidi)
   
   oscillator = audioContext.createOscillator()
   gainNode = audioContext.createGain()
@@ -205,13 +315,13 @@ function playNote(midi) {
   
   oscillator.start()
   
-  currentMidi.value = midi
-  currentNote.value = midiToNoteName(midi)
+  currentMidi.value = displayMidi
+  currentNote.value = midiToNoteName(displayMidi)
   currentFreq.value = freq
   
   if (props.onToneStart) {
     props.onToneStart({
-      midi,
+      midi: displayMidi,
       frequency: freq,
       note: currentNote.value,
       loopbackMode: loopbackMode.value

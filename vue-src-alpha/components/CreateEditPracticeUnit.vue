@@ -113,7 +113,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
               <div>
                 <label class="label"><span class="label-text">Practice Name</span></label>
-              
+                <input v-model="headerObj.practiceName" class="input input-bordered w-full" placeholder="Practice name" />
 
                 <label class="label mt-2"><span class="label-text">Type</span></label>
                 <select v-model="headerObj.practiceUnitType" class="select select-bordered w-full">
@@ -255,7 +255,14 @@ function openEditPanelFromUnit(unit) {
   const h = unit.unit_json.practiceUnitHeader || {};
   headerObj.practiceName = h.practiceName || h.practiceUnitName || editUnitName.value || '';
   headerObj.practiceUnitType = h.practiceUnitType || unit.type || 'Scale';
-  headerObj.instrumentName = h.instrument || h.instrumentName || '';
+  
+  // Handle instrument: store full object for later save, and extract name for display
+  const savedInstrument = h.instrument || h.instrumentName || '';
+  headerObj.instrument = typeof savedInstrument === 'object' ? savedInstrument : null;
+  headerObj.instrumentName = typeof savedInstrument === 'object' 
+    ? (savedInstrument.instrument || '')
+    : String(savedInstrument || '');
+  
   headerObj.keySignature = h.keySignature || h.key || '';
   headerObj.timeSignature = h.timeSignature || '';
   headerObj.tempo = h.tempo || h.bpm || 120;
@@ -346,7 +353,31 @@ function saveToMemory() {
 
 async function saveToDatabase() {
   try {
-    const unitJson = { practiceUnitHeader: { ...headerObj }, noteArray: notes.value };
+    // Resolve instrument string to full object
+    const instrumentToSave = (() => {
+      if (!headerObj.instrumentName) return null;
+      if (typeof headerObj.instrumentName === 'object') return headerObj.instrumentName;
+      
+      // Search for matching instrument in store
+      const instName = String(headerObj.instrumentName).toLowerCase().trim();
+      if (Array.isArray(store.instruments)) {
+        const found = store.instruments.find(i => 
+          String(i.instrument || '').toLowerCase().trim() === instName
+        );
+        if (found) return found;
+      }
+      
+      // Fallback: return as string if not found in list
+      return headerObj.instrumentName;
+    })();
+
+    const unitJson = { 
+      practiceUnitHeader: { 
+        ...headerObj,
+        instrument: instrumentToSave
+      }, 
+      noteArray: notes.value 
+    };
     const { data: sessData, error: sessErr } = await supabase.auth.getSession();
     if (sessErr) throw sessErr;
     const user = sessData?.session?.user;
@@ -355,10 +386,13 @@ async function saveToDatabase() {
       return;
     }
 
+    // Sync the practice name to both the database name column and the JSON header
+    const practiceNameToSave = headerObj.practiceName?.trim() || editUnitName.value?.trim() || '(untitled)';
+    
     const row = {
       practice_unit_id: editingUnitId.value || undefined,
       user_id: user.id,
-      name: editUnitName.value || headerObj.practiceName || '(untitled)',
+      name: practiceNameToSave,
       type: headerObj.practiceUnitType || editingUnit.value?.type || 'Scale',
       unit_json: unitJson,
     };

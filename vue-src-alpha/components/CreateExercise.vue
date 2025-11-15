@@ -374,7 +374,11 @@ async function practiceNow() {
     
     // Update header for quick practice
     const exerciseName = store.practiceUnitHeader.practiceName || 'Exercise';
-    store.practiceUnitHeader.practiceName = exerciseName + ' (Quick Practice)';
+    // Only add (Quick Practice) if not already present
+    const practiceName = exerciseName.includes('(Quick Practice)') 
+      ? exerciseName 
+      : exerciseName + ' (Quick Practice)';
+    store.practiceUnitHeader.practiceName = practiceName;
     store.practiceUnitHeader.practiceUnitId = 'quick-' + Date.now();
     store.practiceUnitHeader.lastModified = new Date().toISOString();
     store.practiceUnitHeader.practiceUnitType = 'Exercise';

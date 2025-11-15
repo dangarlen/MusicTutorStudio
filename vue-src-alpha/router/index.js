@@ -6,6 +6,7 @@ import PracticeExercises from "../components/PracticeExercises.vue";
 import PracticeScales from "../components/PracticeScales.vue";
 import PracticeNotes from "../components/PracticeNotes.vue";
 import PracticePitch from "../components/PracticePitch.vue";
+import PracticeTuning from "../components/PracticeTuning.vue";
 import Creator from "../components/Creator.vue";
 import Lessons from "../components/Lessons.vue";
 import LessonsManage from "../components/LessonsManage.vue";
@@ -42,6 +43,7 @@ const routes = [
   },
   { path: "/practice-notes", name: "practice-notes", component: PracticeNotes },
   { path: "/practice-pitch", name: "practice-pitch", component: PracticePitch },
+  { path: "/practice-tuning", name: "practice-tuning", component: PracticeTuning },
   { path: "/creator", name: "creator", component: Creator },
   { path: "/lessons", name: "lessons", component: Lessons },
   { path: "/lessons-manage", name: "lessons-manage", component: LessonsManage },

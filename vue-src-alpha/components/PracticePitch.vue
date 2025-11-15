@@ -1363,19 +1363,20 @@ function highlightDetectedNote() {
     // Compute MIDI for detected (best-effort)
     const detMidi = Number.isFinite(Number(detectedFreq.value)) && detectedFreq.value > 0 ? Math.round(freqToMidi(detectedFreq.value)) : Number.NaN;
 
-    // Find best match: exact SPN match first, else closest MIDI distance
+    // Find best match: exact SPN match (including octave) first, else closest MIDI distance
     let bestIdx = -1;
     for (let i = 0; i < testNotes.noteArray.length; i++) {
       const n = testNotes.noteArray[i];
       const p = String(n.pitch || n.spn || '').trim();
       if (!p) continue;
-      // normalize: allow C/4 or C4
+      // normalize: allow C/4 or C4, but preserve octave for exact comparison
       const normP = p.replace('/', '');
       const normDet = det.replace('/', '');
+      // Exact match: compare the full note with octave
       if (normP.toLowerCase() === normDet.toLowerCase()) { bestIdx = i; break; }
     }
     if (bestIdx === -1 && Number.isFinite(detMidi)) {
-      // fallback: choose note with nearest MIDI
+      // fallback: choose note with nearest MIDI (if no exact match found)
       let bestDiff = Infinity;
       for (let i = 0; i < testNotes.noteArray.length; i++) {
         const n = testNotes.noteArray[i];
@@ -1701,9 +1702,15 @@ function start() {
           if (freq && freq > 0) {
             detectedFreq.value = freq;
             const midi = freqToMidi(freq);
-            const nearest = Math.round(midi);
+            
+            // Apply instrument transposition to convert sounding pitch to written pitch
+            const inst = store.practiceUnitHeader?.instrument || store.instrument || (store.instruments && store.instruments[0]);
+            const transposeSemitones = inst ? transpositionToSemitones(inst.transposition) : 0;
+            const writtenMidi = midi + transposeSemitones;
+            
+            const nearest = Math.round(writtenMidi);
             detectedNote.value = noteNameFromMidi(nearest);
-            cents.value = (midi - nearest) * 100;
+            cents.value = (writtenMidi - nearest) * 100;
             needlePosition.value = Math.max(0, Math.min(100, 50 + (cents.value/100)*50));
           }
 

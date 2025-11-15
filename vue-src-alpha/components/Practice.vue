@@ -83,6 +83,11 @@
           <span class="material-symbols-outlined" aria-hidden="true">hearing</span>
           Pitch Practice
         </RouterLink>
+
+        <RouterLink to="/practice-tuning" class="mtsFormatPracticeButtons">
+          <span class="material-symbols-outlined" aria-hidden="true">tune</span>
+          Tuning Practice
+        </RouterLink>
         
         <RouterLink to="/practice-notes" class="mtsFormatPracticeButtons">
           <span class="material-symbols-outlined" aria-hidden="true">sticky_note_2</span>
