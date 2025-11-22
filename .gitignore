@@ -1,24 +1,37 @@
-archive/
-public/vendor/
+# 🔒 Backups / prototypes (keep local, not tracked)
+archive_DELETE_ME/
+prototype_DELETE_ME/
+alpha-vue-SPA_DELETE_ME/
+public/vendor_DELETE_ME/
 
-# Root dependencies
+
+
+# 📦 Dependencies
 node_modules/
-
-# Nested vendor trees
 tailwind/node_modules/
 alpha-vue-SPA/node_modules/
 prototype/node_modules/
 
-# Build artifacts
+# 🏗️ Build artifacts
 dist/
 build/
+public/assets_DELETE_ME/        # hashed JS/CSS bundles only
 
-# Test outputs
+# 🧪 Test outputs
 coverage/
 playwright-report/
 test-results/
 
-# Misc caches/logs
+# ⚙️ Misc caches/logs
 .cache/
 logs/
 tmp/
+
+# 🖥️ OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+
+
+

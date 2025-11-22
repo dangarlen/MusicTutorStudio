@@ -9,9 +9,9 @@ function Timestamp { (Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz') }
 $RepoRoot = (Resolve-Path $RepoRoot).ProviderPath
 Write-Output "Repo root: $RepoRoot"
 
-$versionFile = Join-Path $RepoRoot 'public\data\version.json'
+$versionFile = Join-Path $RepoRoot 'data\version.json'
 $projectNotes = Join-Path $RepoRoot '.notes\PROJECT_NOTES.md'
-$changeLog = Join-Path $RepoRoot 'public\data\change-log.json'
+$changeLog = Join-Path $RepoRoot 'data\change-log.json'
 
 if (-not (Test-Path $versionFile)) { Write-Error "version.json not found at $versionFile"; exit 2 }
 if (-not (Test-Path $projectNotes)) { Write-Error "PROJECT_NOTES.md not found at $projectNotes"; exit 2 }
@@ -44,7 +44,7 @@ Write-Output "Appended uprev note to $projectNotes"
 if (Test-Path $changeLog) {
   try {
     $cl = Get-Content -Raw $changeLog | ConvertFrom-Json
-    $cl.changes += @{ timestamp = $ts; file = 'public/data/version.json'; change = "Uprev to $Version - $Note" }
+    $cl.changes += @{ timestamp = $ts; file = 'data/version.json'; change = "Uprev to $Version - $Note" }
     $clText = $cl | ConvertTo-Json -Depth 10
     [System.IO.File]::WriteAllText($changeLog, $clText + "`n")
     Write-Output "Updated change-log.json"

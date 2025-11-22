@@ -40,11 +40,11 @@ composePracticeUnit.js
 - `usePracticeUnitScaleStore` (file: `vue-src-alpha/stores/practiceUnitScaleStore.js`)
 
   - state
-    - `instrument`: currently selected instrument object (from `public/data/instruments.json`)
+    - `instrument`: currently selected instrument object (from `data/instruments.json`)
     - `instruments`: the catalog loaded from JSON
     - `title`: page title (e.g., "Create Scale")
   - actions
-    - `loadInstruments()`: fetches `public/data/instruments.json`
+    - `loadInstruments()`: fetches `data/instruments.json`
     - `setInstrument(inst)`, `setTitle(title)`
 
 - `useTestStaffNoteStore` (file: `vue-src-alpha/stores/testStaffNoteStore.js`)
