@@ -20,19 +20,19 @@ Notes:
 - Designed for the repository layout used by MusicTutorStudio
 #>
 
-Write-Host "BUILD-VERIFY-DEPLOY script started"
+Write-Host "ðŸ”§ build-verify-deploy.ps1 started"
 
 # Helper to fail with message
 function Fail($msg) {
-    Write-Host "ERROR: $msg"
+    Write-Host "âŒ $msg"
     exit 1
 }
 
 # Ensure Netlify CLI exists
-Write-Host "Checking for Netlify CLI..."
+Write-Host "âŒ› Checking for Netlify CLI..."
 $netlifyPath = & where.exe netlify 2>$null
 if (-not $netlifyPath) {
-    Write-Host "WARNING: Netlify CLI not found. Install it with: npm install -g netlify-cli"
+    Write-Host "âš  Netlify CLI not found. Install it with: npm install -g netlify-cli"
     # Not failing immediately; user may want to build-only
 }
 
@@ -56,7 +56,7 @@ $dstLibs = Join-Path $PSScriptRoot "..\public\alpha-vue-SPA\libs"
 if (Test-Path $srcLibs) {
     Write-Host "[DEBUG] Copying libs $srcLibs -> $dstLibs"
     New-Item -ItemType Directory -Force -Path $dstLibs | Out-Null
-    Get-ChildItem -Path $srcLibs | Copy-Item -Destination $dstLibs -Recurse -Force
+    Copy-Item -Path (Join-Path $srcLibs '*') -Destination $dstLibs -Recurse -Force
 } else {
     Write-Host "[WARN] Source libs folder not found: $srcLibs"
 }
@@ -104,10 +104,10 @@ Set-Content -Path $topIndex -Value $html -Encoding UTF8
 Write-Host "[DEBUG] Promoted index.html to top-level public/index.html"
 
 # Verification: list a few key files
-Write-Host "VERIFY: public/assets (top 20):"
+Write-Host "[VERIFY] public/assets (top 20):"
 Get-ChildItem $dstAssets -File -Recurse -Depth 1 | Select-Object -First 20 | ForEach-Object { Write-Host " - $($_.Name)" }
 
-Write-Host "VERIFY: public/alpha-vue-SPA/libs:"
+Write-Host "[VERIFY] public/alpha-vue-SPA/libs:"
 if (Test-Path $dstLibs) { Get-ChildItem $dstLibs -File | ForEach-Object { Write-Host " - $($_.Name)" } } else { Write-Host " - (not found)" }
 
 # Deploy to Netlify
@@ -120,17 +120,17 @@ if ($netlifyPath) {
         Write-Host "[DEBUG] Netlify CLI output:"
         Write-Host $output
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "SUCCESS: Netlify deploy succeeded."
+            Write-Host "âœ… Netlify deploy succeeded."
             exit 0
         } else {
-            Write-Host "ERROR: Netlify deploy failed with exit code $LASTEXITCODE."
+            Write-Host "âŒ Netlify deploy failed with exit code $LASTEXITCODE."
             exit $LASTEXITCODE
         }
     } catch {
-        Write-Host "ERROR: Netlify deploy encountered an error: $_"
+        Write-Host "âŒ Netlify deploy encountered an error: $_"
         exit 1
     }
 } else {
-    Write-Host "WARNING: Netlify CLI not found; build/verify steps completed but deploy skipped. Install netlify-cli to enable deployment."
+    Write-Host "âš  Netlify CLI not found; build/verify steps completed but deploy skipped. Install netlify-cli to enable deployment."
     exit 0
 }

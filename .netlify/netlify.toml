@@ -7,7 +7,7 @@ redirects = []
 [functions."*"]
 
 [build]
-publish = "C:\\Dev\\MusicTutorStudio\\Code\\public\\alpha-vue-SPA"
+publish = "C:\\Dev\\MusicTutorStudio\\Code\\public"
 publishOrigin = "config"
 commandOrigin = "config"
 command = "echo \"No build\""
