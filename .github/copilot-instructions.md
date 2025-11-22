@@ -6,8 +6,8 @@ Target audience for these instructions: automated coding agents (Copilot-style) 
 
 ## Big-picture architecture (read before editing)
 - Static site served from `public/` (HTML + client JS). No server-side code in the repo.
-- Fragments: header and footer are injected at runtime (`public/scripts/load-header.js`, `public/scripts/load-footer.js`) from `fragments/header.html` and `fragments/footer.html`.
-- Data-driven UI: `public/scripts/*.js` fetch JSON from `public/data/*.json` (examples: `pitch-class.json`, `instruments.json`, `version.json`). These JSON files are authoritative for pitch maps and fingerings.
+- Fragments: header and footer are injected at runtime (`src/scripts/load-header.js`, `src/scripts/load-footer.js`) from `fragments/header.html` and `fragments/footer.html`.
+- Data-driven UI: `src/scripts/*.js` fetch JSON from `data/*.json` (examples: `pitch-class.json`, `instruments.json`, `version.json`). These JSON files are authoritative for pitch maps and fingerings.
 - Notation & audio: VexFlow (notation) and Tone.js (audio) are used via CDN links in the HTML pages (see `public/show-scales.html`, `public/play-scales.html`).
 
 Why this matters: most changes are front-end-only and must preserve the fetch/load order and data shapes. Many scripts assume global helpers on `window` and the existence of certain cookie keys.
@@ -26,7 +26,7 @@ npx serve public
 - Deploy: a PowerShell script `deploy.ps1` wraps `netlify deploy --prod --dir=public`. Netlify CLI must be installed (`npm install -g netlify-cli`). VS Code task "🚀 Push & Deploy to Netlify" runs the script.
 
 ## Project-specific conventions & patterns
-- File layout: most client code lives under `public/scripts/`. HTML pages reference scripts with relative paths; maintain relative references when moving files.
+- File layout: most client code lives under `src/scripts/`. HTML pages reference scripts with relative paths; maintain relative references when moving files.
 - Load-order matters: `fragments/header.html` is injected by `load-header.js`. Scripts that depend on data or globals must be included in the same order seen in the HTML pages. Example ordering in `show-scales.html`:
   1. `scripts/pitchUtils.js` (normalization, SPN/MIDI helpers)
   2. `scripts/pitchConverter.js` (midi/spn helpers)
@@ -55,8 +55,8 @@ When adding an instrument, follow the existing shape: keys are normalized via `n
 
 ## Common edit patterns & safe changes
 - To change UI text or layout, edit `public/fragments/header.html`, `public/fragments/footer.html` or the relevant page under `public/`.
-- To add a new root-note or scale option, update `public/data/show-scales.json` (populated in `show-scales.js`).
-- To change pitch/fingering behavior, edit `public/scripts/pitchUtils.js` / `public/scripts/pitchConverter.js` and update `data/*.json` accordingly.
+- To add a new root-note or scale option, update `data/show-scales.json` (populated in `show-scales.js`).
+- To change pitch/fingering behavior, edit `src/scripts/pitchUtils.js` / `src/scripts/pitchConverter.js` and update `data/*.json` accordingly.
 
 Avoid:
 - Renaming top-level files without updating the HTML references.
