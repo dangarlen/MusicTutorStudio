@@ -55,90 +55,136 @@
 
       <!-- Collapses Section -->
       <div class="max-w-5xl mx-auto mt-6">
-        <!-- Live Tuner Collapse -->
+        <!-- Tuning Display Collapse -->
         <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl">
           <input type="checkbox" class="peer" checked />
-          <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center">
-            <span>🎤 Live Tuner</span>
-            <span v-if="running" class="badge badge-success">Listening</span>
+          <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">
+            🎵 Tuning Display
           </div>
           <div class="collapse-content px-4 pb-4">
-            <div v-if="inputMode === 'instrument'" class="space-y-3">
-              <div class="text-sm text-gray-700 mb-3">
-                Using microphone input for {{ currentInstrumentName }} (microphone permission required)
+            <!-- Detected Note • Expected Next • Tuning (Side-by-Side) -->
+            <div class="flex gap-4 mb-4">
+              <!-- Detected Note (Left) -->
+              <div class="flex-1 bg-white p-3 rounded-lg border border-gray-200">
+                <div class="text-center">
+                  <div class="text-xs text-gray-600 mb-1 font-medium">Detected Note</div>
+                  <div class="text-4xl font-bold text-gray-800">{{ detectedNote || '--' }}</div>
+                  <div class="text-xs text-gray-600 mt-1">{{ formatFreq(detectedFreq) }}</div>
+                  
+                  <!-- Hold Time Countdown Timer -->
+                  <div v-if="detectedNote" class="mt-2">
+                    <div class="text-xs font-medium text-gray-600 mb-1" v-if="!isNoteHeld">Hold for 1s</div>
+                    <div class="text-3xl font-bold font-mono transition-all" :class="isNoteHeld ? 'text-green-600' : 'text-blue-600'">
+                      {{ holdTimeDisplay }}
+                    </div>
+                    <div class="w-full bg-gray-300 rounded-full h-3 overflow-hidden mt-1">
+                      <div 
+                        class="h-full rounded-full transition-all duration-100"
+                        :class="isNoteHeld ? 'bg-green-500' : 'bg-blue-500'"
+                        :style="{ width: holdPercentage + '%' }"
+                      ></div>
+                    </div>
+                    <!-- Completion message -->
+                    <div v-if="isNoteHeld" class="mt-2 p-1 bg-green-100 border border-green-500 rounded text-xs">
+                      <div class="font-bold text-green-600">✓ HELD!</div>
+                    </div>
+                  </div>
+                  
+                  <div class="text-xs text-gray-500 mt-2">
+                    <span v-if="inputMode === 'instrument' && running">🎤 Live</span>
+                    <span v-else-if="inputMode === 'virtual-keyboard'">🎹 Virtual</span>
+                    <span v-else>—</span>
+                  </div>
+                </div>
               </div>
-              <button
-                class="btn btn-lg w-full"
-                :class="running ? 'btn-error' : 'btn-primary'"
-                @click="toggleRunning"
-              >
-                <span class="material-symbols-outlined mr-2">{{ running ? 'mic_off' : 'mic' }}</span>
-                {{ running ? 'Stop Microphone' : 'Start Microphone' }}
-              </button>
-              <div v-if="!running" class="text-xs text-center text-gray-500 mt-2">
-                <button class="link link-primary" @click="showPermissionHelp = !showPermissionHelp">
-                  Permission Help
-                </button>
-              </div>
-            </div>
-            <div v-else class="text-sm text-gray-500 py-4 text-center">
-              Switch to microphone input above to start tuning practice.
-            </div>
-          </div>
-        </div>
 
-        <!-- Scale Detection Debug Collapse -->
-        <div class="collapse collapse-arrow bg-yellow-50 border border-yellow-300 mb-4 rounded-xl hidden">
-          <input type="checkbox" class="peer" />
-          <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center">
-            <span>🎼 Scale Detection Debug</span>
-            <span v-if="scaleDetectionRunning" class="badge badge-warning">Recording</span>
-          </div>
-          <div class="collapse-content px-4 pb-4">
-            <div class="space-y-3">
-              <div class="text-sm text-gray-700">
-                Play a C major scale starting with C4. Each note will be logged with frequency, MIDI value, and converted note.
-              </div>
-              <button
-                class="btn btn-lg w-full"
-                :class="scaleDetectionRunning ? 'btn-error' : 'btn-warning'"
-                @click="toggleScaleDetection"
-              >
-                <span class="material-symbols-outlined mr-2">{{ scaleDetectionRunning ? 'stop' : 'play_arrow' }}</span>
-                {{ scaleDetectionRunning ? 'Stop Scale Detection' : 'Start Scale Detection' }}
-              </button>
-              
-              <div class="mt-4 p-3 bg-gray-900 text-gray-100 rounded font-mono text-xs max-h-64 overflow-y-auto">
-                <div v-if="scaleLog.length === 0" class="text-gray-500">
-                  Logs will appear here as notes are detected...
-                </div>
-                <div v-for="(entry, idx) in scaleLog" :key="idx" class="mb-2 pb-1 border-b border-gray-700">
-                  <div>
-                    <span class="text-blue-300">{{ entry.time }}</span>
-                    <span class="text-green-300 mx-2 font-bold">{{ entry.note }}</span>
-                    <span class="text-yellow-300">{{ entry.freq.toFixed(1) }}Hz</span>
-                  </div>
-                  <div class="text-gray-400 ml-2">
-                    MIDI: {{ entry.midi.toFixed(2) }} | Rounded: {{ entry.midiRounded }} | Oct: {{ entry.octave }} | Note Idx: {{ entry.noteIdx }}
+              <!-- Expected Next Note (Middle) -->
+              <div class="w-56 bg-gradient-to-r from-cyan-50 to-blue-50 p-3 rounded-lg border border-cyan-300 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="text-xs text-gray-700 font-semibold uppercase">Expected Next</div>
+                  <div class="text-3xl font-bold font-mono text-cyan-600">
+                    {{ expectedNextNote || 'N/A' }}
                   </div>
                 </div>
               </div>
-              
-              <button class="btn btn-sm btn-ghost w-full" @click="clearScaleLog">
-                Clear Log
-              </button>
+
+              <!-- Tuning Meter (Right) - Horizontal Style -->
+              <div class="flex-1 bg-gradient-to-b from-gray-50 to-white p-4 rounded-lg border-2 border-gray-300 shadow-lg flex flex-col justify-center">
+                <div class="text-sm text-gray-800 mb-3 font-bold text-center uppercase tracking-wide">Tuning</div>
+                <svg width="100%" height="80" viewBox="0 0 200 80" class="drop-shadow-lg">
+                  <defs>
+                    <linearGradient id="meterHGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.5" />
+                      <stop offset="50%" style="stop-color:#22c55e;stop-opacity:0.6" />
+                      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.5" />
+                    </linearGradient>
+                  </defs>
+                  
+                  <!-- Background bar -->
+                  <rect x="10" y="28" width="180" height="24" fill="url(#meterHGradient)" rx="12" ry="12" stroke="#666" stroke-width="1"/>
+                  
+                  <!-- Tick marks -->
+                  <g stroke="#666" stroke-width="2">
+                    <line x1="10" y1="20" x2="10" y2="60"/>
+                    <line x1="100" y1="18" x2="100" y2="62"/>
+                    <line x1="190" y1="20" x2="190" y2="60"/>
+                  </g>
+                  
+                  <!-- Labels -->
+                  <text x="10" y="73" text-anchor="middle" font-size="12" fill="#3b82f6" font-weight="bold">♭ FLAT</text>
+                  <text x="100" y="73" text-anchor="middle" font-size="12" fill="#22c55e" font-weight="bold">IN TUNE</text>
+                  <text x="190" y="73" text-anchor="middle" font-size="12" fill="#ef4444" font-weight="bold">♯ SHARP</text>
+                  
+                  <!-- Needle -->
+                  <line 
+                    x1="100" y1="40" 
+                    :x2="10 + getTuningNeedlePosition() * 1.8"
+                    y2="40"
+                    stroke="#000" stroke-width="4" stroke-linecap="round"
+                  />
+                  
+                  <!-- Center knob -->
+                  <circle cx="100" cy="40" r="5" fill="#000" stroke="#fff" stroke-width="1"/>
+                </svg>
+                <div class="text-center text-base font-bold text-gray-800 mt-2">{{ centsDisplay() }}</div>
+              </div>
             </div>
+
+            <!-- Staff Display -->
+            <details class="border-t pt-3" open>
+              <summary class="cursor-pointer text-base font-bold text-gray-800 mb-2">📊 C Major Scale Progress</summary>
+              <div class="mt-2 bg-gradient-to-b from-blue-50 to-white p-4 rounded-lg border-2 border-blue-200">
+                <div class="text-xs text-gray-600 mb-2 text-center">
+                  <strong>Color Key:</strong>
+                  <span class="mx-2 text-yellow-600">● Yellow = Expected Next</span>
+                  <span class="mx-2 text-green-600">● Green = Perfect</span>
+                  <span class="mx-2 text-blue-600">● Blue = Good</span>
+                  <span class="mx-2 text-orange-600">● Orange = Flat/Sharp</span>
+                  <span class="mx-2 text-red-600">● Red = Wrong</span>
+                </div>
+                <StaffPreview
+                  :practice-overlay-mode="'pitch'"
+                  :practice-overlay-tooltip-only="false"
+                  :practice-enable-click-to-cycle="false"
+                  :practice-color-cycle="['black', 'yellow', 'green', 'blue', 'orange', 'red']"
+                />
+              </div>
+            </details>
           </div>
         </div>
 
         <!-- Virtual Keyboard Collapse -->
-        <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl">
-          <input type="checkbox" class="peer" :checked="inputMode === 'virtual-keyboard'" />
+        <div v-if="showVirtualKeyboardCollapse" class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl">
+          <input 
+            type="checkbox" 
+            class="peer" 
+            checked
+          />
           <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2">
             🎹 Virtual Keyboard
           </div>
           <div class="collapse-content px-4 pb-4">
-            <div v-if="inputMode === 'virtual-keyboard'" class="space-y-3">
+            <div class="space-y-3">
               <div class="text-sm text-gray-700 mb-3">
                 {{ currentInstrumentName }} • Starting octave {{ virtualKeyboardOctave }}
               </div>
@@ -149,110 +195,210 @@
                 @on-tone-stop="stopVirtualKeyboardTone"
               />
             </div>
-            <div v-else class="text-sm text-gray-500 py-4 text-center">
-              Switch to virtual keyboard input above to use the on-screen piano.
+          </div>
+        </div>
+
+        <!-- Microphone Input Collapse -->
+        <div v-if="showMicrophoneCollapse" class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl">
+          <input type="checkbox" class="peer" checked />
+          <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center">
+            <span>🎤 Microphone Input</span>
+            <span v-if="running" class="badge badge-success">Listening</span>
+          </div>
+          <div class="collapse-content px-4 pb-4">
+            <div class="space-y-3">
+              <div class="text-sm text-gray-700 mb-3">
+                <template v-if="inputMode === 'instrument'">
+                  Using microphone input for {{ currentInstrumentName }} (microphone permission required)
+                </template>
+                <template v-else>
+                  Using microphone to detect audio from Virtual Keyboard (enable speakers in keyboard settings)
+                </template>
+              </div>
+              <button
+                class="btn w-full"
+                :class="running ? 'btn-error' : 'btn-primary'"
+                @click="toggleRunning"
+              >
+                <span class="material-symbols-outlined">{{ running ? 'mic_off' : 'mic' }}</span>
+                {{ running ? 'Stop Microphone' : 'Start Microphone' }}
+              </button>
+              <div v-if="!running" class="text-xs text-center text-gray-500 mt-2">
+                <button class="link link-primary" @click="showPermissionHelp = !showPermissionHelp">
+                  Permission Help
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Chromatic Scale + Tuning Meter + Detected Note Collapse -->
-        <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl">
-          <input type="checkbox" class="peer" checked />
+        <!-- Scale Detection Debug Collapse -->
+        <div class="collapse collapse-arrow bg-yellow-50 border border-yellow-300 mb-4 rounded-xl">
+          <input type="checkbox" class="peer" />
           <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center">
-            <span>🎵 Tuning Display</span>
+            <span>🎼 Scale Detection</span>
+            <span v-if="scaleDetectionRunning" class="badge badge-warning">Recording</span>
           </div>
-          <div class="collapse-content px-4 pb-4 space-y-6">
-            <!-- Detected Note Display -->
-            <div class="bg-white p-4 rounded-lg border border-gray-200">
-              <div class="text-center">
-                <div class="text-sm text-gray-600 mb-2 font-medium">Detected Note</div>
-                <div class="text-5xl font-bold text-gray-800 mb-2">{{ detectedNote || '--' }}</div>
-                <div class="text-sm text-gray-600">{{ formatFreq(detectedFreq) }} Hz</div>
+          <div class="collapse-content px-4 pb-4">
+            <div class="space-y-3">
+              <!-- Compact Workflow Instructions -->
+              <div class="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-gray-700">
+                <details class="cursor-pointer">
+                  <summary class="font-semibold text-blue-800">📋 Workflow</summary>
+                  <div class="text-xs mt-2 space-y-2 ml-2">
+                    <div v-if="inputMode === 'instrument'" class="space-y-1">
+                      <strong>Microphone Mode:</strong>
+                      <ol class="list-decimal list-inside ml-2">
+                        <li>Open "🎤 Microphone Input" collapse (above)</li>
+                        <li>Click "Start Microphone" button</li>
+                        <li>Click "Start Scale Detection" button below</li>
+                        <li>Play C major scale on your instrument (C, D, E, F, G, A, B, C)</li>
+                        <li>Watch the analysis table fill with your notes and tuning data</li>
+                      </ol>
+                    </div>
+                    <div v-else class="space-y-1">
+                      <strong>Virtual Keyboard Mode:</strong>
+                      <ol class="list-decimal list-inside ml-2">
+                        <li>Enable "🎙️ Simulate Microphone Detection" toggle</li>
+                        <li>Click "Start Scale Detection" button</li>
+                        <li><strong>Click each key:</strong> C, D, E, F, G, A, B, C</li>
+                        <li>Hold each note for 1+ seconds until "✓ HELD!" shows</li>
+                        <li>Watch the analysis table auto-populate</li>
+                      </ol>
+                    </div>
+                  </div>
+                </details>
               </div>
-              <div class="text-xs text-gray-500 text-center mt-2">
-                <span v-if="inputMode === 'instrument' && running">🎤 Live microphone input</span>
-                <span v-else-if="inputMode === 'virtual-keyboard'">🎹 Virtual keyboard input</span>
-                <span v-else-if="inputMode === 'instrument' && !running">Start microphone to see live input</span>
-                <span v-else>No input active</span>
-              </div>
-            </div>
 
-            <!-- Tuning Meter -->
-            <div>
-              <div class="text-sm text-gray-600 mb-3 font-medium text-center">Tuning Meter</div>
-              <div class="flex flex-col items-center gap-2">
-                <svg width="200" height="120" viewBox="0 0 200 120" class="drop-shadow-md">
-                  <!-- Background gradient -->
-                  <defs>
-                    <linearGradient id="meterGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.2" />
-                      <stop offset="50%" style="stop-color:#22c55e;stop-opacity:0.3" />
-                      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.2" />
-                    </linearGradient>
-                  </defs>
-                  
-                  <!-- Semicircle background -->
-                  <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#meterGradient)" stroke-width="20" stroke-linecap="round"/>
-                  
-                  <!-- Tick marks -->
-                  <g stroke="#999" stroke-width="2">
-                    <!-- Left tick (flat) -->
-                    <line x1="25" y1="95" x2="25" y2="105"/>
-                    <!-- Center tick (in tune) -->
-                    <line x1="100" y1="90" x2="100" y2="105"/>
-                    <!-- Right tick (sharp) -->
-                    <line x1="175" y1="95" x2="175" y2="105"/>
-                  </g>
-                  
-                  <!-- Labels -->
-                  <text x="25" y="115" text-anchor="middle" font-size="10" fill="#3b82f6" font-weight="bold">♭ Flat</text>
-                  <text x="100" y="115" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="bold">In Tune</text>
-                  <text x="175" y="115" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="bold">Sharp ♯</text>
-                  
-                  <!-- Needle -->
-                  <line 
-                    x1="100" y1="100" 
-                    :x2="`${100 + Math.cos((getTuningNeedleAngle() - 90) * Math.PI / 180) * 60}`"
-                    :y2="`${100 - Math.sin((getTuningNeedleAngle() - 90) * Math.PI / 180) * 60}`"
-                    stroke="#000" stroke-width="3" stroke-linecap="round"
-                  />
-                  
-                  <!-- Center knob -->
-                  <circle cx="100" cy="100" r="6" fill="#000"/>
-                </svg>
-                <div class="text-center text-sm font-semibold text-gray-700">{{ centsDisplay() }}</div>
-              </div>
-            </div>
-
-            <!-- Chromatic Scale Display -->
-            <div>
-              <div class="text-sm text-gray-600 mb-3 font-medium">Chromatic Scale (Target: {{ targetNote }})</div>
-              <div class="flex flex-wrap gap-2 bg-white p-4 rounded-lg border border-gray-200">
+              <!-- Control Buttons Row -->
+              <div class="flex gap-2 items-center flex-wrap">
                 <button
-                  v-for="note in chromaticScaleNotes"
-                  :key="note"
-                  class="px-3 py-2 rounded-lg font-semibold transition-all text-sm"
-                  :class="note === highlightedNote 
-                    ? 'bg-green-500 text-white ring-2 ring-green-600 scale-110' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                  class="btn btn-sm flex-1"
+                  :class="scaleDetectionRunning ? 'btn-error' : 'btn-warning'"
+                  @click="toggleScaleDetection"
                 >
-                  {{ note }}
+                  <span class="material-symbols-outlined">{{ scaleDetectionRunning ? 'stop' : 'play_arrow' }}</span>
+                  {{ scaleDetectionRunning ? 'Stop' : 'Start' }} Detection
                 </button>
+                
+                <!-- Simulate Microphone Toggle -->
+                <label class="flex items-center gap-2 cursor-pointer bg-purple-50 border border-purple-200 px-3 py-2 rounded-lg flex-1">
+                  <input 
+                    type="checkbox" 
+                    v-model="simulateMicrophoneMode" 
+                    class="toggle toggle-xs toggle-primary"
+                  />
+                  <span class="text-xs font-medium text-gray-700 whitespace-nowrap">
+                    🎙️ Simulate
+                  </span>
+                </label>
               </div>
-            </div>
 
-            <!-- Staff Display (Optional) -->
-            <details class="border-t pt-4">
-              <summary class="cursor-pointer font-medium text-gray-700">Show Staff</summary>
-              <div class="mt-3">
-                <StaffPreview
-                  :practice-overlay-mode="'pitch'"
-                  :practice-overlay-tooltip-only="false"
-                  :practice-enable-click-to-cycle="false"
-                  :practice-color-cycle="['blue']"
-                />
+              <!-- Statistics Summary (Single Line) -->
+              <div v-if="scaleLog.length > 0" class="bg-white p-2 rounded border border-yellow-200 text-xs">
+                <div class="flex justify-between items-center gap-3">
+                  <span><strong>Notes:</strong> <span class="font-bold text-yellow-600">{{ scaleLog.length }}</span></span>
+                  <span><strong>Avg Error:</strong> <span class="font-bold" :class="averageTuningError <= 50 ? 'text-green-600' : 'text-orange-600'">{{ averageTuningError.toFixed(0) }}¢</span></span>
+                  <span><strong>Expected:</strong> <span class="font-mono text-gray-700">{{ expectedSequence }}</span></span>
+                  <span><strong>Detected:</strong> <span class="font-mono text-gray-700">{{ detectedSequence }}</span></span>
+                </div>
               </div>
-            </details>
+
+              <!-- Threshold Configuration Collapse -->
+              <div v-if="scaleDetectionRunning" class="collapse collapse-arrow bg-gray-800 text-gray-100 border border-gray-600 rounded">
+                <input type="checkbox" class="peer" />
+                <div class="collapse-title text-xs font-semibold text-cyan-300 py-2 px-3">
+                  🎯 Status Thresholds (click to configure)
+                </div>
+                <div class="collapse-content px-3 pb-3">
+                  <div class="space-y-2 text-xs">
+                    <div class="flex items-center justify-between gap-2">
+                      <label class="text-green-300 font-mono">✓ Perfect (0-X¢):</label>
+                      <input type="number" v-model="thresholdPerfect" min="1" max="49" class="input input-xs w-16 bg-gray-700 text-white" @keydown.stop />
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                      <label class="text-yellow-300 font-mono">✓ Good (X+1 to Y¢):</label>
+                      <input type="number" v-model="thresholdGood" min="2" max="49" class="input input-xs w-16 bg-gray-700 text-white" @keydown.stop />
+                    </div>
+                    <div class="text-blue-300 font-mono">♭ Flat: {{ thresholdGood + 1 }} to {{ thresholdWrong }}¢ (negative)</div>
+                    <div class="text-orange-300 font-mono">♯ Sharp: {{ thresholdGood + 1 }} to {{ thresholdWrong }}¢ (positive)</div>
+                    <div class="flex items-center justify-between gap-2">
+                      <label class="text-red-300 font-mono">⚠ Wrong Note (>X¢):</label>
+                      <input type="number" v-model="thresholdWrong" min="10" max="100" class="input input-xs w-16 bg-gray-700 text-white" @keydown.stop />
+                    </div>
+                    <div class="flex items-center gap-2 pt-2 border-t border-gray-600">
+                      <input type="checkbox" v-model="logWrongNotes" class="toggle toggle-xs toggle-error" />
+                      <label class="text-gray-300">Log wrong notes (instead of rejecting)</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expected Next Note Display (Prominent) -->
+              <div v-if="scaleDetectionRunning" class="bg-gradient-to-r from-cyan-50 to-blue-50 border-2 border-cyan-400 rounded-lg p-3 text-center relative">
+                <div class="text-xs text-gray-700 font-semibold uppercase">Expected Next Note</div>
+                <div class="text-4xl font-bold text-cyan-600 font-mono">
+                  {{ expectedNextNote || 'C4' }}
+                </div>
+                <div class="text-xs text-gray-600 mt-1 tracking-wider">C · D · E · F · G · A · B · C</div>
+                
+                <!-- Wrong Note Flash Indicator -->
+                <div v-if="wrongNoteFlash" class="absolute inset-0 bg-red-500 bg-opacity-80 rounded-lg flex items-center justify-center animate-pulse">
+                  <div class="text-white font-bold text-2xl">⚠ WRONG NOTE</div>
+                </div>
+              </div>
+
+              <!-- Detailed Analysis Table (Condensed) -->
+              <div v-if="scaleLog.length > 0" class="p-2 bg-gray-900 text-gray-100 rounded font-mono text-xs max-h-48 overflow-y-auto">
+                <table class="w-full">
+                  <thead class="sticky top-0 bg-gray-800 border-b border-gray-600">
+                    <tr>
+                      <th class="text-left px-1 py-0.5 text-blue-300">#</th>
+                      <th class="text-left px-1 py-0.5 text-green-300">Detected</th>
+                      <th class="text-left px-1 py-0.5 text-cyan-300">Expected</th>
+                      <th class="text-left px-1 py-0.5 text-yellow-300">Freq</th>
+                      <th class="text-left px-1 py-0.5 text-orange-300">Error</th>
+                      <th class="text-left px-1 py-0.5 text-purple-300">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(entry, idx) in scaleLog" :key="idx" class="border-b border-gray-700 hover:bg-gray-800">
+                      <td class="px-1 py-0.5 text-blue-300">{{ idx + 1 }}</td>
+                      <td class="px-1 py-0.5 text-green-300 font-bold">{{ entry.note }}</td>
+                      <td class="px-1 py-0.5 text-cyan-300">{{ entry.expectedNote || '--' }}</td>
+                      <td class="px-1 py-0.5 text-yellow-300">{{ entry.freq.toFixed(0) }}</td>
+                      <td class="px-1 py-0.5" :class="getTuningErrorColor(entry.tuningError)">
+                        {{ entry.tuningError !== undefined ? entry.tuningError.toFixed(0) : '--' }}
+                      </td>
+                      <td class="px-1 py-0.5 text-purple-300">{{ getTuningStatus(entry.tuningError) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Results Collapse (Compact) -->
+              <div v-if="scaleLog.length > 0" class="collapse collapse-arrow bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded">
+                <input type="checkbox" class="peer" />
+                <div class="collapse-title text-xs font-semibold text-gray-800 py-2 px-3">
+                  ✓ Results
+                </div>
+                <div class="collapse-content px-3 pb-3">
+                  <div class="space-y-0.5 text-xs text-gray-700">
+                    <div>• <span class="font-mono font-bold">{{ currentInstrumentName }}</span> ({{ keyboardKey }})</div>
+                    <div>• Pitch: <span :class="averageTuningError <= thresholdWrong ? 'text-green-600 font-bold' : 'text-orange-600 font-bold'">
+                      {{ averageTuningError <= thresholdWrong ? '✓ Accurate' : '⚠ Check' }}
+                    </span></div>
+                    <div>• Deviation: <span class="font-mono font-bold">{{ averageTuningError.toFixed(1) }}¢</span></div>
+                    <div v-if="accurateDetections > 0">• Accurate: <span class="font-mono font-bold text-green-600">{{ accurateDetections }}/{{ scaleLog.length }}</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Clear Button -->
+              <button class="btn btn-xs btn-ghost w-full" @click="clearScaleLog">
+                Clear Analysis
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -296,12 +442,31 @@ const referenceFreq = ref(440)
 const selectedInstrument = ref('')
 const showPermissionHelp = ref(false)
 const liveAnnounce = ref('')
+const keyboardKey = ref('C') // Piano key setting for instrument display
+
+// Collapse visibility controls
+const showMicrophoneCollapse = ref(true)
+const showVirtualKeyboardCollapse = ref(false)
+
+// Hold time tracking for visual feedback
+const noteHoldTime = ref(0) // Milliseconds note has been held
+const maxHoldTime = ref(1000) // 1 second required to register note
+const simulateMicrophoneMode = ref(false) // Simulate microphone detection without actual mic input
+let virtualKeyboardHoldInterval = null // Tracks hold time for virtual keyboard
 
 // Scale detection debug state
 const scaleDetectionRunning = ref(false)
 const scaleLog = ref([])
 const lastDetectedNote = ref('')
 const lastNoteTime = ref(0)
+const firstDetectedOctave = ref(null) // Track the starting octave for dynamic scale generation
+const wrongNoteFlash = ref(false) // Flash indicator for wrong notes
+
+// Threshold configuration (editable)
+const thresholdPerfect = ref(10)  // 0-10¢
+const thresholdGood = ref(25)     // 11-25¢
+const thresholdWrong = ref(50)    // >50¢
+const logWrongNotes = ref(false)  // If true, log wrong notes instead of rejecting them
 
 // Audio
 let audioCtx = null
@@ -310,7 +475,9 @@ let processor = null
 let oscillator = null
 let gainNode = null
 const frequencyHistory = [] // Smooth pitch detection by averaging recent frequencies
-const MAX_HISTORY = 8 // Number of recent frequency samples to average
+const MAX_HISTORY = 20 // Number of recent frequency samples to average (increased for stability)
+let lastPitchTime = 0 // Track when last valid pitch was detected
+const PITCH_TIMEOUT = 1500 // Clear detected note if no pitch for 1.5 seconds (increased for stability)
 
 // Cookie utilities for persisting user preferences
 function setCookie(name, value, days = 365) {
@@ -400,6 +567,58 @@ const highlightedNote = computed(() => {
   return detectedNote.value
 })
 
+// C Major scale notes for staff display
+const cMajorScaleNotes = computed(() => {
+  const octave = firstDetectedOctave.value || 4
+  const noteNames = ['c', 'd', 'e', 'f', 'g', 'a', 'b', 'c']
+  const octaves = [octave, octave, octave, octave, octave, octave, octave, octave + 1]
+  
+  return noteNames.map((pitch, idx) => {
+    const spn = `${pitch.toUpperCase()}${octaves[idx]}`
+    const vexPitch = `${pitch}/${octaves[idx]}`
+    
+    // Determine color based on whether this note has been logged and its tuning
+    let color = 'black' // Default: not yet played
+    
+    // Check if this note has been logged
+    if (scaleLog.value.length > idx) {
+      const logEntry = scaleLog.value[idx]
+      const tuningError = logEntry.tuningError
+      
+      if (tuningError !== undefined) {
+        const absError = Math.abs(tuningError)
+        // Check wrong note first (highest priority)
+        if (absError > thresholdWrong.value) {
+          color = 'red' // Wrong note
+        }
+        // Then check perfect
+        else if (absError <= thresholdPerfect.value) {
+          color = 'green' // Perfect
+        }
+        // Then check good
+        else if (absError <= thresholdGood.value) {
+          color = 'blue' // Good
+        }
+        // Otherwise it's flat or sharp (within acceptable range)
+        else {
+          color = 'orange' // Flat or Sharp
+        }
+      }
+    }
+    // If not logged yet, check if it's the expected next note
+    else if (idx === scaleLog.value.length) {
+      // This is the next note in sequence - highlight as yellow
+      color = 'yellow'
+    }
+    
+    return {
+      n: { pitch: vexPitch },
+      duration: 'q',
+      color: color
+    }
+  })
+})
+
 // Utilities
 function noteToFreq(note, refFreq = 440) {
   const noteMap = { 'C': -9, 'C#': -8, 'D': -7, 'D#': -6, 'E': -5, 'F': -4, 'F#': -3, 'G': -2, 'G#': -1, 'A': 0, 'A#': 1, 'B': 2 }
@@ -464,12 +683,21 @@ function selectInputMethod(mode) {
   inputMode.value = mode
   if (mode === 'virtual-keyboard') {
     stopRunning()
+    showVirtualKeyboardCollapse.value = true
+    showMicrophoneCollapse.value = false
+  } else {
+    showMicrophoneCollapse.value = true
+    showVirtualKeyboardCollapse.value = false
   }
 }
 
 function stopRunning() {
   running.value = false
   frequencyHistory.length = 0 // Clear frequency history
+  detectedNote.value = ''
+  detectedFreq.value = 0
+  cents.value = 0
+  noteHoldTime.value = 0 // Reset hold time
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop())
     mediaStream = null
@@ -532,7 +760,12 @@ async function startMicrophone() {
 function analyzeAudio(buffer) {
   // Detect pitch with stability filtering
   const freq = detectPitch(buffer)
+  const now = Date.now()
+  
   if (freq > 0 && freq > 40 && freq < 8000) {
+    // Valid pitch detected
+    lastPitchTime = now
+    
     // Add to history for smoothing
     frequencyHistory.push(freq)
     if (frequencyHistory.length > MAX_HISTORY) {
@@ -550,7 +783,17 @@ function analyzeAudio(buffer) {
     // For a tuner, show the actual sounding pitch being detected
     // Don't apply transposition - just show what's being heard
     const noteName = midiToNote(nearest)
-    detectedNote.value = noteName
+    
+    // Track hold time for visual feedback
+    if (noteName === detectedNote.value) {
+      // Same note - increment hold time
+      noteHoldTime.value += buffer.length / audioCtx.sampleRate * 1000 // Convert to milliseconds
+    } else {
+      // New note - reset hold time
+      noteHoldTime.value = 0
+      detectedNote.value = noteName
+    }
+    
     cents.value = (midi - nearest) * 100
     
     // Log for scale detection if enabled
@@ -561,27 +804,71 @@ function analyzeAudio(buffer) {
         lastDetectedNote.value = noteName
         lastNoteTime.value = now
         
+        console.log(`[Scale Detection] Note detected: ${noteName}, MIDI: ${midi.toFixed(2)}, Freq: ${smoothedFreq.toFixed(1)}, Log length: ${scaleLog.value.length}`)
+        
         const time = new Date().toLocaleTimeString()
         
         // Calculate octave and note index for debugging
         const octave = Math.floor(nearest / 12) - 1
         const noteIdx = ((nearest % 12) + 12) % 12
         
+        // Dynamic C major scale generation based on first detected note
+        if (firstDetectedOctave.value === null && detectedNote.value) {
+          firstDetectedOctave.value = octave
+          console.log(`[Scale Detection] First note detected: ${detectedNote.value}, octave ${octave}`)
+        }
+        
+        // Calculate expected note for C major scale analysis
+        const detectionIndex = scaleLog.value.length
+        let expectedNote = ''
+        let tuningError = undefined
+        
+        if (firstDetectedOctave.value !== null) {
+          // C major scale intervals from C (in semitones): C, D, E, F, G, A, B, C
+          const cMajorIntervals = [0, 2, 4, 5, 7, 9, 11, 12]
+          const noteNames = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C']
+          
+          // Allow continuous cycling through the scale
+          const scaleDegree = detectionIndex % 8  // Cycle through 0-7
+          const octaveOffset = Math.floor(detectionIndex / 8)  // How many times through the scale
+          
+          const expectedOctave = firstDetectedOctave.value + octaveOffset + (scaleDegree >= 7 ? 1 : 0)
+          const expectedMidi = firstDetectedOctave.value * 12 + 12 + cMajorIntervals[scaleDegree] + (octaveOffset * 12)
+          expectedNote = noteNames[scaleDegree] + expectedOctave
+          
+          // Tuning error in cents: 100 cents = 1 semitone
+          tuningError = (midi - expectedMidi) * 100
+          console.log(`[Scale Detection] Index ${detectionIndex}: Expected ${expectedNote} (MIDI ${expectedMidi}), Tuning error: ${tuningError.toFixed(0)}¢`)
+        }
+        
         scaleLog.value.push({
           time,
           note: noteName,
+          expectedNote,
           freq: smoothedFreq,
           midi: midi,
           midiRounded: nearest,
           octave: octave,
-          noteIdx: noteIdx
+          noteIdx: noteIdx,
+          tuningError: tuningError
         })
+        
+        console.log(`[Scale Detection] Entry added, scaleLog now has ${scaleLog.value.length} entries`)
         
         // Keep log from getting too long
         if (scaleLog.value.length > 50) {
           scaleLog.value.shift()
         }
       }
+    }
+  } else if (now - lastPitchTime > PITCH_TIMEOUT) {
+    // No valid pitch detected and enough time has passed since last valid pitch
+    // Only clear if we had no frequency history at all (never detected anything)
+    if (frequencyHistory.length === 0) {
+      detectedNote.value = ''
+      detectedFreq.value = 0
+      cents.value = 0
+      noteHoldTime.value = 0
     }
   }
 }
@@ -686,6 +973,89 @@ function detectPitch(buffer) {
   return -1
 }
 
+function addNoteToScaleLog(midi, freq, noteName) {
+  // Add note to scale detection log (used by both real microphone and simulated mode)
+  const now = Date.now()
+  
+  // Only log if note changed or enough time has passed (avoid duplicate logs)
+  if (noteName !== lastDetectedNote.value || now - lastNoteTime.value > 500) {
+    lastDetectedNote.value = noteName
+    lastNoteTime.value = now
+    
+    console.log(`[Scale Detection] Note detected: ${noteName}, MIDI: ${midi.toFixed(2)}, Freq: ${freq.toFixed(1)}, Log length: ${scaleLog.value.length}`)
+    
+    const time = new Date().toLocaleTimeString()
+    
+    // Calculate octave and note index for debugging
+    const nearest = Math.round(midi)
+    const octave = Math.floor(nearest / 12) - 1
+    const noteIdx = ((nearest % 12) + 12) % 12
+    
+    // Dynamic C major scale generation based on first detected note
+    if (firstDetectedOctave.value === null) {
+      firstDetectedOctave.value = octave
+      console.log(`[Scale Detection] First note detected: ${noteName}, octave ${octave}`)
+    }
+    
+    // Calculate expected note for C major scale analysis
+    const detectionIndex = scaleLog.value.length
+    let expectedNote = ''
+    let tuningError = undefined
+    
+    if (firstDetectedOctave.value !== null) {
+      // C major scale intervals from C (in semitones): C, D, E, F, G, A, B, C
+      const cMajorIntervals = [0, 2, 4, 5, 7, 9, 11, 12]
+      const noteNames = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C']
+      
+      // Allow continuous cycling through the scale
+      const scaleDegree = detectionIndex % 8  // Cycle through 0-7
+      const octaveOffset = Math.floor(detectionIndex / 8)  // How many times through the scale
+      
+      const expectedOctave = firstDetectedOctave.value + octaveOffset + (scaleDegree >= 7 ? 1 : 0)
+      const expectedMidi = firstDetectedOctave.value * 12 + 12 + cMajorIntervals[scaleDegree] + (octaveOffset * 12)
+      expectedNote = noteNames[scaleDegree] + expectedOctave
+      
+      // Tuning error in cents: 100 cents = 1 semitone
+      tuningError = (midi - expectedMidi) * 100
+      console.log(`[Scale Detection] Index ${detectionIndex}: Expected ${expectedNote} (MIDI ${expectedMidi}), Tuning error: ${tuningError.toFixed(0)}¢`)
+      
+      // Check if note is wrong (exceeds threshold)
+      if (Math.abs(tuningError) > thresholdWrong.value) {
+        wrongNoteFlash.value = true
+        setTimeout(() => { wrongNoteFlash.value = false }, 1000)
+        
+        if (!logWrongNotes.value) {
+          // Reject note - don't add to log or increment expected note
+          console.log(`[Scale Detection] ❌ WRONG NOTE - Error ${tuningError.toFixed(0)}¢ exceeds ±${thresholdWrong.value}¢ threshold. Not logging.`)
+          return
+        } else {
+          // Log as wrong note
+          console.log(`[Scale Detection] ⚠ WRONG NOTE - Error ${tuningError.toFixed(0)}¢ exceeds ±${thresholdWrong.value}¢ threshold. Logging as wrong.`)
+        }
+      }
+    }
+    
+    scaleLog.value.push({
+      time,
+      note: noteName,
+      expectedNote,
+      freq: freq,
+      midi: midi,
+      midiRounded: nearest,
+      octave: octave,
+      noteIdx: noteIdx,
+      tuningError: tuningError
+    })
+    
+    console.log(`[Scale Detection] ✓ Entry added, scaleLog now has ${scaleLog.value.length} entries`)
+    
+    // Keep log from getting too long
+    if (scaleLog.value.length > 50) {
+      scaleLog.value.shift()
+    }
+  }
+}
+
 function handleVirtualKeyboardTone(data) {
   if (!data || !data.midi) return
   const midi = data.midi
@@ -693,16 +1063,45 @@ function handleVirtualKeyboardTone(data) {
   
   detectedFreq.value = freq
   
+  // Calculate the MIDI note from the actual frequency (which includes detune)
+  const actualMidi = freqToMidi(freq)
+  
   // For a tuner, show the actual note being played (no transposition)
-  detectedNote.value = midiToNote(midi)
-  const nearest = Math.round(midi)
-  cents.value = (midi - nearest) * 100
+  const newNote = midiToNote(midi)
+  
+  // If this is a new note, reset hold time
+  if (newNote !== detectedNote.value) {
+    noteHoldTime.value = 0
+    detectedNote.value = newNote
+    
+    // Clear any existing hold time interval
+    if (virtualKeyboardHoldInterval) {
+      clearInterval(virtualKeyboardHoldInterval)
+    }
+    
+    // Start tracking hold time for virtual keyboard
+    virtualKeyboardHoldInterval = setInterval(() => {
+      noteHoldTime.value += 50 // Increment by 50ms each interval
+    }, 50)
+  }
+  
+  // Calculate cents based on actual frequency vs nearest semitone
+  const nearest = Math.round(actualMidi)
+  cents.value = (actualMidi - nearest) * 100
 }
 
 function stopVirtualKeyboardTone(data) {
+  // Clear the hold time tracking interval
+  if (virtualKeyboardHoldInterval) {
+    clearInterval(virtualKeyboardHoldInterval)
+    virtualKeyboardHoldInterval = null
+  }
+  
+  // Clear the detected note and reset hold time immediately
   detectedNote.value = ''
   detectedFreq.value = 0
   cents.value = 0
+  noteHoldTime.value = 0
 }
 
 function onInstrumentChange() {
@@ -740,6 +1139,16 @@ function getTuningNeedleAngle() {
   
   // Convert to angle: -50 cents → 90° (left), 0 cents → 180° (up), +50 cents → 270° (right)
   return 180 + (c / 50) * 90
+}
+
+function getTuningNeedlePosition() {
+  // Returns 0-100 for horizontal tuning meter
+  // 0 = flat (left), 50 = in tune (center), 100 = sharp (right)
+  let c = Math.round(cents.value)
+  // Clamp to ±100 cents for display
+  c = Math.max(-100, Math.min(100, c))
+  // Convert to 0-100 scale (negative cents = flat = left)
+  return 50 + (c / 100) * 50
 }
 
 // Initialize
@@ -826,11 +1235,18 @@ function toggleScaleDetection() {
     // Start scale detection
     clearScaleLog()
     scaleDetectionRunning.value = true
-    selectInputMethod('instrument')
-    // Delay to ensure input method is set
-    setTimeout(() => {
-      toggleRunning()
-    }, 100)
+    
+    // Only start microphone if NOT in simulate mode
+    if (!simulateMicrophoneMode.value) {
+      // Start microphone if not already running
+      setTimeout(() => {
+        if (!running.value) {
+          toggleRunning()
+        }
+      }, 100)
+    } else {
+      console.log('[Scale Detection] Simulate microphone mode enabled - skipping real microphone')
+    }
   }
 }
 
@@ -838,11 +1254,126 @@ function clearScaleLog() {
   scaleLog.value = []
   lastDetectedNote.value = ''
   lastNoteTime.value = 0
+  firstDetectedOctave.value = null
 }
+
+// Analysis helper functions
+function getTuningErrorColor(error) {
+  if (error === undefined) return 'text-gray-400'
+  const absError = Math.abs(error)
+  if (absError <= 25) return 'text-green-300' // ± 25¢ is excellent
+  if (absError <= 50) return 'text-yellow-300' // ± 50¢ is good
+  return 'text-red-300' // > 50¢ is poor
+}
+
+function getTuningStatus(error) {
+  if (error === undefined) return '?'
+  const absError = Math.abs(error)
+  if (absError <= thresholdPerfect.value) return '✓ Perfect'
+  if (absError <= thresholdGood.value) return '✓ Good'
+  if (absError > thresholdWrong.value) return '⚠ Wrong'
+  if (error < 0) return '♭ Flat'
+  return '♯ Sharp'
+}
+
+// Computed properties for analysis
+const detectedSequence = computed(() => {
+  if (scaleLog.value.length === 0) return '---'
+  return scaleLog.value.map(e => e.note.replace(/\d+/, '')).join(' ')
+})
+
+const expectedSequence = computed(() => {
+  if (scaleLog.value.length === 0) return 'C D E F G A B C'
+  // Return only the notes we're expecting to see (C major scale)
+  const noteNames = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C']
+  return noteNames.join(' ')
+})
+
+const averageTuningError = computed(() => {
+  if (scaleLog.value.length === 0) return 0
+  const validErrors = scaleLog.value.filter(e => e.tuningError !== undefined).map(e => Math.abs(e.tuningError))
+  if (validErrors.length === 0) return 0
+  return validErrors.reduce((a, b) => a + b, 0) / validErrors.length
+})
+
+const accurateDetections = computed(() => {
+  return scaleLog.value.filter(e => e.tuningError !== undefined && Math.abs(e.tuningError) <= 50).length
+})
+
+const holdPercentage = computed(() => {
+  if (detectedNote.value === '') return 0
+  return Math.min(100, (noteHoldTime.value / maxHoldTime.value) * 100)
+})
+
+const holdTimeDisplay = computed(() => {
+  // Show countdown from 1.00s to 0.00s
+  const remaining = Math.max(0, (maxHoldTime.value - noteHoldTime.value) / 1000)
+  return remaining.toFixed(2) + 's'
+})
+
+const isNoteHeld = computed(() => {
+  return noteHoldTime.value >= maxHoldTime.value && detectedNote.value !== ''
+})
+
+const expectedNextNote = computed(() => {
+  // Show the NEXT expected note in the C major scale
+  if (!scaleDetectionRunning.value) return null
+  if (firstDetectedOctave.value === null) {
+    // No notes detected yet, expect C at default octave
+    return 'C4'
+  }
+  
+  // C major scale note names
+  const noteNames = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C']
+  const cMajorIntervals = [0, 2, 4, 5, 7, 9, 11, 12]
+  
+  // Current index is based on how many notes we've logged
+  const nextIndex = scaleLog.value.length
+  const scaleDegree = nextIndex % 8
+  const octaveOffset = Math.floor(nextIndex / 8)
+  
+  const expectedOctave = firstDetectedOctave.value + octaveOffset + (scaleDegree >= 7 ? 1 : 0)
+  const nextNote = noteNames[scaleDegree] + expectedOctave
+  
+  return nextNote
+})
+
+// Update staff display when C major scale notes change
+watch(cMajorScaleNotes, (notes) => {
+  // Update the notesStore with the current scale state
+  notesStore.noteArray = notes.map(note => ({
+    pitch: note.n.pitch,
+    duration: note.duration,
+    color: note.color
+  }))
+}, { deep: true, immediate: true })
+
+// Watch for when note is held in simulate mode and log it to scale
+let lastLoggedNote = null
+watch(isNoteHeld, (isHeld) => {
+  if (isHeld && simulateMicrophoneMode.value && scaleDetectionRunning.value && detectedNote.value) {
+    // Log the held note only once per hold (prevent duplicate entries)
+    if (detectedNote.value !== lastLoggedNote) {
+      lastLoggedNote = detectedNote.value
+      
+      // Use actual frequency to calculate MIDI (includes detune)
+      const actualMidi = freqToMidi(detectedFreq.value)
+      console.log(`[Scale Detection] Note held in simulate mode: ${detectedNote.value}, actualMidi=${actualMidi.toFixed(2)}, freq=${detectedFreq.value.toFixed(1)}Hz`)
+      addNoteToScaleLog(actualMidi, detectedFreq.value, detectedNote.value)
+    }
+  } else if (!isHeld) {
+    // Reset when note is no longer held
+    lastLoggedNote = null
+  }
+})
 
 // Cleanup
 onBeforeUnmount(() => {
   stopRunning()
+  if (virtualKeyboardHoldInterval) {
+    clearInterval(virtualKeyboardHoldInterval)
+    virtualKeyboardHoldInterval = null
+  }
 })
 </script>
 

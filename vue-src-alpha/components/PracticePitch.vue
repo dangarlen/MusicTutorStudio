@@ -1706,7 +1706,7 @@ function start() {
             // Apply instrument transposition to convert sounding pitch to written pitch
             const inst = store.practiceUnitHeader?.instrument || store.instrument || (store.instruments && store.instruments[0]);
             const transposeSemitones = inst ? transpositionToSemitones(inst.transposition) : 0;
-            const writtenMidi = midi + transposeSemitones;
+            const writtenMidi = midi - transposeSemitones;
             
             const nearest = Math.round(writtenMidi);
             detectedNote.value = noteNameFromMidi(nearest);

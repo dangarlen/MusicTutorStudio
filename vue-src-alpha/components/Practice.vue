@@ -26,12 +26,9 @@
             <button class="btn btn-sm btn-warning" @click="endLesson">End Lesson</button>
           </div>
         </div>
-        <EmptyStateMessage 
-          v-else-if="!hasActiveUnit"
-          :context="{ page: 'practice-hub', hasActiveUnit, isInLessonMode }"
-          size="medium"
-          :showActions="true"
-        />
+        <div v-else-if="!hasActiveUnit" class="text-sm text-gray-500">
+          No practice unit loaded
+        </div>
         <div v-else class="mb-4">
           <div class="p-3 bg-blue-50 rounded-lg border-2 border-dashed border-blue-300 text-center">
             <div class="flex items-center justify-center gap-2 mb-2">
@@ -58,13 +55,13 @@
         </div>
       </div>
       <div
-        class="flex flex-col gap-6 max-w-xs mx-auto mt-8"
+        class="flex flex-col gap-6 max-w-xs mx-auto"
         style="
           display: flex;
           flex-direction: column;
           gap: 1.5em;
           max-width: 400px;
-          margin: 2em auto;
+          margin: 1rem auto 0;
         "
       >
         <RouterLink to="/practice-active-unit" class="mtsFormatPracticeButtons">

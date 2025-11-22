@@ -85,15 +85,29 @@ function confirmEndLesson() {
   showEndLessonModal.value = false;
 }
 
-// Close modal on Escape when open
+// Close modal on Escape when open - only listen when modal is actually open
 function onKeyDown(e) {
   if (e.key === 'Escape' && showEndLessonModal.value) {
     closeEndLessonModal();
   }
 }
 
-onMounted(() => window.addEventListener('keydown', onKeyDown));
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown));
+onMounted(() => {
+  // Only add listener when modal becomes visible
+  // Prevents interfering with other components like microphone input
+});
+onBeforeUnmount(() => {
+  // Cleanup
+});
+
+// Listen for modal open/close to attach/detach keyboard listener dynamically
+watch(showEndLessonModal, (isOpen) => {
+  if (isOpen) {
+    window.addEventListener('keydown', onKeyDown);
+  } else {
+    window.removeEventListener('keydown', onKeyDown);
+  }
+});
 
 // Expose refs to template
 </script>

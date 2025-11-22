@@ -1,6 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
+    <base href='/'>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Music Tutor Studio (Vue Alpha)</title>
@@ -10,8 +11,8 @@
     />
     <!-- VexFlow CDN (exact version as static page) -->
     <script src="https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js"></script>
-    <script type="module" crossorigin src="/assets/index-CsdM-joy.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-76i8UBgT.css">
+    <script type="module" crossorigin src="/assets/index-B6435nFB.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-pDZPv08G.css">
   </head>
   <body class="bg-base-200 flex flex-col min-h-screen">
     <div id="header-container"></div>
@@ -19,3 +20,4 @@
     <div id="footer-container"></div>
   </body>
 </html>
+

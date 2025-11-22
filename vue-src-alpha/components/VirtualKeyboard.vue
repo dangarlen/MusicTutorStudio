@@ -1,112 +1,116 @@
 <template>
-  <div class="virtual-keyboard bg-gradient-to-b from-gray-100 to-gray-200 p-6 rounded-xl shadow-lg border border-gray-300">
-    <!-- Header Controls -->
-    <div class="mb-4">
-      <h3 class="font-bold text-base text-gray-800 mb-3 text-center">🎹 Virtual Piano Keyboard</h3>
-      
-      <!-- Octave Controls -->
-      <div class="flex justify-center items-center gap-3 mb-3">
-        <span class="text-sm font-medium text-gray-600">Octave:</span>
-        <button 
-          class="btn btn-sm btn-circle" 
-          @click="octave = Math.max(0, octave - 1)"
-          :disabled="octave <= 0"
-        >
-          −
-        </button>
-        <span class="text-lg font-bold font-mono text-gray-800 w-8 text-center">{{ octave }}</span>
-        <button 
-          class="btn btn-sm btn-circle" 
-          @click="octave = Math.min(8, octave + 1)"
-          :disabled="octave >= 8"
-        >
-          +
-        </button>
-        <button 
-          class="btn btn-sm btn-error ml-4" 
-          @click="stopAllNotes"
-        >
-          Stop All
-        </button>
-      </div>
+  <div 
+    class="virtual-keyboard bg-gradient-to-b from-gray-100 to-gray-200 p-6 rounded-xl shadow-lg border border-gray-300"
+    ref="keyboardContainer"
+    tabindex="0"
 
-      <!-- Keyboard Key Selection -->
-      <div class="flex justify-center items-center gap-3 mb-3">
-        <span class="text-sm font-medium text-gray-600">Key:</span>
+  >
+    <!-- Header Controls (Condensed) -->
+    <div class="mb-3">
+      <h3 class="font-bold text-base text-gray-800 mb-2 text-center">🎹 Virtual Piano Keyboard</h3>
+      
+      <!-- First Row: Range, Key, Stop All -->
+      <div class="flex justify-center items-center gap-4 mb-2 flex-wrap">
+        <span class="text-xs font-medium text-gray-600">Range: <span class="font-mono text-gray-700">C4-C6</span></span>
+        <span class="text-xs text-gray-400">|</span>
+        <span class="text-xs font-medium text-gray-600">Key:</span>
         <button 
-          class="btn btn-sm"
+          class="btn btn-xs"
           :class="keyboardKey === 'C' ? 'btn-primary' : 'btn-outline'"
           @click="keyboardKey = 'C'"
         >
-          C (Concert)
+          C
         </button>
         <button 
-          class="btn btn-sm"
+          class="btn btn-xs"
           :class="keyboardKey === 'instrument' ? 'btn-primary' : 'btn-outline'"
           @click="keyboardKey = 'instrument'"
         >
           {{ instrumentTransposition }}
         </button>
+        <span class="text-xs text-gray-400">|</span>
+        <button 
+          class="btn btn-xs btn-error" 
+          @click="stopAllNotes"
+        >
+          Stop All
+        </button>
       </div>
-      <div class="flex justify-center items-center gap-3 mb-3">
+      
+      <!-- Second Row: Audio, Volume, Microphone Test -->
+      <div class="flex justify-center items-center gap-4 mb-2 flex-wrap text-xs">
         <label class="flex items-center gap-2 cursor-pointer">
           <input 
             type="checkbox" 
             v-model="audioEnabled" 
-            class="toggle toggle-success toggle-sm"
+            class="toggle toggle-xs toggle-success"
           />
-          <span class="text-sm font-medium text-gray-700">
-            🔊 Play Audio
-          </span>
+          <span class="font-medium text-gray-700">🔊 Audio</span>
         </label>
         <div v-if="audioEnabled" class="flex items-center gap-2">
-          <span class="text-xs text-gray-500">Volume:</span>
+          <span class="text-gray-500">Vol:</span>
           <input 
             type="range" 
             v-model="volume" 
             min="0" 
             max="100" 
             step="10" 
-            class="range range-xs w-20"
+            class="range range-xs w-16"
           />
-          <span class="text-xs text-gray-600">{{ volume }}%</span>
+          <span class="text-gray-600">{{ volume }}%</span>
         </div>
-      </div>
-
-      <div class="text-xs text-center text-gray-500 mb-2">
-        Click a key to hear the piano sound
-      </div>
-
-      <!-- Loopback Testing Mode -->
-      <div v-if="audioEnabled" class="flex justify-center items-center gap-3 mb-3">
-        <label class="flex items-center gap-2 cursor-pointer">
+        <label v-if="audioEnabled" class="flex items-center gap-2 cursor-pointer">
           <input 
             type="checkbox" 
             v-model="loopbackMode" 
-            class="toggle toggle-warning toggle-sm" 
+            class="toggle toggle-xs toggle-warning" 
           />
-          <span class="text-sm font-medium text-gray-700">
-            🎤 Test with Microphone
-          </span>
-        </label>
-        <div class="tooltip tooltip-bottom" data-tip="Plays audio through speakers so you can test microphone detection">
-          <span class="material-symbols-outlined text-xs text-gray-500 cursor-help">help</span>
-        </div>
-      </div>
-      <div v-if="audioEnabled && loopbackMode" class="alert alert-warning mb-3 py-2">
-        <span class="material-symbols-outlined text-sm">warning</span>
-        <div class="text-xs space-y-1">
-          <div>
-            <strong>Mic Testing Mode:</strong> Audio plays through speakers - start microphone to detect it.
+          <span class="font-medium text-gray-700">🎤 Test</span>
+          <div class="tooltip tooltip-bottom" data-tip="Plays audio through speakers for mic testing">
+            <span class="material-symbols-outlined text-xs text-gray-500 cursor-help">help</span>
           </div>
-          <div class="opacity-75">
-            <strong>Note:</strong> No internal audio routing. Your microphone must physically detect sound from your speakers.
+        </label>
+        <span class="text-xs text-gray-400">|</span>
+        <div class="flex items-center gap-2">
+          <button 
+            class="text-xs font-medium cursor-pointer px-2 py-0.5 rounded transition-colors whitespace-nowrap"
+            :class="detuneCents == 0 ? 'bg-green-100 text-green-700 font-bold' : 'bg-gray-100 text-gray-600 hover:bg-green-50'"
+            @click="detuneCents = 0"
+            title="Click to reset to in-tune (0 cents)"
+          >
+            Tuning
+          </button>
+          <button 
+            class="text-xs font-medium text-gray-600 hover:text-blue-600 cursor-pointer px-1"
+            @click="detuneCents = Math.max(-100, detuneCents - 2)"
+            title="Click to flatten by 2 cents"
+          >
+            ♭ Flat
+          </button>
+          <input 
+            type="range" 
+            v-model="detuneCents" 
+            min="-100" 
+            max="100" 
+            step="1" 
+            class="range range-xs w-32"
+          />
+          <button 
+            class="text-xs font-medium text-gray-600 hover:text-blue-600 cursor-pointer px-1"
+            @click="detuneCents = Math.min(100, parseInt(detuneCents) + 2)"
+            title="Click to sharpen by 2 cents"
+          >
+            ♯ Sharp
+          </button>
+          <span class="text-xs font-mono" :class="detuneCents == 0 ? 'text-green-600 font-bold' : 'text-orange-600'">{{ detuneCents > 0 ? '+' : '' }}{{ detuneCents }}¢</span>
+          <div class="tooltip tooltip-bottom" data-tip="Tuning Control: Click 'Tuning' to reset to 0¢ (in-tune). Click '♭ Flat' to lower pitch by 2¢. Click '♯ Sharp' to raise pitch by 2¢. Use slider for precise adjustment (-100¢ to +100¢). Perfect for testing tuning accuracy across a full semitone range.">
+            <span class="material-symbols-outlined text-xs text-gray-500 cursor-help">help</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Canvas Keyboard -->
+    <!-- Piano Canvas -->
     <div class="flex justify-center w-full">
       <canvas 
         ref="canvasRef"
@@ -136,24 +140,24 @@ import { usePracticeUnitScaleStore } from '../stores/practiceUnitScaleStore'
 
 const useStore = () => usePracticeUnitScaleStore()
 
+const emit = defineEmits(['on-tone-start', 'on-tone-stop'])
+
 const props = defineProps({
   onToneStart: Function,
-  onToneStop: Function,
-  initialOctave: {
-    type: Number,
-    default: 4
-  }
+  onToneStop: Function
 })
 
 const canvasRef = ref(null)
-const octave = ref(props.initialOctave)
+const keyboardContainer = ref(null)
 const audioEnabled = ref(true)
 const volume = ref(50)
 const loopbackMode = ref(false)
 const currentNote = ref('')
 const currentFreq = ref(0)
 const currentMidi = ref(null)
+const pressedMidiNote = ref(null) // Track which key is currently pressed for visual feedback
 const keyboardKey = ref('C') // 'C' or 'instrument'
+const detuneCents = ref(0) // Detune in cents: -100 (flat) to +100 (sharp)
 
 // Keyboard key display - computed to be reactive
 const instrumentTransposition = computed(() => {
@@ -215,8 +219,10 @@ function midiToFreq(midiNote) {
   return 440 * Math.pow(2, (midiNote - 69) / 12)
 }
 
-function midiToNoteName(midiNote) {
-  const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+function midiToNoteName(midiNote, preferFlats = false) {
+  const sharps = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+  const flats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
+  const notes = preferFlats ? flats : sharps
   const octaveNum = Math.floor(midiNote / 12) - 1
   const noteNum = midiNote % 12
   return notes[noteNum] + octaveNum
@@ -284,44 +290,65 @@ function initAudio() {
 
 // Play a note
 function playNote(midi) {
-  if (!audioEnabled.value) return
-
-  initAudio()
+  console.log(`[VirtualKeyboard] playNote called with midi=${midi}, audioEnabled=${audioEnabled.value}`)
   
   // Stop any existing note
   stopNote()
   
   // Apply transposition if "Key of [Instrument]" is selected
   const transpositionSemitones = getInstrumentTranspositionSemitones()
-  const displayMidi = midi
-  // For transposing instruments: if transposition = -2 (Bb), subtract from MIDI to get lower pitch
+  const inputMidi = midi
   const playMidi = midi + transpositionSemitones
   
-  console.log(`[VirtualKeyboard] playNote: keyboardKey=${keyboardKey.value}, displayMidi=${displayMidi}, transposition=${transpositionSemitones}, playMidi=${playMidi}`)
+  console.log(`[VirtualKeyboard] playNote: keyboardKey=${keyboardKey.value}, inputMidi=${inputMidi}, transposition=${transpositionSemitones}, playMidi=${playMidi}`)
   
-  const freq = midiToFreq(playMidi)
+  let freq = midiToFreq(playMidi)
   
-  oscillator = audioContext.createOscillator()
-  gainNode = audioContext.createGain()
+  // Apply detune from slider (range -50 to +50 cents)
+  if (detuneCents.value !== 0) {
+    freq = freq * Math.pow(2, detuneCents.value / 1200)
+  }
   
-  oscillator.frequency.value = freq
-  oscillator.type = 'sine'
+  // Only play audio if enabled
+  if (audioEnabled.value) {
+    initAudio()
+    
+    oscillator = audioContext.createOscillator()
+    gainNode = audioContext.createGain()
+    
+    oscillator.frequency.value = freq
+    oscillator.type = 'sine'
+    
+    const gainValue = (volume.value / 100) * 0.3
+    gainNode.gain.setValueAtTime(gainValue, audioContext.currentTime)
+    
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+    
+    oscillator.start()
+  }
   
-  const gainValue = (volume.value / 100) * 0.3
-  gainNode.gain.setValueAtTime(gainValue, audioContext.currentTime)
-  
-  oscillator.connect(gainNode)
-  gainNode.connect(audioContext.destination)
-  
-  oscillator.start()
-  
-  currentMidi.value = displayMidi
-  currentNote.value = midiToNoteName(displayMidi)
+  // Display the actual sounding pitch (playMidi), not the input fingering (inputMidi)
+  // Use flat notation for transposed instruments
+  const useFlats = keyboardKey.value === 'instrument'
+  currentMidi.value = playMidi
+  pressedMidiNote.value = midi // Track the input MIDI for visual feedback on the correct key
+  currentNote.value = midiToNoteName(playMidi, useFlats)
   currentFreq.value = freq
+  
+  console.log(`[VirtualKeyboard] Emitting tone-start: displayMidi=${playMidi}, note=${currentNote.value}, freq=${freq}`)
+  
+  // Emit event for listeners (regardless of audio state)
+  emit('on-tone-start', {
+    midi: playMidi,
+    frequency: freq,
+    note: currentNote.value,
+    loopbackMode: loopbackMode.value
+  })
   
   if (props.onToneStart) {
     props.onToneStart({
-      midi: displayMidi,
+      midi: playMidi,
       frequency: freq,
       note: currentNote.value,
       loopbackMode: loopbackMode.value
@@ -331,6 +358,8 @@ function playNote(midi) {
 
 // Stop current note
 function stopNote() {
+  console.log(`[VirtualKeyboard] stopNote called, currentMidi=${currentMidi.value}`)
+  
   if (oscillator) {
     try {
       oscillator.stop()
@@ -340,16 +369,30 @@ function stopNote() {
     oscillator = null
   }
   
-  if (currentMidi.value !== null && props.onToneStop) {
-    props.onToneStop({
+  if (currentMidi.value !== null) {
+    console.log(`[VirtualKeyboard] Emitting tone-stop: midi=${currentMidi.value}, note=${currentNote.value}`)
+    
+    // Emit event for listeners
+    emit('on-tone-stop', {
       midi: currentMidi.value,
       note: currentNote.value
     })
+    
+    if (props.onToneStop) {
+      props.onToneStop({
+        midi: currentMidi.value,
+        note: currentNote.value
+      })
+    }
   }
   
   currentMidi.value = null
+  pressedMidiNote.value = null // Clear pressed state to redraw keys normally
   currentNote.value = ''
   currentFreq.value = 0
+  
+  // Redraw to remove highlight
+  drawKeyboard()
 }
 
 // Stop all notes
@@ -365,20 +408,45 @@ function drawKeyboard() {
   const ctx = canvas.getContext('2d')
   keyRects = []
 
-  // Calculate canvas size for 2 octaves (14 white keys)
-  const numWhiteKeys = 14
-  const totalWidth = numWhiteKeys * KEY_WIDTH
-  canvas.width = totalWidth
-  canvas.height = KEY_HEIGHT
+  console.log(`[VirtualKeyboard] drawKeyboard called, pressedMidiNote=${pressedMidiNote.value}`)
 
-  // Draw white keys for 2 octaves
+  // Get device pixel ratio for crisp rendering
+  const dpr = window.devicePixelRatio || 1
+  
+  // Calculate canvas size for C4 to C6 (15 white keys: C-C6)
+  const numWhiteKeys = 15
+  const totalWidth = numWhiteKeys * KEY_WIDTH
+  const displayWidth = totalWidth
+  const displayHeight = KEY_HEIGHT
+  
+  // Set canvas display size
+  canvas.style.width = displayWidth + 'px'
+  canvas.style.height = displayHeight + 'px'
+  
+  // Set canvas resolution to match device pixel ratio
+  canvas.width = displayWidth * dpr
+  canvas.height = displayHeight * dpr
+  
+  // Scale context to device pixel ratio
+  ctx.scale(dpr, dpr)
+
+  // Draw white keys for C4 to C6 (2 full octaves + C)
+  // Always start from octave 4, draw octaves 4 and 5, then just C from octave 6
   for (let octaveOffset = 0; octaveOffset < 2; octaveOffset++) {
     WHITE_KEYS.forEach((note, index) => {
       const whiteKeyIndex = octaveOffset * 7 + index
       const x = whiteKeyIndex * KEY_WIDTH
       const y = 0
 
-      ctx.fillStyle = '#FFFFFF'
+      // Check if this key is pressed
+      const midi = noteNameToMidi(note, 4 + octaveOffset)
+      const isPressed = pressedMidiNote.value === midi
+      
+      if (isPressed) {
+        console.log(`[VirtualKeyboard] WHITE KEY MATCH: ${note}${4 + octaveOffset} midi=${midi}, pressedMidiNote=${pressedMidiNote.value}`)
+      }
+
+      ctx.fillStyle = isPressed ? '#ADD8E6' : '#FFFFFF' // Light blue if pressed, white otherwise
       ctx.strokeStyle = '#000000'
       ctx.lineWidth = 2
       ctx.fillRect(x, y, KEY_WIDTH, KEY_HEIGHT)
@@ -389,10 +457,9 @@ function drawKeyboard() {
       ctx.font = 'bold 14px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'bottom'
-      ctx.fillText(note + (octave.value + octaveOffset), x + KEY_WIDTH / 2, KEY_HEIGHT - 8)
+      ctx.fillText(note + (4 + octaveOffset), x + KEY_WIDTH / 2, KEY_HEIGHT - 8)
 
       // Store white key rect
-      const midi = noteNameToMidi(note, octave.value + octaveOffset)
       keyRects.push({
         x,
         y,
@@ -404,30 +471,66 @@ function drawKeyboard() {
       })
     })
   }
+  
+  // Add the final C6
+  const finalCIndex = 14
+  const finalCX = finalCIndex * KEY_WIDTH
+  const c6Midi = noteNameToMidi('C', 6)
+  const c6IsPressed = pressedMidiNote.value === c6Midi
+  
+  if (c6IsPressed) {
+    console.log(`[VirtualKeyboard] C6 KEY MATCH: midi=${c6Midi}, pressedMidiNote=${pressedMidiNote.value}`)
+  }
+  
+  ctx.fillStyle = c6IsPressed ? '#ADD8E6' : '#FFFFFF' // Light blue if pressed
+  ctx.strokeStyle = '#000000'
+  ctx.lineWidth = 2
+  ctx.fillRect(finalCX, 0, KEY_WIDTH, KEY_HEIGHT)
+  ctx.strokeRect(finalCX, 0, KEY_WIDTH, KEY_HEIGHT)
+  ctx.fillStyle = '#000000'
+  ctx.font = 'bold 14px Arial'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'bottom'
+  ctx.fillText('C6', finalCX + KEY_WIDTH / 2, KEY_HEIGHT - 8)
+  keyRects.push({
+    x: finalCX,
+    y: 0,
+    width: KEY_WIDTH,
+    height: KEY_HEIGHT,
+    midi: c6Midi,
+    note: 'C',
+    isBlack: false
+  })
 
-  // Draw black keys for 2 octaves
+  // Draw black keys for C4 to C6
   for (let octaveOffset = 0; octaveOffset < 2; octaveOffset++) {
     BLACK_KEYS.forEach((blackKey) => {
       const whiteKeyIndex = octaveOffset * 7 + blackKey.whiteKeyIndex
       const x = (whiteKeyIndex + 1) * KEY_WIDTH  // Center on border between white keys
       const y = 0
 
-      ctx.fillStyle = '#000000'
+      // Store black key rect - use hardcoded octave (4+octaveOffset)
+      const midi = noteNameToMidi(WHITE_KEYS[blackKey.whiteKeyIndex], 4 + octaveOffset) + 1
+      const isPressed = pressedMidiNote.value === midi
+      
+      if (isPressed) {
+        console.log(`[VirtualKeyboard] BLACK KEY MATCH: ${WHITE_KEYS[blackKey.whiteKeyIndex]}#${4 + octaveOffset} midi=${midi}, pressedMidiNote=${pressedMidiNote.value}`)
+      }
+
+      ctx.fillStyle = isPressed ? '#FFD700' : '#000000' // Gold/yellow if pressed, black otherwise
       ctx.strokeStyle = '#333333'
       ctx.lineWidth = 1
       ctx.fillRect(x - BLACK_KEY_WIDTH / 2, y, BLACK_KEY_WIDTH, BLACK_KEY_HEIGHT)
       ctx.strokeRect(x - BLACK_KEY_WIDTH / 2, y, BLACK_KEY_WIDTH, BLACK_KEY_HEIGHT)
 
       // Add note label
-      ctx.fillStyle = '#FFFFFF'
+      ctx.fillStyle = isPressed ? '#000000' : '#FFFFFF' // Black text if pressed (so it shows on yellow), white otherwise
       ctx.font = 'bold 10px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'bottom'
       const sharpNote = WHITE_KEYS[blackKey.whiteKeyIndex] + '#'
       ctx.fillText(sharpNote, x, BLACK_KEY_HEIGHT - 4)
 
-      // Store black key rect
-      const midi = noteNameToMidi(WHITE_KEYS[blackKey.whiteKeyIndex], octave.value + octaveOffset) + 1
       keyRects.push({
         x: x - BLACK_KEY_WIDTH / 2,
         y,
@@ -484,15 +587,32 @@ function handleCanvasMouseLeave() {
   stopNote()
 }
 
-// Watch octave changes
-watch(octave, () => {
+// Keyboard shortcuts disabled - users click keys to play
+
+// Keyboard handling disabled
+
+// Key up handling disabled
+
+// Watch for key press changes to redraw keyboard with visual feedback
+// Use flush: 'sync' to redraw immediately when pressedMidiNote changes
+watch(pressedMidiNote, () => {
+  console.log(`[VirtualKeyboard] Watch fired: pressedMidiNote=${pressedMidiNote.value}`)
   drawKeyboard()
-})
+}, { flush: 'sync' })
 
 // Initialize on mount
 onMounted(() => {
+  console.log(`[VirtualKeyboard] Mounted, setting up keyboard handling`)
   drawKeyboard()
   window.addEventListener('resize', drawKeyboard)
+  
+  // Keyboard shortcuts disabled
+  
+  // Cleanup on unmount
+  return () => {
+    console.log(`[VirtualKeyboard] Unmounting`)
+    window.removeEventListener('resize', drawKeyboard)
+  }
 })
 </script>
 
@@ -504,7 +624,9 @@ onMounted(() => {
 canvas {
   display: block;
   margin: 0 auto;
-  max-width: 100%;
-  height: auto;
+  /* Let the canvas size be determined by the width/height attributes set in JavaScript */
+  /* Do NOT scale or stretch the canvas */
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
 </style>

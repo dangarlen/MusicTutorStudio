@@ -311,9 +311,9 @@ import InstrumentDropdown from "./InstrumentDropdown.vue";
 import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 
 const store = usePracticeUnitScaleStore();
-onMounted(() => {
+onMounted(async () => {
   if (!store.instruments || store.instruments.length === 0) {
-    store.loadInstruments();
+    await store.loadInstruments();
   }
   // Preselect instrument from cookie if present and not already set
   const cookieInstrument = getCookie("instrument");

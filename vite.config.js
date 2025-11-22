@@ -1,16 +1,18 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import { resolve } from "path";
 
 export default defineConfig({
-  root: "public/alpha-vue",
+  root: "vue-src-alpha",
   plugins: [vue()],
   build: {
-    outDir: "dist",
+    outDir: resolve(__dirname, "public/alpha-vue-SPA"),
     emptyOutDir: true,
   },
+  base: "/",
   resolve: {
     alias: {
-      "@": "/public/alpha-vue",
+      "@": resolve(__dirname, "vue-src-alpha"),
     },
   },
   server: {

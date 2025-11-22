@@ -4,6 +4,7 @@ Reload the VS Code window (Ctrl+Shift+P → "Developer: Reload Window")
 Sign out and back in to the Copilot extension (Ctrl+Shift+P → "GitHub Copilot: Sign Out", then sign back in)
 Check the Copilot output panel (View → Output → select "GitHub Copilot" from dropdown) for error messages
 Verify your GitHub token hasn't expired or been revoked in account settings
+
 To prevent hangs:
 
 Keep conversation summaries brief rather than extremely long exchanges (though ours is well-documented)
@@ -13,3 +14,29 @@ For this project specifically:
 
 I have full context from our conversation history, so you can jump directly to the next task without re-explaining background
 Ready to move forward—shall we get back to diagnosing the virtual keyboard audio issue, or is there something else you'd like to tackle?
+
+Model Name	Cost Multiplier	Notes
+Auto	🔻 10% discount	Dynamically selects best model based on prompt, quota, and availability.
+GPT-4.1, GPT-4o, GPT-5 mini	0x	Free-tier or low-cost models. Fast, but less context depth.
+Claude Haiku 4.5	0.33x	Lightweight Claude model. Fast and efficient.
+Claude Sonnet 4 / 4.5	1x	Premium Claude models. Richer context, slower response.
+Gemini 2.5 Pro	1x	Google’s flagship model. Premium tier.
+GPT-5, GPT-5.1, Codex variants	1x / 0.33x	Premium OpenAI models. Codex variants tuned for code.
+Grok Code Fast 1, Raptor mini	0x	Likely experimental or preview models.
+🔍 What This Means for You
+Auto is smart but fragile: It tries to route to the best model, but if budget enforcement blocks a premium model (like GPT-5 or Claude Sonnet), it may hang instead of falling back.
+
+0x models are safe: These won’t consume premium quota and are ideal for fallback or lightweight tasks.
+
+Claude Haiku 4.5 (0.33x) is a great middle ground — fast, low-cost, and reliable.
+
+Codex Mini (0.33x) is optimized for code and cheaper than full GPT-5.
+
+✅ Recommended Strategy
+To avoid hangs while keeping quality:
+
+Use Auto for general prompts, but switch manually if it stalls.
+
+Fallback to Claude Haiku 4.5 or Codex Mini when you need speed and stability.
+
+Use GPT-5 or Sonnet 4.5 only when you need deep reasoning or long context — and your quota allows.
