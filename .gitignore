@@ -1,8 +1,10 @@
 # 🔒 Backups / prototypes (keep local, not tracked)
-archive/
-prototype/
-alpha-vue-SPA/
-public/vendor/
+archive_DELETE_ME/
+prototype_DELETE_ME/
+alpha-vue-SPA_DELETE_ME/
+public/vendor_DELETE_ME/
+
+
 
 # 📦 Dependencies
 node_modules/
@@ -13,7 +15,7 @@ prototype/node_modules/
 # 🏗️ Build artifacts
 dist/
 build/
-public/assets/        # hashed JS/CSS bundles only
+public/assets_DELETE_ME/        # hashed JS/CSS bundles only
 
 # 🧪 Test outputs
 coverage/
@@ -30,4 +32,6 @@ tmp/
 Thumbs.db
 .vscode/
 *.swp
+
+
 
