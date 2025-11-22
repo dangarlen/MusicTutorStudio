@@ -1,1 +1,24 @@
-node_modules
+archive/
+public/vendor/
+
+# Root dependencies
+node_modules/
+
+# Nested vendor trees
+tailwind/node_modules/
+alpha-vue-SPA/node_modules/
+prototype/node_modules/
+
+# Build artifacts
+dist/
+build/
+
+# Test outputs
+coverage/
+playwright-report/
+test-results/
+
+# Misc caches/logs
+.cache/
+logs/
+tmp/
