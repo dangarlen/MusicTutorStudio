@@ -1,0 +1,173 @@
+## Repository Cleanup Procedure - Music Tutor Studio
+
+### Phase 1: Remove Legacy Build Outputs (SAFE - Regenerable)
+
+**Target: `public/alpha-vue-SPA/`**
+- Status: Legacy build output from old Vite config
+- Current: Builds go to `dist/` then promoted to `public/`
+- Action: `Remove-Item -Recurse -Force public\alpha-vue-SPA`
+- Verification: Confirm `vite.config.js` has `outDir: 'dist'`
+
+**Target: `public/vue/`**
+- Status: Old Vue prototype builds (dist/ and refactor-alpha/)
+- References: Only found in `.docs/helloVue.md` and `.docs/vue-vite.md` (documentation)
+- Action: `Remove-Item -Recurse -Force public\vue`
+
+**Target: `vue-src-alpha/`**
+- Status: Old source directory before consolidation to `src/`
+- Current: All source is in `src/`
+- Action: `Remove-Item -Recurse -Force vue-src-alpha`
+- Verification: Confirm `tools/dev-alpha-vue-spa.ps1` runs from repo root, not vue-src-alpha
+
+**Target: Backup index.html files**
+- Files: `public/index.html.bak.20251122161107`, `public/index.html.bak.20251122161418`
+- Action: `Remove-Item public\index.html.bak.*`
+
+**Target: `dist/` (after confirming build works)**
+- Status: Vite build output (regenerable)
+- Action: Add to `.gitignore` if not already there
+- Note: Keep locally until first successful deploy, then can clean periodically
+
+### Phase 2: Remove Duplicate Data Files (REQUIRES VALIDATION)
+
+**Target: `vue-src-alpha/public/data/` (if vue-src-alpha still exists)**
+- Status: Duplicates of canonical `data/*.json`
+- Current: Canonical data is in `/data`
+- Action: Delete after removing vue-src-alpha directory
+
+### Phase 3: Remove Old Test/Prototype Files
+
+**Target: `public/test/`**
+- Contents: fragment-a/b/c.html, loader.js, test-tailwind-daisyUI-install.html
+- References: None found in active scripts
+- Action: `Remove-Item -Recurse -Force public\test`
+
+**Target: `public/tools/`**
+- Contents: MusicXML sample files and test-musicxml-import.html
+- Action: Move to `.docs/samples/` if needed for reference, or delete
+- Command: `New-Item -ItemType Directory -Force .docs\samples; Move-Item public\tools\* .docs\samples\; Remove-Item public\tools`
+
+### Phase 4: Remove Orphaned Config Files
+
+**Target: `tailwind/` directory**
+- Status: Tailwind config moved to repo root
+- Current: `tailwind.config.js` and `postcss.config.js` are at repo root
+- Action: Verify root configs work, then `Remove-Item -Recurse -Force tailwind`
+
+**Target: Duplicate Tailwind configs**
+- Files: `tailwind.config copy.js`, `tailwind/tailwind.config.js`
+- Action: `Remove-Item "tailwind.config copy.js"`
+
+### Phase 5: Clean Documentation Duplicates
+
+**Target: Duplicate directory trees**
+- Files: `public/planned-alpha-directory-tree.txt`, `public/preAlpha-directory-tree.txt`
+- Canonical: `.docs/directory-tree.txt`
+- Action: `Remove-Item public\planned-alpha-directory-tree.txt, public\preAlpha-directory-tree.txt`
+
+### Phase 6: Remove Obsolete Scripts
+
+**Target: `tools/vueView.ps1` (if exists)**
+- Status: Duplicate of `dev-alpha-vue-spa.ps1`
+- Action: `Remove-Item tools\vueView.ps1` (if found)
+
+**Target: `tools/build-alpha-vue-spa.ps1` and `tools/vueDeploySPA.ps1`**
+- Status: Superseded by `build-verify-deploy.ps1`
+- Action: Verify primary script works, then delete alternates
+- Verification: Run "Build and Deploy" task successfully first
+
+### Phase 7: Remove Temporary/Cleanup Files
+
+**Target: `.tbd/` directory**
+- Contents: Old warning screenshots (addPassageDisplayOverlays, renderScale)
+- References: Only in `.docs/cleaupHitList.txt`
+- Action: `Remove-Item -Recurse -Force .tbd`
+
+**Target: Root cleanup scripts**
+- Files: `root-cleanup.ps1`, `root-move-to-tbd.ps1`
+- Status: One-time migration scripts
+- Action: Move to `.docs/migration-scripts/` or delete
+- Command: `New-Item -ItemType Directory -Force .docs\migration-scripts; Move-Item root-*.ps1 .docs\migration-scripts\`
+
+**Target: Old tasks.json**
+- File: `OLD_tasks.json`
+- Action: `Remove-Item OLD_tasks.json`
+
+### Phase 8: Update .gitignore
+
+Add these patterns if not present:
+```
+# Build outputs
+dist/
+public/assets/
+public/index.html.bak.*
+
+# Legacy directories (if recreated)
+public/alpha-vue-SPA/
+public/vue/
+vue-src-alpha/
+tailwind/
+
+# Node modules (should already be there)
+node_modules/
+
+# Temp/backup files
+*.bak
+.tbd/
+```
+
+### Verification Steps (Run AFTER each phase)
+
+1. **After Phase 1**: Run `npm run dev` - dev server should work
+2. **After Phase 3**: Run `npm run build` - build should succeed
+3. **After Phase 4**: Restart dev server - Tailwind should still load
+4. **After Phase 6**: Run "Build and Deploy" task - should deploy successfully
+5. **Final**: Visit deployed site and verify all features work
+
+### Rollback Plan
+
+Before starting, create a git commit:
+```powershell
+git add -A
+git commit -m "Snapshot before cleanup"
+git tag cleanup-snapshot
+```
+
+If something breaks:
+```powershell
+git reset --hard cleanup-snapshot
+```
+
+### Execution Order (Recommended)
+
+1. Create snapshot commit
+2. Phase 1 (safe, regenerable files)
+3. Test dev server
+4. Phase 3 (test files)
+5. Phase 4 (configs) - TEST CAREFULLY
+6. Test dev server again
+7. Phase 6 (scripts) - only after confirming primary script works
+8. Test build and deploy
+9. Phases 2, 5, 7 (documentation and temp files)
+10. Update .gitignore
+11. Final verification
+12. Commit cleanup: `git add -A; git commit -m "Repository cleanup: removed legacy build outputs and duplicates"`
+
+### Files That Should REMAIN
+
+**Keep these directories:**
+- `src/` - canonical source code
+- `public/libs/` - audio worklets, VexFlow workers
+- `data/` - canonical JSON data
+- `tests/` - test files
+- `.docs/` - documentation
+- `.github/` - GitHub configuration
+- `tools/` - active build scripts (after removing obsolete ones)
+
+**Keep these files:**
+- `index.html` (repo root) - Vite entry point
+- `package.json`, `package-lock.json` - dependencies
+- `vite.config.js` - Vite configuration
+- `tailwind.config.js`, `postcss.config.js` (repo root) - styling configs
+- `netlify.toml` - deployment config
+- `.vscode/tasks.json` - VS Code tasks
