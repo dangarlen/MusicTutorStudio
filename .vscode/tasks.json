@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build and Deploy",
+      "label": "🚀 Build and Deploy VUU to Netlify🚀",
       "type": "shell",
       "command": "powershell",
       "args": [
@@ -23,7 +23,7 @@
       "problemMatcher": []
     },
     {
-      "label": "View Vue",
+      "label": "✈️ View Vue ✈️",
       "type": "shell",
       "command": "powershell",
       "args": [
@@ -42,3 +42,5 @@
     }
   ]
 }
+
+

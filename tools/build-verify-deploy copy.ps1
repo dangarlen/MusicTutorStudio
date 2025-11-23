@@ -1,73 +1,84 @@
 ﻿<#
-PowerShell helper to build the canonical Vite/Vue app, verify outputs, copy libs, promote index.html,
+PowerShell helper to build the Vue SPA, verify outputs, copy libs, promote index.html,
 and deploy the public/ folder to Netlify in one step.
 
 Usage (from repo root):
   powershell -ExecutionPolicy Bypass -File tools\build-verify-deploy.ps1
 
 This script performs the following:
-- npm install in src/
+- npm install in vue-src-alpha
 - npm run build -- --emptyOutDir
 - verify built index exists
-- copy worklet/worker libs from public/libs -> public/libs (canonical)
+- copy worklet/worker libs from public/libs -> public/alpha-vue-SPA/libs
 - promote built index to public/index.html and rewrite asset paths to /assets/
 - copy built assets into public/assets/
 - verify files present (assets and libs)
 - run `netlify deploy --prod --dir=public`
+
+Notes:
+- Netlify CLI must be installed and authenticated ahead of time (npm i -g netlify-cli)
+- Designed for the repository layout used by MusicTutorStudio
 #>
 
 Write-Host "BUILD-VERIFY-DEPLOY script started"
 
+# Helper to fail with message
 function Fail($msg) {
     Write-Host "ERROR: $msg"
     exit 1
 }
 
+# Ensure Netlify CLI exists
 Write-Host "Checking for Netlify CLI..."
 $netlifyPath = & where.exe netlify 2>$null
 if (-not $netlifyPath) {
     Write-Host "WARNING: Netlify CLI not found. Install it with: npm install -g netlify-cli"
+    # Not failing immediately; user may want to build-only
 }
 
-# Canonical SPA source directory (repo root)
-$repoRoot = Join-Path $PSScriptRoot ".."
-if (-not (Test-Path $repoRoot)) { Fail "Repo root not found: $repoRoot" }
+$spaDir = Join-Path $PSScriptRoot "..\vue-src-alpha"
+if (-not (Test-Path $spaDir)) { Fail "SPA source directory not found: $spaDir" }
 
-Push-Location $repoRoot
-Write-Host "[DEBUG] Running npm install in repo root"
+Push-Location $spaDir
+Write-Host "[DEBUG] Running npm install in $spaDir"
 npm install
 Write-Host "[DEBUG] Running npm run build"
-npm run build
+npm run build -- --emptyOutDir
 Pop-Location
 
-# Verify build output (Vite defaults to dist/)
-$outIndex = Join-Path $repoRoot "dist\index.html"
+# Verify build output
+$outIndex = Join-Path $PSScriptRoot "..\public\alpha-vue-SPA\index.html"
 if (-not (Test-Path $outIndex)) { Fail "Build output missing: $outIndex" }
 
-# Copy libs (canonical: public/libs stays in place)
+# Ensure libs are copied into the built SPA folder
 $srcLibs = Join-Path $PSScriptRoot "..\public\libs"
-$dstLibs = $srcLibs
+$dstLibs = Join-Path $PSScriptRoot "..\public\alpha-vue-SPA\libs"
 if (Test-Path $srcLibs) {
-    Write-Host "[DEBUG] Verifying libs in $srcLibs"
+    Write-Host "[DEBUG] Copying libs $srcLibs -> $dstLibs"
+    New-Item -ItemType Directory -Force -Path $dstLibs | Out-Null
+    Get-ChildItem -Path $srcLibs | Copy-Item -Destination $dstLibs -Recurse -Force
 } else {
     Write-Host "[WARN] Source libs folder not found: $srcLibs"
 }
 
-# Promote built index.html to top-level public/index.html
+# Promote SPA index.html to top-level public/index.html with adjusted base href
 $topIndex = Join-Path $PSScriptRoot "..\public\index.html"
 Write-Host "[DEBUG] Promoting $outIndex -> $topIndex (adjusting base href)"
 $html = Get-Content $outIndex -Raw
 
+# Fix base href - replace any existing base tag or insert new one
 $baseReplacement = '<base href="/" />'
 $basePattern = [regex]::Escape('<base') + '.*?>'
 if ($html -match $basePattern) {
     $html = $html -creplace $basePattern, $baseReplacement
 } else {
+    # Insert base tag after head opening tag
     $headPattern = '(<head[^>]*>)'
     $headReplacement = '$1' + [Environment]::NewLine + '    ' + $baseReplacement
     $html = $html -creplace $headPattern, $headReplacement
 }
 
+# Backup existing top-level index.html if present
 if (Test-Path $topIndex) {
     $timestamp = Get-Date -Format "yyyyMMddHHmmss"
     $backupPath = "$topIndex.bak.$timestamp"
@@ -76,13 +87,14 @@ if (Test-Path $topIndex) {
 }
 
 # Copy assets into public/assets and rewrite references
-$srcAssets = Join-Path $PSScriptRoot "..\dist\assets"
+$srcAssets = Join-Path $PSScriptRoot "..\public\alpha-vue-SPA\assets"
 $dstAssets = Join-Path $PSScriptRoot "..\public\assets"
 if (Test-Path $srcAssets) {
     Write-Host "[DEBUG] Copying SPA assets from $srcAssets -> $dstAssets"
     New-Item -ItemType Directory -Force -Path $dstAssets | Out-Null
     Get-ChildItem -Path $srcAssets | Copy-Item -Destination $dstAssets -Recurse -Force
-    $html = $html.Replace('/assets/', '/assets/')
+    # Rewrite asset URL prefixes in HTML
+    $html = $html.Replace('/alpha-vue-SPA/assets/', '/assets/')
     Write-Host "[DEBUG] Rewrote asset references in promoted index.html to /assets/"
 } else {
     Write-Host "[WARN] SPA assets folder not found at $srcAssets; skipping asset copy/rewrite"
@@ -91,12 +103,14 @@ if (Test-Path $srcAssets) {
 Set-Content -Path $topIndex -Value $html -Encoding UTF8
 Write-Host "[DEBUG] Promoted index.html to top-level public/index.html"
 
+# Verification: list a few key files
 Write-Host "VERIFY: public/assets (top 20):"
 Get-ChildItem $dstAssets -File -Recurse -Depth 1 | Select-Object -First 20 | ForEach-Object { Write-Host " - $($_.Name)" }
 
-Write-Host "VERIFY: public/libs:"
+Write-Host "VERIFY: public/alpha-vue-SPA/libs:"
 if (Test-Path $dstLibs) { Get-ChildItem $dstLibs -File | ForEach-Object { Write-Host " - $($_.Name)" } } else { Write-Host " - (not found)" }
 
+# Deploy to Netlify
 if ($netlifyPath) {
     Write-Host "[DEBUG] Starting Netlify deploy of public/"
     $deployCmd = "netlify deploy --prod --dir=public"
@@ -117,6 +131,6 @@ if ($netlifyPath) {
         exit 1
     }
 } else {
-    Write-Host "WARNING: Netlify CLI not found; build/verify steps completed but deploy skipped."
+    Write-Host "WARNING: Netlify CLI not found; build/verify steps completed but deploy skipped. Install netlify-cli to enable deployment."
     exit 0
 }
