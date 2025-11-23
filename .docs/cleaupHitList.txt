@@ -1,0 +1,9 @@
+partials/header-fragment.html
+
+.tbd/addPassageDisplayOverlays Warning 1.png
+.tbd/addPassageDisplayOverlays Warning 2.png
+.tbd/renderScale Warning regarding too many parameters.png
+
+consolidate .docs and docs
+
+public/alpha-vue-SPA

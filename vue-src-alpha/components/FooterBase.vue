@@ -12,7 +12,7 @@ defineProps({
   metaText: {
     type: String,
     default:
-      "A Work in Process. Last Update: 11-22-2025.  Music Tutor Studio © 2025",
+      "A Work in Process. Last Update: 4PM 11-22-2025. Music Tutor Studio © 2025",
   },
 });
 </script>
