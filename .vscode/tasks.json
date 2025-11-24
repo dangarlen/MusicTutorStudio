@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "🚀 Build and Deploy VUU to Netlify🚀",
+      "label": "🚀 Build and Deploy VUE.js to Netlify🚀",
       "type": "shell",
       "command": "powershell",
       "args": [
@@ -39,8 +39,42 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "🕒 Update Footer Time and Version 🕒",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\upRevFooter.ps1"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 View and Deploy Test 🔍",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\view-and-deploy-test.ps1"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
     }
   ]
 }
-
-

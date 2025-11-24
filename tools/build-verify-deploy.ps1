@@ -1,4 +1,7 @@
 ﻿<#
+DRG / CoPilot Script
+dev-alpha-vue-spa.ps1
+
 PowerShell helper to build the canonical Vite/Vue app, verify outputs, copy libs, promote index.html,
 and deploy the public/ folder to Netlify in one step.
 
@@ -86,6 +89,17 @@ if (Test-Path $srcAssets) {
     Write-Host "[DEBUG] Rewrote asset references in promoted index.html to /assets/"
 } else {
     Write-Host "[WARN] SPA assets folder not found at $srcAssets; skipping asset copy/rewrite"
+}
+
+# Ensure footer/version data is available in production (Netlify serves only public/)
+$srcFooterData = Join-Path $PSScriptRoot "..\data\footer.json"
+$dstDataDir = Join-Path $PSScriptRoot "..\public\data"
+if (Test-Path $srcFooterData) {
+    New-Item -ItemType Directory -Force -Path $dstDataDir | Out-Null
+    Copy-Item -Path $srcFooterData -Destination (Join-Path $dstDataDir "footer.json") -Force
+    Write-Host "[DEBUG] Copied footer.json into public/data for production footer version display"
+} else {
+    Write-Host "[WARN] footer.json not found at $srcFooterData; version info will not appear in deployed footer"
 }
 
 Set-Content -Path $topIndex -Value $html -Encoding UTF8
