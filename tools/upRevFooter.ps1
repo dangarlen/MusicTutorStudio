@@ -1,11 +1,11 @@
 # PowerShell script to increment footer version and update timestamp
-# Updates src/fragments/footer.json with new version (+0.1) and current timestamp
+# Updates src/data/footer.json with new version (+0.1) and current timestamp
 
 $ErrorActionPreference = "Stop"
 
 # Paths
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$footerJsonPath = Join-Path $repoRoot "data\footer.json"
+$footerJsonPath = Join-Path $repoRoot "src\data\footer.json"
 
 Write-Host "=== Footer Version & Timestamp Updater ===" -ForegroundColor Cyan
 Write-Host ""
