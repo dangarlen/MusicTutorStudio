@@ -53,10 +53,7 @@ Clean Up phase 1B complete.  Proceeding to 1C
 - Action: `Remove-Item -Recurse -Force public\test`
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-**Target: `public/tools/`**
-- Contents: MusicXML sample files and test-musicxml-import.html
-- Action: Move to `.docs/samples/` if needed for reference, or delete
-- Command: `New-Item -ItemType Directory -Force .docs\samples; Move-Item public\tools\* .docs\samples\; Remove-Item public\tools`
+
 
 ### Phase 4: Remove Orphaned Config Files
 
@@ -68,6 +65,8 @@ Clean Up phase 1B complete.  Proceeding to 1C
 **Target: Duplicate Tailwind configs**
 - Files: `tailwind.config copy.js`, `tailwind/tailwind.config.js`
 - Action: `Remove-Item "tailwind.config copy.js"`
+
+===============================================================
 
 ### Phase 5: Clean Documentation Duplicates
 
@@ -199,3 +198,11 @@ Compile a cleanup shortlist across the repo by grouping duplicates, backups, gen
 
 ### Further Considerations
 1. Verify Netlify deploy or dev scripts don’t require alpha-vue-SPA mirror before removal.
+
+
+========================
+Left AS-IS 
+**Target: `public/tools/`**
+- Contents: MusicXML sample files and test-musicxml-import.html
+- Action: Move to `.docs/samples/` if needed for reference, or delete
+- Command: `New-Item -ItemType Directory -Force .docs\samples; Move-Item public\tools\* .docs\samples\; Remove-Item public\tools`
