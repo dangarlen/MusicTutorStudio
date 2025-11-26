@@ -1,3 +1,10 @@
+Use Claude Sonnet 4.5 when you want to see the reasoning and documentation evolve live.
+
+Use GPT‑5 Codex when you want the most precise, production‑ready code (but accept less visible progress).
+
+For repo‑wide orchestration, Gemini 2.5 Pro can give you both scale and staged progress.
+
+
 If Copilot stops responding:
 
 Reload the VS Code window (Ctrl+Shift+P → "Developer: Reload Window")

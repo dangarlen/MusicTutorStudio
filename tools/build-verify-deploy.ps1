@@ -91,16 +91,29 @@ if (Test-Path $srcAssets) {
     Write-Host "[WARN] SPA assets folder not found at $srcAssets; skipping asset copy/rewrite"
 }
 
-# Ensure footer/version data is available in production (Netlify serves only public/)
-$srcFooterData = Join-Path $PSScriptRoot "..\data\footer.json"
+# Ensure all JSON data files are available in production (Netlify serves only public/)
+$srcDataDir = Join-Path $PSScriptRoot "..\data"
 $dstDataDir = Join-Path $PSScriptRoot "..\public\data"
-if (Test-Path $srcFooterData) {
+if (Test-Path $srcDataDir) {
     New-Item -ItemType Directory -Force -Path $dstDataDir | Out-Null
-    Copy-Item -Path $srcFooterData -Destination (Join-Path $dstDataDir "footer.json") -Force
-    Write-Host "[DEBUG] Copied footer.json into public/data for production footer version display"
+    Get-ChildItem -Path $srcDataDir -Filter "*.json" | ForEach-Object {
+        Copy-Item -Path $_.FullName -Destination (Join-Path $dstDataDir $_.Name) -Force
+        Write-Host "[DEBUG] Copied $($_.Name) to public/data/ for production"
+    }
 } else {
-    Write-Host "[WARN] footer.json not found at $srcFooterData; version info will not appear in deployed footer"
+    Write-Host "[WARN] data/ folder not found at $srcDataDir; JSON data will not be available in production"
 }
+
+# Ensure src/data/footer.json is available at site root for footer fragment fetch("footer.json")
+$srcFooterJson = Join-Path $PSScriptRoot "..\src\data\footer.json"
+$dstFooterJson = Join-Path $PSScriptRoot "..\public\footer.json"
+if (Test-Path $srcFooterJson) {
+    Copy-Item -Path $srcFooterJson -Destination $dstFooterJson -Force
+    Write-Host "[DEBUG] Copied footer.json to public/ for runtime footer metadata"
+} else {
+    Write-Host "[WARN] src/data/footer.json not found at $srcFooterJson"
+}
+
 
 Set-Content -Path $topIndex -Value $html -Encoding UTF8
 Write-Host "[DEBUG] Promoted index.html to top-level public/index.html"

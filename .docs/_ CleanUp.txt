@@ -3,13 +3,15 @@
 ### Phase 1: Remove Legacy Build Outputs (SAFE - Regenerable)
 
 COMPLETED .......................
+1A 
 **Target: `public/alpha-vue-SPA/`**
 - Status: Legacy build output from old Vite config
 - Current: Builds go to `dist/` then promoted to `public/`
 - Action: `Remove-Item -Recurse -Force public\alpha-vue-SPA`
 - Verification: Confirm `vite.config.js` has `outDir: 'dist'`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Clean Up phase 1B complete.  Proceeding to 1C
+1B 
 **Target: `public/vue/`**
 - Status: Old Vue prototype builds (dist/ and refactor-alpha/)
 - References: Only found in `.docs/helloVue.md` and `.docs/vue-vite.md` (documentation)
@@ -21,14 +23,18 @@ COMPLETED .......................
 - Action: `Remove-Item -Recurse -Force vue-src-alpha`
 - Verification: Confirm `tools/dev-alpha-vue-spa.ps1` runs from repo root, not vue-src-alpha
 
+
 **Target: Backup index.html files**
 - Files: `public/index.html.bak.20251122161107`, `public/index.html.bak.20251122161418`
 - Action: `Remove-Item public\index.html.bak.*`
+
 
 **Target: `dist/` (after confirming build works)**
 - Status: Vite build output (regenerable)
 - Action: Add to `.gitignore` if not already there
 - Note: Keep locally until first successful deploy, then can clean periodically
+
+
 
 ### Phase 2: Remove Duplicate Data Files (REQUIRES VALIDATION)
 
@@ -37,6 +43,8 @@ COMPLETED .......................
 - Current: Canonical data is in `/data`
 - Action: Delete after removing vue-src-alpha directory
 
+
+
 ### Phase 3: Remove Old Test/Prototype Files
 
 **Target: `public/test/`**
@@ -44,6 +52,7 @@ COMPLETED .......................
 - References: None found in active scripts
 - Action: `Remove-Item -Recurse -Force public\test`
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 **Target: `public/tools/`**
 - Contents: MusicXML sample files and test-musicxml-import.html
 - Action: Move to `.docs/samples/` if needed for reference, or delete

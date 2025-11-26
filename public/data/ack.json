@@ -1,0 +1,42 @@
+{
+  "tools": [
+    {
+      "name": "VexFlow",
+      "publisher": "0xfe",
+      "description": "A powerful music notation rendering library for web applications.",
+      "homepage": "https://www.vexflow.com",
+      "links": [
+        "https://github.com/0xfe/vexflow/wiki/Using-EasyScore",
+        "https://github.com/0xfe/vexflow/wiki/Tutorial",
+        "https://jsfiddle.net/ronyeh/c36p8eo2/"
+      ]
+    },
+    {
+      "name": "Tailwind CSS via CDN",
+      "publisher": "Tailwind Labs",
+      "description": "A utility-first CSS framework for rapid UI development.  Instead of installing via npm, I am referencing Tailwind through the CDN using an inline script tag pointing to cdn.tailwindcss.com allowing me to prototype without a build step.",
+      "homepage": "https://tailwindcss.com",
+      "links": [
+        "https://tailwindcss.com/docs"
+      ]
+    },
+    {
+      "name": "Tone.js",
+      "publisher": "Yotam Mann",
+      "description": "A Web Audio framework for creating interactive music in the browser.",
+      "homepage": "https://tonejs.github.io",
+      "links": [
+        "https://tonejs.github.io"
+      ]
+    },
+    {
+      "name": "SpeechSynthesis API",
+      "publisher": "W3C",
+      "description": "Browser-native API for converting text to spoken voice.",
+      "homepage": "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis",
+      "links": [
+        "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis"
+      ]
+    }
+  ]
+}

@@ -14,7 +14,7 @@ const footerText = ref('Loading...');
 
 onMounted(async () => {
   try {
-    const response = await fetch('/src/data/footer.json');
+    const response = await fetch('/footer.json');
     const data = await response.json();
     footerText.value = `A Work in Process. Version ${data.version}. Last Update: ${data.lastUpdate}. Music Tutor Studio © 2025`;
   } catch (error) {
