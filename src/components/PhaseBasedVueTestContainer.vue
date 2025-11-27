@@ -83,7 +83,9 @@ onMounted(async () => {
       instruments.value = await res.json();
       instrumentsLoaded = true;
       break;
-    } catch (e) { /* try next */ }
+    } catch (e) { 
+      console.debug('Failed to load instruments from', url, e);
+    }
   }
   if (!instrumentsLoaded) {
     errors.push('Could not load instruments.json from any candidate path.');
@@ -103,7 +105,9 @@ onMounted(async () => {
       enums.value = await res.json();
       enumsLoaded = true;
       break;
-    } catch (e) { /* try next */ }
+    } catch (e) { 
+      console.debug('Failed to load enums from', url, e);
+    }
   }
   if (!enumsLoaded) {
     errors.push('Could not load enums.json from any candidate path.');
