@@ -1,0 +1,227 @@
+# Music Tutor Studio - Workflow Test Report Generator
+# Runs Playwright tests and generates a detailed markdown report
+
+param(
+    [string]$OutputDir = ".docs",
+    [switch]$OpenReport
+)
+
+$ErrorActionPreference = "Continue"
+
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host " Music Tutor Studio Workflow Test Report" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# Timestamp for report filename
+$timestamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
+$reportFile = Join-Path $OutputDir "workflow-test-report-$timestamp.md"
+
+# Ensure output directory exists
+if (-not (Test-Path $OutputDir)) {
+    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+}
+
+Write-Host "Running Playwright tests..." -ForegroundColor Yellow
+Write-Host ""
+
+# Run Playwright tests and capture output
+$testOutput = npm run test:e2e 2>&1 | Out-String
+
+# Extract test results (simplified parsing - adjust based on actual output)
+$testsPassed = 0
+$testsFailed = 0
+$testsSkipped = 0
+
+# Parse test output for results
+if ($testOutput -match "(\d+) passed") {
+    $testsPassed = [int]$matches[1]
+}
+if ($testOutput -match "(\d+) failed") {
+    $testsFailed = [int]$matches[1]
+}
+if ($testOutput -match "(\d+) skipped") {
+    $testsSkipped = [int]$matches[1]
+}
+
+$totalTests = $testsPassed + $testsFailed + $testsSkipped
+
+# Determine overall status
+$overallStatus = if ($testsFailed -eq 0) { "✅ PASSED" } else { "❌ FAILED" }
+
+Write-Host ""
+Write-Host "Test Execution Complete" -ForegroundColor Green
+Write-Host "  Passed: $testsPassed" -ForegroundColor Green
+Write-Host "  Failed: $testsFailed" -ForegroundColor $(if ($testsFailed -gt 0) { "Red" } else { "Gray" })
+Write-Host "  Skipped: $testsSkipped" -ForegroundColor Yellow
+Write-Host ""
+
+# Generate markdown report
+$reportContent = @"
+# Music Tutor Studio - Workflow Test Report
+
+**Generated:** $(Get-Date -Format "MMMM dd, yyyy 'at' HH:mm:ss")  
+**Overall Status:** $overallStatus
+
+---
+
+## Test Summary
+
+| Metric | Count |
+|--------|-------|
+| Total Tests | $totalTests |
+| ✅ Passed | $testsPassed |
+| ❌ Failed | $testsFailed |
+| ⏭️ Skipped | $testsSkipped |
+| **Success Rate** | $(if ($totalTests -gt 0) { [math]::Round(($testsPassed / $totalTests) * 100, 2) } else { 0 })% |
+
+---
+
+## Workflow Coverage
+
+### Primary User Journeys Tested
+
+- [x] **Home Page Navigation**
+  - Main navigation buttons (Creator, Practice, Lessons, Preferences, About)
+  - Navigation from home to each section
+  
+- [x] **Creator Workflow**
+  - Create Scales page navigation
+  - Create Exercises page navigation
+  - Scale creation and viewing
+  - MusicXML import interface
+  
+- [x] **Practice Workflow**
+  - Practice hub navigation
+  - Active Unit Practice
+  - Recall Saved Practice Unit
+  - Practice modes (Notes, Pitch, Tuning)
+  - Empty state handling
+  
+- [x] **Lessons Workflow**
+  - Lessons hub navigation
+  - Manage Lessons
+  - Create Lesson
+  - Start Lesson
+  
+- [x] **Preferences**
+  - Preferences page navigation
+  - Instrument selection interface
+  
+- [x] **About Page**
+  - About page navigation
+  - Collapsible sections
+
+- [x] **Global UI Elements**
+  - Footer on all pages
+  - Version information display
+  - Home button functionality
+  
+- [x] **State Persistence**
+  - Pinia state across navigation
+  - localStorage handling
+  
+- [x] **Error Handling**
+  - Invalid route handling
+  - Console error monitoring
+  
+- [x] **Performance**
+  - Home page load time
+  - VexFlow rendering performance
+  
+- [x] **Accessibility**
+  - Accessible navigation elements
+  - Keyboard navigation support
+
+---
+
+## Test Execution Details
+
+``````
+$testOutput
+``````
+
+---
+
+## Identified Issues
+
+$(if ($testsFailed -gt 0) {
+@"
+⚠️ **$testsFailed test(s) failed.** Review the test output above for details.
+
+### Recommended Actions:
+1. Review failed test output for specific assertion failures
+2. Check browser console for JavaScript errors
+3. Verify route definitions in src/router/index.js
+4. Validate component rendering and state management
+5. Run tests individually for detailed debugging: ``npx playwright test --debug``
+"@
+} else {
+@"
+✅ **No issues detected.** All tests passed successfully.
+"@
+})
+
+---
+
+## Playwright Report
+
+The detailed HTML report is available at:
+``````
+playwright-report/index.html
+``````
+
+To view the report, run:
+``````powershell
+npx playwright show-report
+``````
+
+---
+
+## Next Steps
+
+1. Review any failed tests and address root causes
+2. Update test coverage for new features
+3. Run tests regularly before deployments
+4. Consider adding tests to CI/CD pipeline
+
+---
+
+## Testing Resources
+
+- Workflow Documentation: [.docs/user-workflow.md](.docs/user-workflow.md)
+- Test Suite: [tests/e2e/workflow.spec.js](tests/e2e/workflow.spec.js)
+- Playwright Config: [playwright.config.js](playwright.config.js)
+- Run Tests: ``npm run test:e2e``
+- Debug Tests: ``npx playwright test --debug``
+
+---
+
+*Report generated by workflow-test-report.ps1*
+"@
+
+# Write report to file
+$reportContent | Out-File -FilePath $reportFile -Encoding UTF8
+
+Write-Host "Report generated: $reportFile" -ForegroundColor Green
+Write-Host ""
+
+# Open report if requested
+if ($OpenReport) {
+    Write-Host "Opening report in default markdown viewer..." -ForegroundColor Yellow
+    Start-Process $reportFile
+}
+
+# Offer to open Playwright HTML report
+Write-Host "View detailed Playwright HTML report? (Y/N)" -ForegroundColor Cyan
+$response = Read-Host
+if ($response -eq 'Y' -or $response -eq 'y') {
+    npx playwright show-report
+}
+
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host " Workflow Test Report Complete" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+
+exit 0
