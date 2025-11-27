@@ -18,7 +18,6 @@
     "dev": "vite",
     "test:e2e": "playwright test",
     "build": "vite build",
-    "build:css": "npx tailwindcss -c tailwind/tailwind.config.js -i tailwind/input.css -o public/alpha-vue/site.css --minify",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

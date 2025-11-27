@@ -2,8 +2,8 @@
   <div class="border border-gray-300" :style="containerStyle">
     <div
       ref="vfContainer"
-      class="w-full"
-      :style="{ minHeight: staffHeight + 'px' }"
+      class="w-full staff-container"
+      style="min-height: 100px;"
     ></div>
   </div>
 </template>
@@ -214,9 +214,27 @@ function withinLedgerLimits(pitch, clef, limits) {
 }
 
 async function renderVexFlow() {
-  if (!vfContainer.value) return;
+  if (!vfContainer.value) {
+    console.log('[StaffPreview] vfContainer not ready');
+    return;
+  }
   vfContainer.value.innerHTML = "";
   const VF = globalThis.Vex ? globalThis.Vex.Flow : null;
+  console.log('[StaffPreview] VexFlow available:', !!VF);
+  
+  // Prepare note data early so it can be used in both VexFlow and fallback rendering
+  const arr = Array.isArray(notesStore.noteArray) ? notesStore.noteArray : [];
+  console.log('[StaffPreview] noteArray length:', arr.length, 'notes:', arr);
+  const clef = scaleStore?.instrument?.clef || staffFormat.staff.clef || "treble";
+  const limits = staffFormat.staff.ledgerLines || { above: 3, below: 3 };
+  const optEnforce = scaleStore?.scaleSelections?.staffOptions?.enforceLedgerLimits;
+  const enforceLedger = typeof optEnforce === "boolean" ? optEnforce : Boolean(staffFormat.staff?.enforceLedgerLimits ?? false);
+  
+  const valid = arr.map((n, i) => ({ n, i })).filter((x) => x.n?.pitch && x.n?.duration);
+  const filtered = valid.filter((x) => withinLedgerLimits(x.n.pitch, clef, limits));
+  const notesToRender = enforceLedger ? filtered : valid;
+  console.log('[StaffPreview] notesToRender length:', notesToRender.length);
+  
   // If VexFlow is not available, draw a simple SVG staff as a graceful fallback
   function noteToKeyObj(n) {
     // attempt to convert pitch like 'C4' or 'C#4' or 'Bb4' to { key: 'c#/4', acc: '#'}
@@ -329,24 +347,33 @@ async function renderVexFlow() {
   }
 
   if (!VF) {
-    // map notesToRender to simple key objects
-    const noteObjs = (notesToRender || []).map(x => noteToKeyObj(x.n || {}));
-    drawSimpleStaff(vfContainer.value, noteObjs, scaleStore?.instrument?.clef || staffFormat.staff.clef || 'treble');
+    console.log('[StaffPreview] VexFlow not loaded, using fallback SVG renderer');
+    // map notes to simple key objects
+    const noteObjs = notesToRender.map(x => noteToKeyObj(x.n || {}));
+    console.log('[StaffPreview] Fallback noteObjs:', noteObjs);
+    drawSimpleStaff(vfContainer.value, noteObjs, clef);
     // try to lazy-load VexFlow and re-render when available
     const scriptId = 'vexflow-cdn';
     if (!document.getElementById(scriptId)) {
+      console.log('[StaffPreview] Loading VexFlow from CDN...');
       const s = document.createElement('script');
       s.id = scriptId;
       s.src = 'https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js';
       s.async = true;
-      s.onload = () => setTimeout(renderVexFlow, 50);
+      s.onload = () => {
+        console.log('[StaffPreview] VexFlow loaded, re-rendering...');
+        setTimeout(renderVexFlow, 50);
+      };
+      s.onerror = () => console.error('[StaffPreview] Failed to load VexFlow from CDN');
       document.head.appendChild(s);
     }
     return;
   }
 
+  console.log('[StaffPreview] Using VexFlow renderer');
   const width = staffFormat.staff.width ?? 650;
   let height = staffFormat.staff.height ?? 200;
+  console.log('[StaffPreview] Canvas dimensions:', width, 'x', height);
   const renderer = new VF.Renderer(vfContainer.value, VF.Renderer.Backends.SVG);
   renderer.resize(width, height);
   const context = renderer.getContext();
@@ -358,9 +385,7 @@ async function renderVexFlow() {
 
   const staveX = staffFormat.staff.x ?? 10;
 
-  // Clef: prefer instrument clef if available, else config, else treble
-  const clef =
-    scaleStore?.instrument?.clef || staffFormat.staff.clef || "treble";
+  // Clef is already declared at the top of renderVexFlow function
 
   // Determine meter and bar lines behavior
   let tsString = "4/4";
@@ -413,7 +438,6 @@ async function renderVexFlow() {
   }
   const showMeasureBars = shouldShow("barLines", true);
 
-  const arr = Array.isArray(notesStore.noteArray) ? notesStore.noteArray : [];
   // If there are no notes to render, still draw an empty stave so the UI shows a staff
   if (!arr.length) {
     try {
@@ -425,29 +449,15 @@ async function renderVexFlow() {
       const staveX = staffFormat.staff.x ?? 10;
       const staveY = staffFormat.staff.y ?? 30;
       const stave = new VF.Stave(staveX, staveY, width - staveX - 10);
-      const clef = scaleStore?.instrument?.clef || staffFormat.staff.clef || 'treble';
       stave.addClef(clef).setContext(context).draw();
     } catch (e) {
       // ignore errors and return silently
     }
     return;
   }
-  const limits = staffFormat.staff.ledgerLines || { above: 3, below: 3 };
-  const optEnforce =
-    scaleStore?.scaleSelections?.staffOptions?.enforceLedgerLimits;
-  const enforceLedger =
-    typeof optEnforce === "boolean"
-      ? optEnforce
-      : Boolean(staffFormat.staff?.enforceLedgerLimits ?? false);
-  // Keep track of original indices alongside note objects
-  const valid = arr
-    .map((n, i) => ({ n, i }))
-    .filter((x) => x.n?.pitch && x.n?.duration);
-  const filtered = valid.filter((x) =>
-    withinLedgerLimits(x.n.pitch, clef, limits)
-  );
-  // Decide which notes to render based on enforcement toggle
-  const notesToRender = enforceLedger ? filtered : valid;
+  
+  // Guard variable so it exists even if re-referenced above in non-VF branch
+  const renderList = Array.isArray(notesToRender) ? notesToRender : [];
   if (enforceLedger && !filtered.length) {
     // Strict mode: nothing to draw as notes; draw a clean stave only
     // eslint-disable-next-line no-console
@@ -734,7 +744,19 @@ async function renderVexFlow() {
       // Fallback: use VexFlow default formatting
       formatter.format([voice], availableWidth);
     }
-    voice.draw(context, stave);
+    console.log('[StaffPreview] Drawing voice with', vfNotes.length, 'notes');
+    try {
+      voice.draw(context, stave);
+      console.log('[StaffPreview] Voice draw completed successfully');
+      // Log SVG dimensions after draw
+      const svg = vfContainer.value?.querySelector('svg');
+      if (svg) {
+        console.log('[StaffPreview] SVG dimensions:', svg.getAttribute('width'), 'x', svg.getAttribute('height'));
+        console.log('[StaffPreview] SVG viewBox:', svg.getAttribute('viewBox'));
+      }
+    } catch (e) {
+      console.error('[StaffPreview] Error drawing voice:', e);
+    }
   }
 
   // Track original indices for click binding and optional tooltips
@@ -765,11 +787,14 @@ async function renderVexFlow() {
         stave.addTimeSignature(tsString);
       } catch {}
     }
+    console.log('[StaffPreview] Drawing stave (staff lines)');
     stave.setContext(context).draw();
+    console.log('[StaffPreview] Creating VexFlow notes from', notesToRender.length, 'note objects');
     const vfNotes = notesToRender.map(({ n, i }) => {
       allDrawnOriginalIndices.push(i);
       return buildVFNote(n);
     });
+    console.log('[StaffPreview] Built', vfNotes.length, 'VexFlow notes, calling layoutAndDraw');
     layoutAndDraw(stave, vfNotes, width - staveX * 2);
     // Attach events after draw
     attachNoteInteractivity(allDrawnOriginalIndices, tooltipTextByIndex);
@@ -902,7 +927,9 @@ async function renderVexFlow() {
       ms.setBegBarType(VF.Barline.type.SINGLE);
       ms.setEndBarType(VF.Barline.type.SINGLE);
     }
+    console.log('[StaffPreview] Drawing measure', idx + 1, 'of', measures.length, 'at position', x, y);
     ms.setContext(context).draw();
+    console.log('[StaffPreview] Calling layoutAndDraw for measure', idx + 1, 'with', notes.length, 'notes');
     layoutAndDraw(ms, notes, msWidth);
     // Record original indices in the same draw order
     const idxs = measuresIdx[idx] || [];
@@ -1027,3 +1054,18 @@ function onNoteClick(idx) {
   }
 }
 </script>
+
+<style scoped>
+.staff-container {
+  background: white;
+  position: relative;
+}
+
+.staff-container svg {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+  height: auto !important;
+}
+</style>

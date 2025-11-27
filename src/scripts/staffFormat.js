@@ -4,11 +4,20 @@ let _cachedFormat = null;
 export async function getStaffFormat() {
   if (_cachedFormat) return _cachedFormat;
   try {
-    const url = `${import.meta.env.BASE_URL}staff-format.json`;
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`Failed to load ${url}`);
-    _cachedFormat = await resp.json();
-    return _cachedFormat;
+    const candidates = [
+      `${import.meta.env.BASE_URL}staff-format.json`,
+      '/staff-format.json'
+    ];
+    let lastErr = null;
+    for (const url of candidates) {
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`Failed to load ${url}: HTTP ${resp.status}`);
+        _cachedFormat = await resp.json();
+        return _cachedFormat;
+      } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error('Failed to load staff-format.json');
   } catch (e) {
     console.warn("[staffFormat] Using fallback defaults:", e);
     _cachedFormat = {

@@ -89,11 +89,21 @@ const localSelections = computed({
 const scaleKeys = ref({});
 onMounted(async () => {
   try {
-    const response = await fetch(
-      `${import.meta.env.BASE_URL}data/scaleKeys.json`
-    );
-    if (!response.ok) throw new Error("Failed to load scaleKeys.json");
-    scaleKeys.value = await response.json();
+    const candidates = [
+      `${import.meta.env.BASE_URL}data/scaleKeys.json`,
+      '/data/scaleKeys.json'
+    ];
+    let lastErr = null;
+    for (const url of candidates) {
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`Failed to load ${url}: HTTP ${resp.status}`);
+        scaleKeys.value = await resp.json();
+        lastErr = null;
+        break;
+      } catch (e) { lastErr = e; }
+    }
+    if (lastErr) throw lastErr;
   } catch (e) {
     console.error("ScaleKeys fetch error:", e);
   }

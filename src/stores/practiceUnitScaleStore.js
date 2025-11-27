@@ -25,8 +25,7 @@ export const usePracticeUnitScaleStore = defineStore("practiceUnitScale", {
         // would leave the staff range empty.
         const candidates = [
           `${import.meta.env.BASE_URL}data/instruments.json`,
-          '/alpha-vue-SPA/data/instruments.json',
-          '/data/instruments.json',
+          '/data/instruments.json'
         ];
         let data = null;
         let lastErr = null;
