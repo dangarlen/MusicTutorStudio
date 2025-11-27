@@ -100,9 +100,10 @@ This error typically occurs when the Copilot coding agent cannot locate or creat
 - Verify Copilot is enabled for your organization/account
 
 ### Best practices for this repository
-- Always run `npm run dev` to test changes locally before committing
-- Use `npm run build` to verify the build succeeds
-- Test in the browser by navigating to `http://localhost:5173`
+- Always test changes locally before committing using one of the methods from "Important developer workflows":
+  - Run `python -m http.server 8000 -d public` and navigate to `http://localhost:8000`
+  - Or use `npx serve public` for a quick static server
+- Use `npm run build` to verify the build succeeds before submitting changes
 
 ---
 
