@@ -7,10 +7,10 @@ redirects = []
 [functions."*"]
 
 [build]
-publish = "C:\\Dev\\MusicTutorStudio\\Code\\public"
+publish = "C:\\Dev\\MusicTutorStudio\\Code\\dist"
 publishOrigin = "config"
 commandOrigin = "config"
-command = "echo \"No build\""
+command = "npm run build"
 
 [build.environment]
 

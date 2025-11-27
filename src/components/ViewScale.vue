@@ -10,7 +10,7 @@
         <span class="text-2xl font-bold">View Scale</span>
       </div>
       <div
-        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
+        class="collapse collapse-arrow arrow-left bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
         <input type="checkbox" class="peer" checked />
         <div
@@ -31,7 +31,7 @@
       </div>
       <!-- New: Scale Details panel under Scale Preview -->
       <div
-        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
+        class="collapse collapse-arrow arrow-left bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
         <input type="checkbox" class="peer" />
         <div
@@ -54,7 +54,7 @@
       </div>
 
       <div
-        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mt-4 rounded-xl"
+        class="collapse collapse-arrow arrow-left bg-gray-50 border border-gray-300 mt-4 rounded-xl"
       >
         <input type="checkbox" class="peer" />
         <div
@@ -169,3 +169,11 @@ const staffFormattingText = computed(() => {
   return parts.join(", ") + (family ? `, ${family}` : "");
 });
 </script>
+
+<style scoped>
+/* Move DaisyUI collapse arrow to the left side */
+.arrow-left .collapse-title::after {
+  left: 1rem;
+  right: auto;
+}
+</style>

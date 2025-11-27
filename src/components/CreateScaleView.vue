@@ -10,9 +10,9 @@
         <span class="text-2xl font-bold">{{ store.title }}</span>
       </div>
       <div
-        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
+        class="collapse collapse-arrow collapse-arrow-left bg-gray-50 border border-gray-300 mb-4 rounded-xl"
       >
-        <input type="checkbox" class="peer" />
+        <input type="checkbox" class="peer" checked />
         <div
           class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"
         >
@@ -62,7 +62,7 @@
       />
 
       <div
-        class="collapse collapse-arrow bg-gray-50 border border-gray-300 mt-4 rounded-xl"
+        class="collapse collapse-arrow collapse-arrow-left bg-gray-50 border border-gray-300 mt-4 rounded-xl"
       >
         <input type="checkbox" class="peer" />
         <div
