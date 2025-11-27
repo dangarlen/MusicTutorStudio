@@ -1,5 +1,5 @@
 <template>
-  <div class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl">
+  <div class="collapse collapse-arrow collapse-arrow-left bg-gray-50 border border-gray-300 mb-4 rounded-xl">
     <input type="checkbox" class="peer" />
     <div
       class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex justify-between items-center"

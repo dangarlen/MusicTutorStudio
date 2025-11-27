@@ -11,7 +11,7 @@
 
       <!-- Scale Data Collapse -->
       <div
-        class="collapse collapse-arrow bg-white mb-6 border-2 border-dotted border-gray-400"
+        class="collapse collapse-arrow collapse-arrow-left bg-white mb-6 border-2 border-dotted border-gray-400"
       >
         <input type="checkbox" class="peer" checked />
         <div class="collapse-title font-bold text-lg flex items-center gap-2">

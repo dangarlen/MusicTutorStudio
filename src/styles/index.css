@@ -1,3 +1,12 @@
+@import "./theme.css";
+
 @tailwind base;
 @tailwind components;
+/* Move DaisyUI collapse arrow to the left of caption */
+.collapse-arrow-left .collapse-title { padding-left: 2.25rem; padding-right: 1rem; }
+.collapse-arrow-left.collapse-arrow > .collapse-title:after {
+  inset-inline-start: 1rem;
+  inset-inline-end: auto;
+}
+
 @tailwind utilities;

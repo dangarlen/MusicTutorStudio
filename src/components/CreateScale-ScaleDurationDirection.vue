@@ -1,6 +1,6 @@
 <template>
   <div
-    class="collapse collapse-arrow bg-gray-50 border border-gray-300 mb-4 rounded-xl"
+    class="collapse collapse-arrow collapse-arrow-left bg-gray-50 border border-gray-300 mb-4 rounded-xl"
   >
     <input type="checkbox" class="peer" />
     <div

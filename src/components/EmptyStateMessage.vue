@@ -257,81 +257,103 @@ function navigateToAction() {
 }
 </script>
 
-<style scoped>
+<style>
+/* Tailwind v3.4+ requires @reference instead of @apply in CSS */
 .empty-state-container {
-  @apply flex items-center justify-center p-8;
+  @reference flex;
+  @reference items-center;
+  @reference justify-center;
+  @reference p-8;
   min-height: 200px;
 }
 
 .empty-state-content {
-  @apply text-center max-w-md;
+  @reference text-center;
+  @reference max-w-md;
 }
 
 .empty-state-icon {
-  @apply mb-4;
+  @reference mb-4;
 }
 
 .empty-state-message {
-  @apply mb-6;
+  @reference mb-6;
 }
 
 .empty-state-title {
-  @apply text-lg font-semibold mb-2 text-gray-700;
+  @reference text-lg;
+  @reference font-semibold;
+  @reference mb-2;
+  @reference text-gray-700;
 }
 
 .empty-state-text {
-  @apply text-gray-600 leading-relaxed;
+  @reference text-gray-600;
+  @reference leading-relaxed;
 }
 
 .empty-state-action {
-  @apply flex justify-center;
+  @reference flex;
+  @reference justify-center;
 }
 
 /* Size variants */
 .empty-state-small {
-  @apply p-4;
+  @reference p-4;
   min-height: 120px;
 }
 
 .empty-state-small .empty-state-content {
-  @apply max-w-xs;
+  @reference max-w-xs;
 }
 
 .empty-state-small .empty-state-title {
-  @apply text-base;
+  @reference text-base;
 }
 
 .empty-state-small .empty-state-text {
-  @apply text-sm;
+  @reference text-sm;
 }
 
 .empty-state-large {
-  @apply p-12;
+  @reference p-12;
   min-height: 300px;
 }
 
 .empty-state-large .empty-state-content {
-  @apply max-w-lg;
+  @reference max-w-lg;
 }
 
 .empty-state-large .empty-state-title {
-  @apply text-xl;
+  @reference text-xl;
 }
 
 /* Variant styles */
 .empty-state-info {
-  @apply bg-blue-50 border border-blue-200 rounded-lg;
+  @reference bg-blue-50;
+  @reference border;
+  @reference border-blue-200;
+  @reference rounded-lg;
 }
 
 .empty-state-warning {
-  @apply bg-yellow-50 border border-yellow-200 rounded-lg;
+  @reference bg-yellow-50;
+  @reference border;
+  @reference border-yellow-200;
+  @reference rounded-lg;
 }
 
 .empty-state-error {
-  @apply bg-red-50 border border-red-200 rounded-lg;
+  @reference bg-red-50;
+  @reference border;
+  @reference border-red-200;
+  @reference rounded-lg;
 }
 
 .empty-state-default {
-  @apply bg-gray-50 border border-gray-200 rounded-lg;
+  @reference bg-gray-50;
+  @reference border;
+  @reference border-gray-200;
+  @reference rounded-lg;
 }
 </style>
