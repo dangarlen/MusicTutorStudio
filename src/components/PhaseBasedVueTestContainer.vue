@@ -68,25 +68,50 @@ function prevPhase() {
 }
 
 onMounted(async () => {
-  try {
-    const instrumentsRes = await fetch("/alpha-vue-SPA/data/instruments.json");
-    if (!instrumentsRes.ok) throw new Error("Failed to fetch instruments.json");
-    instruments.value = await instrumentsRes.json();
-  } catch (err) {
-    errorMsg.value = `Could not load c:/Dev/MusicTutorStudio/Code/public/alpha-vue-SPA/data/instruments.json.\nError: ${
-      err && err.message ? err.message : err
-    }`;
+  const errors = [];
+  
+  // Try multiple URL candidates for instruments.json
+  const instrumentCandidates = [
+    `${import.meta.env.BASE_URL}data/instruments.json`,
+    '/data/instruments.json'
+  ];
+  let instrumentsLoaded = false;
+  for (const url of instrumentCandidates) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      instruments.value = await res.json();
+      instrumentsLoaded = true;
+      break;
+    } catch (e) { /* try next */ }
+  }
+  if (!instrumentsLoaded) {
+    errors.push('Could not load instruments.json from any candidate path.');
     instruments.value = [];
   }
-  try {
-    const enumsRes = await fetch("/alpha-vue-SPA/data/enums.json");
-    if (!enumsRes.ok) throw new Error("Failed to fetch enums.json");
-    enums.value = await enumsRes.json();
-  } catch (err) {
-    errorMsg.value += `\nCould not load c:/Dev/MusicTutorStudio/Code/public/alpha-vue-SPA/data/enums.json.\nError: ${
-      err && err.message ? err.message : err
-    }`;
+
+  // Try multiple URL candidates for enums.json
+  const enumCandidates = [
+    `${import.meta.env.BASE_URL}data/enums.json`,
+    '/data/enums.json'
+  ];
+  let enumsLoaded = false;
+  for (const url of enumCandidates) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      enums.value = await res.json();
+      enumsLoaded = true;
+      break;
+    } catch (e) { /* try next */ }
+  }
+  if (!enumsLoaded) {
+    errors.push('Could not load enums.json from any candidate path.');
     enums.value = {};
+  }
+  
+  if (errors.length > 0) {
+    errorMsg.value = errors.join('\n');
   }
 });
 </script>
