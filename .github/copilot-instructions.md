@@ -71,6 +71,39 @@ Avoid:
 - Keep changes small and focused. When editing JSON data shapes, update the corresponding UI code that reads it.
 - Preserve CDN references for VexFlow/Tone unless there is a specific reason to change them — tests and pages rely on those exact versions.
 
+## Troubleshooting Copilot Coding Agent
+
+### "Failed to find pull request" error
+This error typically occurs when the Copilot coding agent cannot locate or create a pull request. Common causes and fixes:
+
+1. **Transient API issues**: Refresh the page and wait a few moments. The agent will retry automatically in most cases.
+
+2. **Branch targeting**: Ensure you're working from a branch that can be merged into the default branch (`master`). The agent creates PRs targeting the default branch.
+
+3. **Repository permissions**: Verify that:
+   - Copilot coding agent is enabled for this repository
+   - GitHub Actions are enabled in repository settings
+   - You have write access to the repository
+
+4. **IDE-specific issues**:
+   - In VS Code: Use `@github` prefix when asking Copilot to create PRs
+   - Sign out and sign back in to refresh authentication tokens
+   - Update the GitHub Copilot and GitHub Pull Request extensions
+
+5. **Assignment method**: When assigning issues to Copilot:
+   - On GitHub.com: Assign the issue directly to Copilot
+   - In VS Code: Use the GitHub Pull Request extension's chat interface
+
+### Agent not responding
+- Check GitHub's status page for service interruptions
+- Ensure the repository isn't excluded by content exclusion rules
+- Verify Copilot is enabled for your organization/account
+
+### Best practices for this repository
+- Always run `npm run dev` to test changes locally before committing
+- Use `npm run build` to verify the build succeeds
+- Test in the browser by navigating to `http://localhost:5173`
+
 ---
 
 Please review these instructions and tell me any gaps (missing files or unclear data shapes) and I will refine the guidance.
