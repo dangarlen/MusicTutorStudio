@@ -11,8 +11,8 @@
     />
     <!-- VexFlow CDN (exact version as static page) -->
     <script src="https://cdn.jsdelivr.net/npm/vexflow@3.0.9/releases/vexflow-debug.js"></script>
-    <script type="module" crossorigin src="/assets/index-PqqnAT6n.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-COHFgNKB.css">
+    <script type="module" crossorigin src="/assets/index-vHTbuYsF.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CcVQRmS4.css">
   </head>
   <body>
     <div id="app"></div>
