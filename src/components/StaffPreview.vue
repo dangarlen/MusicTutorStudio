@@ -15,16 +15,10 @@ import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
 import { getStaffFormat } from "../scripts/staffFormat";
 import { composePracticeUnit } from "../scripts/composePracticeUnit";
 
-// Optional practice-mode props to enable overlays and click-to-color without
-// impacting other routes/components that embed StaffPreview.
 const props = defineProps({
-  // Overlay mode to display above notes: 'none' | 'names' | 'pitch' | 'cmt' | 'midi' | 'fingering' | 'fingering-alt'
   practiceOverlayMode: { type: String, default: "none" },
-  // When true, do not render annotations above notes; instead attach tooltip text.
   practiceOverlayTooltipOnly: { type: Boolean, default: false },
-  // Enable clicking notes to cycle colors
   practiceEnableClickToCycle: { type: Boolean, default: false },
-  // Array of CSS color strings to cycle through on click
   practiceColorCycle: {
     type: Array,
     default: () => [
@@ -38,6 +32,7 @@ const props = defineProps({
       "gray",
     ],
   },
+  activePlayIndex: { type: Number, default: -1 },
 });
 
 const vfContainer = ref(null);
@@ -312,7 +307,18 @@ async function renderVexFlow() {
         const y = centerY - (dySemis * (spacing / 2));
         const x = leftPad + i * stepX;
         // If the note object includes a halo flag, draw a soft yellow ellipse behind the note
-        if (it.halo) {
+        // Highlight note if activePlayIndex matches
+        if (props.activePlayIndex === i) {
+          const halo = document.createElementNS(xmlns, 'ellipse');
+          halo.setAttribute('cx', String(x));
+          halo.setAttribute('cy', String(y));
+          halo.setAttribute('rx', String(12));
+          halo.setAttribute('ry', String(10));
+          halo.setAttribute('fill', 'orange');
+          halo.setAttribute('opacity', '0.45');
+          halo.setAttribute('class', 'mts-note-halo');
+          svg.appendChild(halo);
+        } else if (it.halo) {
           const halo = document.createElementNS(xmlns, 'ellipse');
           halo.setAttribute('cx', String(x));
           halo.setAttribute('cy', String(y));

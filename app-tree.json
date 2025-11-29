@@ -1,0 +1,278 @@
+[
+  {
+    "name": "Creator",
+    "children": [
+      {
+        "id": "create-scales",
+        "name": "create-scales",
+        "path": "/create-scales",
+        "page": "CreateScaleView.vue",
+        "componentPath": "src\\components\\CreateScaleView.vue",
+        "icon": "queue_music",
+        "order": 1
+      },
+      {
+        "id": "create-exercises",
+        "name": "create-exercises",
+        "path": "/create-exercises",
+        "page": "CreateExercise.vue",
+        "componentPath": "src\\components\\CreateExercise.vue",
+        "icon": "add_circle",
+        "order": 2
+      },
+      {
+        "id": "create-edit-practice-unit",
+        "name": "create-edit-practice-unit",
+        "path": "/create-edit-practice-unit",
+        "page": "CreateEditPracticeUnit.vue",
+        "componentPath": "src\\components\\CreateEditPracticeUnit.vue",
+        "icon": "edit",
+        "order": 3
+      },
+      {
+        "id": "create-practice-unit-view",
+        "name": "create-practice-unit-view",
+        "path": "/create-practice-unit-view",
+        "page": "CreatePracticeUnitView.vue",
+        "componentPath": "src\\components\\CreatePracticeUnitView.vue",
+        "icon": "visibility",
+        "order": 4
+      },
+      {
+        "id": "creator",
+        "name": "creator",
+        "path": "/creator",
+        "page": "Creator.vue",
+        "componentPath": "src\\components\\Creator.vue",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "create-lessons",
+        "name": "create-lessons",
+        "path": "/create-lessons",
+        "page": null,
+        "componentPath": null,
+        "redirect": "/lessons-create",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "create-scale-view",
+        "name": "create-scale-view",
+        "path": "/create-scale-view",
+        "page": null,
+        "componentPath": null,
+        "redirect": "/create-practice-unit-view",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "create-exercise-view",
+        "name": "create-exercise-view",
+        "path": "/create-exercise-view",
+        "page": null,
+        "componentPath": null,
+        "redirect": "/create-practice-unit-view",
+        "icon": "description",
+        "order": 999
+      }
+    ]
+  },
+  {
+    "name": "Practice",
+    "children": [
+      {
+        "id": "practice-active-unit",
+        "name": "practice-active-unit",
+        "path": "/practice-active-unit",
+        "page": "PracticeScales.vue",
+        "componentPath": "src\\components\\PracticeScales.vue",
+        "icon": "play_circle",
+        "order": 1
+      },
+      {
+        "id": "practice-recall-practice-unit",
+        "name": "practice-recall-practice-unit",
+        "path": "/practice-recall-practice-unit",
+        "page": "PracticeExercises.vue",
+        "componentPath": "src\\components\\PracticeExercises.vue",
+        "icon": "download",
+        "order": 2
+      },
+      {
+        "id": "practice-pitch",
+        "name": "practice-pitch",
+        "path": "/practice-pitch",
+        "page": "PracticePitch.vue",
+        "componentPath": "src\\components\\PracticePitch.vue",
+        "icon": "hearing",
+        "order": 3
+      },
+      {
+        "id": "practice-tuning",
+        "name": "practice-tuning",
+        "path": "/practice-tuning",
+        "page": "PracticeTuning.vue",
+        "componentPath": "src\\components\\PracticeTuning.vue",
+        "icon": "tune",
+        "order": 4
+      },
+      {
+        "id": "practice-notes",
+        "name": "practice-notes",
+        "path": "/practice-notes",
+        "page": "PracticeNotes.vue",
+        "componentPath": "src\\components\\PracticeNotes.vue",
+        "icon": "sticky_note_2",
+        "order": 5
+      },
+      {
+        "id": "practice",
+        "name": "practice",
+        "path": "/practice",
+        "page": "Practice.vue",
+        "componentPath": "src\\components\\Practice.vue",
+        "icon": "description",
+        "order": 999
+      }
+    ]
+  },
+  {
+    "name": "Lessons",
+    "children": [
+      {
+        "id": "lessons-create",
+        "name": "lessons-create",
+        "path": "/lessons-create",
+        "page": "CreateLessons.vue",
+        "componentPath": "src\\components\\CreateLessons.vue",
+        "icon": "add_circle",
+        "order": 1
+      },
+      {
+        "id": "lessons-manage",
+        "name": "lessons-manage",
+        "path": "/lessons-manage",
+        "page": "LessonsManage.vue",
+        "componentPath": "src\\components\\LessonsManage.vue",
+        "icon": "launch",
+        "order": 2
+      },
+      {
+        "id": "lessons-start",
+        "name": "lessons-start",
+        "path": "/lessons-start",
+        "page": "LessonsStart.vue",
+        "componentPath": "src\\components\\LessonsStart.vue",
+        "icon": "play_circle",
+        "order": 3
+      },
+      {
+        "id": "lessons",
+        "name": "lessons",
+        "path": "/lessons",
+        "page": "Lessons.vue",
+        "componentPath": "src\\components\\Lessons.vue",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "lessons-continue",
+        "name": "lessons-continue",
+        "path": "/lessons-continue",
+        "page": "LessonsContinue.vue",
+        "componentPath": "src\\components\\LessonsContinue.vue",
+        "icon": "description",
+        "order": 999
+      }
+    ]
+  },
+  {
+    "name": "Preferences",
+    "children": [
+      {
+        "id": "preferences",
+        "name": "preferences",
+        "path": "/preferences",
+        "page": "Preferences.vue",
+        "componentPath": "src\\components\\Preferences.vue",
+        "icon": "settings",
+        "order": 1
+      }
+    ]
+  },
+  {
+    "name": "About",
+    "children": [
+      {
+        "id": "about",
+        "name": "about",
+        "path": "/about",
+        "page": "About.vue",
+        "componentPath": "src\\components\\About.vue",
+        "icon": "info",
+        "order": 1
+      }
+    ]
+  },
+  {
+    "name": "Other",
+    "children": [
+      {
+        "id": "phase-test-container",
+        "name": "phase-test-container",
+        "path": "/phase-test-container",
+        "page": "PhaseBasedVueTestContainer.vue",
+        "componentPath": "src\\components\\PhaseBasedVueTestContainer.vue",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "save-to-practice-unit-export",
+        "name": "save-to-practice-unit-export",
+        "path": "/save-to-practice-unit-export",
+        "page": "SaveToPracticeUnitExport.vue",
+        "componentPath": "src\\components\\SaveToPracticeUnitExport.vue",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "recall-json-from-pinia",
+        "name": "recall-json-from-pinia",
+        "path": "/recall-json-from-pinia",
+        "page": "RecallJsonFromPinia.vue",
+        "componentPath": "src\\components\\RecallJsonFromPinia.vue",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "import-practice-unit-export",
+        "name": "import-practice-unit-export",
+        "path": "/import-practice-unit-export",
+        "page": "ImportPracticeUnitExport.vue",
+        "componentPath": "src\\components\\ImportPracticeUnitExport.vue",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "edit-practice-unit-scale-in-memory",
+        "name": "edit-practice-unit-scale-in-memory",
+        "path": "/edit-practice-unit-scale-in-memory",
+        "page": "EditPracticeUnitScaleInMemory.vue",
+        "componentPath": "src\\components\\EditPracticeUnitScaleInMemory.vue",
+        "icon": "description",
+        "order": 999
+      },
+      {
+        "id": "debug-state",
+        "name": "debug-state",
+        "path": "/debug-state",
+        "page": "DebugState.vue",
+        "componentPath": "src\\components\\DebugState.vue",
+        "icon": "description",
+        "order": 999
+      }
+    ]
+  }
+]

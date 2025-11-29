@@ -112,5 +112,21 @@
       },
       "problemMatcher": []
     }
+    },
+    {
+      "label": "📚 Generate Vue App Tree 📚",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}\\generate-app-tree.js"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
   ]
 }

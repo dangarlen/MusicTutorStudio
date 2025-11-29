@@ -1,0 +1,42 @@
+Defalut create-exercises
+Add load demo1.musicxml and demo2.musicxml buttons to create-exercises Music XML collapse where demo1.musicxml & demo2.musicxml = 
+Twinkle_Twinkle_Little_Star.musicxml and Danny_Boy_Lead_sheet_with_lyrics.musicxml
+
+Added  [Play Button] (using Tone.js) to practice-active-unit "Preview" Collapse
+Which pages have a "Play" button
+
+Modify [Play Button] so it toggles to a [Stop Button] when playing to practice-active-unit "Preview" Collapse.  Modify play function so that it highlights each note as played.
+
+that to(using Tone.js) to practice-active-unit "Preview" Collapse
+Which pages have a "Play" button
+
+
+Summarized conversation history
+
+Based on the code analysis, here are the pages with a "Play" button:
+
+Pages with "Play" Buttons:
+Practice Hub (src/components/Practice.vue) <<<  !!!!!!!!!!!!!!
+
+"Start Practice Unit" button with play_circle icon
+Routes to /practice/active-unit
+Lessons Hub (src/components/Lessons.vue)  <<<
+
+"Start a Lesson" button with play_circle icon
+Routes to /lessons/start
+Creator - Create Scale ([src/components/CreateScaleView.vue]CreateScaleView.vue ))  <<<
+
+"Practice This Scale Now" button with play_circle icon
+Quick Practice button (routes to /practice/active-unit)
+Creator - Preview Practice Unit (src/components/PreviewPracticeUnit.vue)
+
+"Practice Now" button with play_circle icon
+Routes to /practice/active-unit
+Summary: 4 pages total have Play buttons, all using the Material Symbols play_circle icon and routing to practice-related functionality.
+
+
+The main pages/components that call Tone.js for audio output are:
+PracticePitch
+CreatePracticeUnitView
+VirtualKeyboardVuePiano
+VirtualKeyboardSVG

@@ -83,7 +83,26 @@
             :practice-overlay-tooltip-only="overlayTooltipOnly"
             :practice-enable-click-to-cycle="true"
             :practice-color-cycle="noteColors.map((c) => c.color)"
+            :active-play-index="activePlayIndex"
           />
+          <div class="mt-4 flex items-center gap-2">
+          <button
+            class="btn btn-sm btn-success"
+            v-if="!isPlaying"
+            @click="playScaleNotes"
+          >
+            <span class="material-symbols-outlined align-middle">play_arrow</span>
+            Play Scale
+          </button>
+          <button
+            class="btn btn-sm btn-error"
+            v-else
+            @click="stopScaleNotes"
+          >
+            <span class="material-symbols-outlined align-middle">stop</span>
+            Stop
+          </button>
+        </div>
         </div>
       </div>
       <!-- Scale Preview END -->
@@ -300,6 +319,54 @@
   </div>
 </template>
 <script setup>
+
+const isPlaying = ref(false);
+const activePlayIndex = ref(-1);
+let playTimeouts = [];
+
+async function playScaleNotes() {
+  if (!window.Tone) {
+    // Dynamically load Tone.js from CDN if not present
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = "https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js";
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+  if (!window.Tone) {
+    alert("Tone.js failed to load.");
+    return;
+  }
+  const Tone = window.Tone;
+  if (!Array.isArray(store.noteArray) || store.noteArray.length === 0) {
+    alert("No scale notes to play.");
+    return;
+  }
+  isPlaying.value = true;
+  const notes = store.noteArray.map(n => n.spn || n.pitch || n.name).filter(Boolean);
+  const synth = new Tone.Synth().toDestination();
+  let now = Tone.now();
+  playTimeouts = [];
+  notes.forEach((note, i) => {
+    playTimeouts.push(setTimeout(() => {
+      activePlayIndex.value = i;
+    }, i * 600));
+    synth.triggerAttackRelease(note, "0.5", now + i * 0.6);
+  });
+  playTimeouts.push(setTimeout(() => {
+    activePlayIndex.value = -1;
+    isPlaying.value = false;
+  }, notes.length * 600));
+}
+
+function stopScaleNotes() {
+  playTimeouts.forEach(tid => clearTimeout(tid));
+  playTimeouts = [];
+  activePlayIndex.value = -1;
+  isPlaying.value = false;
+}
 import { RouterLink, useRouter } from "vue-router";
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
