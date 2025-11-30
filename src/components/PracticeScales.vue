@@ -323,41 +323,73 @@
 const isPlaying = ref(false);
 const activePlayIndex = ref(-1);
 let playTimeouts = [];
+const synthRef = ref(null);
+
+let audioCtx = null;
+let oscNodes = [];
+let gainNodes = [];
+
+function midiToFreq(m) {
+  return 440 * Math.pow(2, (m - 69) / 12);
+}
+
+function spnToMidi(spn) {
+  // Accepts 'C/4', 'D#/5', etc.
+  const m = String(spn).match(/^([A-Ga-g])([#b♭♯]?)(?:\/)?(\d+)$/);
+  if (!m) return null;
+  const noteBase = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+  let note = m[1].toUpperCase();
+  let acc = m[2] || '';
+  let octave = parseInt(m[3], 10);
+  let semitone = noteBase[note] ?? 0;
+  if (acc === '#' || acc === '♯') semitone += 1;
+  if (acc === 'b' || acc === '♭') semitone -= 1;
+  return 12 * (octave + 1) + semitone;
+}
 
 async function playScaleNotes() {
-  if (!window.Tone) {
-    // Dynamically load Tone.js from CDN if not present
-    await new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = "https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js";
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-  if (!window.Tone) {
-    alert("Tone.js failed to load.");
-    return;
-  }
-  const Tone = window.Tone;
   if (!Array.isArray(store.noteArray) || store.noteArray.length === 0) {
     alert("No scale notes to play.");
     return;
   }
   isPlaying.value = true;
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    console.log('[PracticeScales] Created AudioContext');
+  }
+  oscNodes = [];
+  gainNodes = [];
   const notes = store.noteArray.map(n => n.spn || n.pitch || n.name).filter(Boolean);
-  const synth = new Tone.Synth().toDestination();
-  let now = Tone.now();
   playTimeouts = [];
   notes.forEach((note, i) => {
     playTimeouts.push(setTimeout(() => {
       activePlayIndex.value = i;
+      const midi = spnToMidi(note);
+      const freq = midiToFreq(midi);
+      console.log(`[PracticeScales] Playing note: ${note} (MIDI: ${midi}, Freq: ${freq.toFixed(2)}Hz)`);
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.16, audioCtx.currentTime + 0.01);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start();
+      oscNodes.push(osc);
+      gainNodes.push(gain);
+      setTimeout(() => {
+        try {
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.06);
+          osc.stop(audioCtx.currentTime + 0.06);
+          console.log(`[PracticeScales] Stopped note: ${note}`);
+        } catch (e) { console.warn('[PracticeScales] Error stopping oscillator', e); }
+      }, 500);
     }, i * 600));
-    synth.triggerAttackRelease(note, "0.5", now + i * 0.6);
   });
   playTimeouts.push(setTimeout(() => {
     activePlayIndex.value = -1;
     isPlaying.value = false;
+    console.log('[PracticeScales] Playback finished');
   }, notes.length * 600));
 }
 
@@ -366,6 +398,17 @@ function stopScaleNotes() {
   playTimeouts = [];
   activePlayIndex.value = -1;
   isPlaying.value = false;
+  if (oscNodes.length) {
+    oscNodes.forEach((osc, idx) => {
+      try {
+        osc.stop();
+        if (gainNodes[idx]) gainNodes[idx].gain.setValueAtTime(0.0001, audioCtx.currentTime);
+      } catch (e) { console.warn('[PracticeScales] Error stopping oscillator', e); }
+    });
+    oscNodes = [];
+    gainNodes = [];
+    console.log('[PracticeScales] All oscillators stopped');
+  }
 }
 import { RouterLink, useRouter } from "vue-router";
 import Header from "./Header.vue";

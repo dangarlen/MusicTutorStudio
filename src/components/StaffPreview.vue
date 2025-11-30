@@ -991,30 +991,51 @@ function attachNoteInteractivity(originalIdxList, tooltipMap) {
       const g = groups[i];
       const origIdx = originalIdxList[i];
       if (!g) continue;
-      // If the note has a halo flag, insert an SVG ellipse behind the group
-      try {
-        const n = notesStore.noteArray && Array.isArray(notesStore.noteArray) && notesStore.noteArray[origIdx] ? notesStore.noteArray[origIdx] : null;
-        if (n && n.halo) {
-          const parentSvg = vfContainer.value.querySelector('svg');
-          if (parentSvg && typeof g.getBBox === 'function') {
-            const bbox = g.getBBox();
-            const cx = bbox.x + bbox.width / 2;
-            const cy = bbox.y + bbox.height / 2;
-            const rx = Math.max(bbox.width * 0.9, 10);
-            const ry = Math.max(bbox.height * 1.4, 8);
-            const halo = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-            halo.setAttribute('cx', String(cx));
-            halo.setAttribute('cy', String(cy));
-            halo.setAttribute('rx', String(rx));
-            halo.setAttribute('ry', String(ry));
-            halo.setAttribute('fill', String(n.haloColor || 'yellow'));
-            halo.setAttribute('opacity', '0.28');
-            halo.setAttribute('class', 'mts-note-halo');
-            try { g.parentNode.insertBefore(halo, g); } catch(_) { parentSvg.appendChild(halo); }
-          }
+      // Highlight currently playing note
+      if (props.activePlayIndex === origIdx) {
+        const parentSvg = vfContainer.value.querySelector('svg');
+        if (parentSvg && typeof g.getBBox === 'function') {
+          const bbox = g.getBBox();
+          const cx = bbox.x + bbox.width / 2;
+          const cy = bbox.y + bbox.height / 2;
+          const rx = Math.max(bbox.width * 1.1, 14);
+          const ry = Math.max(bbox.height * 1.6, 12);
+          const halo = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+          halo.setAttribute('cx', String(cx));
+          halo.setAttribute('cy', String(cy));
+          halo.setAttribute('rx', String(rx));
+          halo.setAttribute('ry', String(ry));
+          halo.setAttribute('fill', 'orange');
+          halo.setAttribute('opacity', '0.45');
+          halo.setAttribute('class', 'mts-note-halo');
+          try { g.parentNode.insertBefore(halo, g); } catch(_) { parentSvg.appendChild(halo); }
         }
-      } catch (e) {
-        // non-fatal
+      } else {
+        // If the note has a halo flag, insert an SVG ellipse behind the group
+        try {
+          const n = notesStore.noteArray && Array.isArray(notesStore.noteArray) && notesStore.noteArray[origIdx] ? notesStore.noteArray[origIdx] : null;
+          if (n && n.halo) {
+            const parentSvg = vfContainer.value.querySelector('svg');
+            if (parentSvg && typeof g.getBBox === 'function') {
+              const bbox = g.getBBox();
+              const cx = bbox.x + bbox.width / 2;
+              const cy = bbox.y + bbox.height / 2;
+              const rx = Math.max(bbox.width * 0.9, 10);
+              const ry = Math.max(bbox.height * 1.4, 8);
+              const halo = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+              halo.setAttribute('cx', String(cx));
+              halo.setAttribute('cy', String(cy));
+              halo.setAttribute('rx', String(rx));
+              halo.setAttribute('ry', String(ry));
+              halo.setAttribute('fill', String(n.haloColor || 'yellow'));
+              halo.setAttribute('opacity', '0.28');
+              halo.setAttribute('class', 'mts-note-halo');
+              try { g.parentNode.insertBefore(halo, g); } catch(_) { parentSvg.appendChild(halo); }
+            }
+          }
+        } catch (e) {
+          // non-fatal
+        }
       }
       // Tooltip (title attribute) for tooltip-only overlay mode
       if (props.practiceOverlayTooltipOnly && tooltipMap?.has(origIdx)) {
