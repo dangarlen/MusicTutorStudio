@@ -337,6 +337,7 @@ import InstrumentDropdown from '@/components/InstrumentDropdown.vue';
 import CreateScaleScaleStaffFormatting from '@/components/CreateScale-ScaleStaffFormatting.vue';
 import CreatorReturn from '@/components/CreatorReturn.vue';
 import FooterStandard from '@/components/FooterStandard.vue';
+import supabase from "../scripts/supabaseClient.js";
 const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
 const router = useRouter();
