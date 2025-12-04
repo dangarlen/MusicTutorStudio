@@ -92,7 +92,7 @@
             @click="playScaleNotes"
           >
             <span class="material-symbols-outlined align-middle">play_arrow</span>
-            Play Scale
+            Play
           </button>
           <button
             class="btn btn-sm btn-error"
@@ -359,14 +359,27 @@ async function playScaleNotes() {
   }
   oscNodes = [];
   gainNodes = [];
-  const notes = store.noteArray.map(n => n.spn || n.pitch || n.name).filter(Boolean);
+  const notes = store.noteArray.filter(n => n.spn || n.pitch || n.name);
   playTimeouts = [];
+  let timeOffset = 0;
   notes.forEach((note, i) => {
+    // Skip playback for rest notes (duration ends with 'r')
+    if (note.duration && note.duration.endsWith('r')) {
+      timeOffset += 600; // still advance time for rest
+      return;
+    }
+    let dur = 600;
+    if (note.duration) {
+      const baseMap = { w: 2400, h: 1200, q: 600, e: 300, s: 150 };
+      let base = baseMap[note.duration[0]] || 600;
+      if (note.duration.includes('.')) base = Math.round(base * 1.5);
+      dur = base;
+    }
     playTimeouts.push(setTimeout(() => {
       activePlayIndex.value = i;
-      const midi = spnToMidi(note);
+      const midi = spnToMidi(note.spn || note.pitch || note.name);
       const freq = midiToFreq(midi);
-      console.log(`[PracticeScales] Playing note: ${note} (MIDI: ${midi}, Freq: ${freq.toFixed(2)}Hz)`);
+      console.log(`[PracticeScales] Playing note: ${note.spn || note.pitch || note.name} (MIDI: ${midi}, Freq: ${freq.toFixed(2)}Hz, Duration: ${dur}ms)`);
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
@@ -381,16 +394,17 @@ async function playScaleNotes() {
         try {
           gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.06);
           osc.stop(audioCtx.currentTime + 0.06);
-          console.log(`[PracticeScales] Stopped note: ${note}`);
+          console.log(`[PracticeScales] Stopped note: ${note.spn || note.pitch || note.name}`);
         } catch (e) { console.warn('[PracticeScales] Error stopping oscillator', e); }
-      }, 500);
-    }, i * 600));
+      }, dur);
+    }, timeOffset));
+    timeOffset += dur;
   });
   playTimeouts.push(setTimeout(() => {
     activePlayIndex.value = -1;
     isPlaying.value = false;
     console.log('[PracticeScales] Playback finished');
-  }, notes.length * 600));
+  }, timeOffset));
 }
 
 function stopScaleNotes() {

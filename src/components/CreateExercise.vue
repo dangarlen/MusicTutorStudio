@@ -34,54 +34,27 @@
             <div class="text-xs text-gray-600 mb-1">
               Imported note count: {{ store.noteArray.length }}
             </div>
-
-            <!-- TRIM Instructions -->
-            <div
-              class="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm text-gray-700"
-            >
-              <strong class="text-blue-800">How to TRIM:</strong> Click on notes
-              to cycle through colors:
-              <span
-                style="
-                  background-color: #bbf7d0;
-                  padding: 0 0.25rem;
-                  border-radius: 0.25rem;
-                "
-                ><strong style="color: #166534">green</strong></span
-              >
-              = trim start,
-              <span
-                style="
-                  background-color: #fecaca;
-                  padding: 0 0.25rem;
-                  border-radius: 0.25rem;
-                "
-                ><strong style="color: #991b1b">red</strong></span
-              >
-              = trim end,
-              <span
-                style="
-                  background-color: #fed7aa;
-                  padding: 0 0.25rem;
-                  border-radius: 0.25rem;
-                "
-                ><strong style="color: #9a3412">orange</strong></span
-              >
-              = delete note,
-              <span
-                style="
-                  background-color: #d1d5db;
-                  padding: 0 0.25rem;
-                  border-radius: 0.25rem;
-                "
-                ><strong style="color: #1f2937">gray</strong></span
-              >
-              = replace with rest. Press <strong>[TRIM]</strong> to keep only
-              notes between green and red (inclusive). Press
-              <strong>[Delete Selected Notes]</strong> to remove orange notes
-              and convert gray notes to rests.
+            <div class="text-xs text-gray-700 mb-2">
+              <strong>Preview (CMT): </strong>
+              <span>
+                {{ store.noteArray.map(n => {
+                  if (n.duration && n.duration.endsWith('r')) {
+                    return `${n.duration.replace('r','')} rest`;
+                  }
+                  let cmt = n.pitch ? n.pitch : '';
+                  if (n.duration) cmt += ' ' + n.duration.replace('r','');
+                  return cmt.trim();
+                }).join(', ') }}
+              </span>
             </div>
-
+<!--             
+            <div class="text-xs text-gray-700 mb-2">
+              <strong>Preview (SPN):</strong>
+              <span>
+                {{ store.noteArray.map(n => n.spn).filter(Boolean).join(', ') }}
+              </span>
+            </div>
+-->            
             <StaffPreview
               :practice-enable-click-to-cycle="true"
               :practice-color-cycle="[
@@ -92,30 +65,36 @@
                 'gray',
               ]"
             />
-
-            <div v-if="trimEnabled" class="mt-3 flex items-center gap-2">
-              <button class="btn btn-sm btn-accent" @click="doTrim">
-                [TRIM]
-              </button>
-              <div class="text-sm text-gray-600">
-                Keeping notes {{ trimStart + 1 }} → {{ trimEnd + 1 }}
-              </div>
+            <!-- Note Color Legend and Edit Instructions -->
+            <div class="text-xs text-gray-700 mt-2 mb-1">
+              <strong>Note Color Legend:</strong>
+              <span class="ml-2"><span class="inline-block w-3 h-3 rounded align-middle" style="background:green;"></span> <b>Green</b>: Start trim</span>,
+              <span class="ml-2"><span class="inline-block w-3 h-3 rounded align-middle" style="background:red;"></span> <b>Red</b>: End trim</span>,
+              <span class="ml-2"><span class="inline-block w-3 h-3 rounded align-middle" style="background:orange;"></span> <b>Orange</b>: Delete note</span>,
+              <span class="ml-2"><span class="inline-block w-3 h-3 rounded align-middle" style="background:gray;"></span> <b>Gray</b>: Replace with rest (same duration)</span>
             </div>
-
-            <div
-              v-if="hasDeleteOrRestNotes"
-              class="mt-3 flex items-center gap-2"
-            >
+            <div class="text-xs text-gray-500 mb-2">
+              <span>Click notes to cycle colors: <b>Green</b> (trim start), <b>Red</b> (trim end), <b>Orange</b> (delete), <b>Gray</b> (replace with rest), <b>Black</b> (normal).</span><br>
+              <span><b>Trim</b> keeps only notes between green and red (inclusive). <b>Delete/Rest</b> removes orange notes and replaces gray notes with rests of the same duration.</span>
+            </div>
+            <!-- TRIM and Delete/Rest Controls -->
+            <div class="flex flex-wrap gap-2 mt-2">
               <button
-                class="btn btn-sm btn-warning"
-                @click="deleteSelectedNotes"
+                v-if="trimEnabled"
+                class="btn btn-success btn-xs"
+                @click="doTrim"
+                title="Trim to green-red range (inclusive)"
               >
-                [Delete Selected Notes]
+                ✂️ Trim to Green–Red
               </button>
-              <div class="text-sm text-gray-600">
-                {{ orangeNoteCount }} to delete, {{ grayNoteCount }} to convert
-                to rests
-              </div>
+              <button
+                v-if="hasDeleteOrRestNotes"
+                class="btn btn-warning btn-xs"
+                @click="deleteSelectedNotes"
+                title="Delete orange notes, convert gray notes to rests"
+              >
+                🗑️ Delete/Rest ({{ orangeNoteCount }} orange, {{ grayNoteCount }} gray)
+              </button>
             </div>
           </div>
         </div>
@@ -142,6 +121,14 @@
             durations are fully supported and render/measure as 1.5× their base
             value.
           </p>
+          <div class="flex gap-2 mb-2">
+            <button class="btn btn-sm btn-info" @click="loadDemoMusicXml('demo1')">
+              Load demo1.musicxml
+            </button>
+            <button class="btn btn-sm btn-info" @click="loadDemoMusicXml('demo2')">
+              Load demo2.musicxml
+            </button>
+          </div>
           <input
             type="file"
             accept=".musicxml,.xml,application/xml,text/xml"
@@ -339,23 +326,85 @@
   </div>
 </template>
 <script setup>
-import Header from "./Header.vue";
-import FooterStandard from "./FooterStandard.vue";
-import CreatorReturn from "./CreatorReturn.vue";
-import StaffPreview from "./StaffPreview.vue";
-import AuthStatusBanner from "./AuthStatusBanner.vue";
-import InstrumentDropdown from "./InstrumentDropdown.vue";
-import CreateScaleScaleStaffFormatting from "./CreateScale-ScaleStaffFormatting.vue";
-import { ref, computed, reactive, onMounted } from "vue";
+import { usePracticeUnitScaleStore } from '@/stores/practiceUnitScaleStore';
+import { useTestStaffNoteStore } from '@/stores/testStaffNoteStore';
 import { useRouter } from 'vue-router';
-import { usePracticeUnitScaleStore } from "../stores/practiceUnitScaleStore";
-import { useTestStaffNoteStore } from "../stores/testStaffNoteStore";
-import supabase from "../scripts/supabaseClient.js";
-// removed duplicate Vue import
-
+import { reactive, ref, computed, onMounted } from 'vue';
+import Header from '@/components/Header.vue';
+import AuthStatusBanner from '@/components/AuthStatusBanner.vue';
+import StaffPreview from '@/components/StaffPreview.vue';
+import InstrumentDropdown from '@/components/InstrumentDropdown.vue';
+import CreateScaleScaleStaffFormatting from '@/components/CreateScale-ScaleStaffFormatting.vue';
+import CreatorReturn from '@/components/CreatorReturn.vue';
+import FooterStandard from '@/components/FooterStandard.vue';
 const store = usePracticeUnitScaleStore();
 const testStaffStore = useTestStaffNoteStore();
 const router = useRouter();
+
+// Demo MusicXML loader
+async function loadDemoMusicXml(demo) {
+  let url = '';
+  if (demo === 'demo1') {
+    url = '/data/twinkle-twinkle-little-star.musicxml';
+  } else if (demo === 'demo2') {
+    url = '/data/Danny_Boy_Lead_sheet_with_lyrics_.musicxml';
+  } else {
+    alert('Unknown demo file');
+    return;
+  }
+  musicXmlFileName.value = demo === 'demo1' ? 'twinkle-twinkle-little-star.musicxml' : 'Danny_Boy_Lead_sheet_with_lyrics_.musicxml';
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch MusicXML file');
+    const xmlText = await res.text();
+    // Call the same handler as file input, but with text
+    await importMusicXmlText(xmlText);
+  } catch (e) {
+    importError.value = 'Error loading demo MusicXML: ' + (e.message || e);
+  }
+}
+
+// Helper to import MusicXML from text (simulate file input)
+async function importMusicXmlText(xmlText) {
+  try {
+    importError.value = '';
+    const parsed = parseMusicXML(xmlText);
+    if (!parsed?.noteArray?.length) {
+      importError.value = "No playable notes found in MusicXML.";
+      return;
+    }
+    importedTitle.value = parsed.title || "Imported Exercise";
+    importedKey.value = parsed.keySignature || "C";
+    importedTime.value = parsed.timeSignature || "4/4";
+
+    // update stores for preview
+    originalNoteArray.value = parsed.noteArray.map((n) => ({ ...n }));
+    octaveTranspositionCount.value = 0;
+    store.noteArray = originalNoteArray.value.map((n) => ({ ...n }));
+    testStaffStore.noteArray = originalNoteArray.value.map((n) => ({ ...n }));
+    store.scaleSelections = store.scaleSelections || {};
+    store.scaleSelections.key = importedKey.value;
+    store.scaleSelections.timeSignature = importedTime.value;
+    store.title = importedTitle.value;
+
+    currentPracticeUnit.value = composePracticeUnit(store.noteArray);
+    // carry over imported header fields
+    currentPracticeUnit.value.practiceUnitHeader.practiceName = importedTitle.value;
+    currentPracticeUnit.value.practiceUnitHeader.keySignature = importedKey.value;
+    currentPracticeUnit.value.practiceUnitHeader.timeSignature = importedTime.value;
+
+    // Update store header to match (needed for unified viewer)
+    store.practiceUnitHeader = {
+      ...store.practiceUnitHeader,
+      ...currentPracticeUnit.value.practiceUnitHeader,
+    };
+
+    seedEditFieldsFromUnit();
+    refreshCurrentUnitJson();
+  } catch (e) {
+    importError.value = 'Error parsing MusicXML: ' + (e.message || e);
+  }
+}
 
 // Practice Now functionality
 async function practiceNow() {
