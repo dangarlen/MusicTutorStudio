@@ -30,7 +30,7 @@
             <div><strong>Time:</strong> {{ importedTime || "4/4" }}</div>
           </div>
 
-          <div v-if="store.noteArray?.length" class="mt-2">
+          <div v-if="store.noteArray?.length" class="mt-2"> then convert notes into simple tokens: SPN plus duration (w|h|q|e|s) w
             <div class="text-xs text-gray-600 mb-1">
               Imported note count: {{ store.noteArray.length }}
             </div>
