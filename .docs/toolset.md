@@ -4,33 +4,37 @@
 
 # 🎛️ MusicTutorStudio Toolset Overview
 
-This document outlines the full development toolset for the Vue.js refactor of MusicTutorStudio, including core technologies, plugins, testing tools, and VS Code extensions.
+This document outlines the full development toolset for MusicTutorStudio, including frontend libraries, backend services, audio/notation tools, and development utilities.
 
 <details>
-<summary><strong>🧩 Core Stack</strong></summary>
 
-- **HTML, CSS, JS** – Base technologies
-- **VexFlow** – Music notation rendering
-- **Tone.js** – Web Audio synthesis and playback
-- **Tailwind CSS** – Utility-first styling (installed via CLI)
-- **DaisyUI** – Tailwind component library
-- **Vue.js 3** – Component-based frontend framework
-- **Vite** – Dev server and build tool for Vue
-- **Vue Router** – Page-level routing
-- **Pinia** – Native Vue state management
-- **VueUse** – Utility composables (e.g. localStorage, lifecycle)
-- **Supabase** – Backend-as-a-Service (Auth, Database, Storage)
+**Frontend Libraries:**
+- Vue.js 3 (SPA framework)
+- Vite (build tool/dev server)
+- Pinia (state management)
+- Vue Router (routing)
+- VueUse (utility composables)
+- Tailwind CSS (utility-first styling)
+- DaisyUI (Tailwind component library)
+- VexFlow (music notation rendering)
+- Tone.js (audio synthesis/playback)
+- Material Symbols (icon font)
+
+**Backend & External Services:**
+- Supabase (Postgres DB, Auth, Storage)
+
+**Data:**
+- JSON-driven config for instruments, scales, lessons
 
 </details>
 
 <details>
-<summary><strong>📡 CDN Libraries</strong></summary>
 
-- **VexFlow 3.0.9** – Music notation rendering (via jsDelivr CDN)
-- **Tone.js** – Web Audio synthesis and playback
-- **Material Symbols** – Google's icon font for UI symbols
-- **Tailwind CSS** – Utility-first CSS framework (CDN for legacy pages)
-- **DaisyUI** – Component library for Tailwind (CDN for legacy pages)
+**CDN Libraries:**
+- VexFlow 3.0.9 (jsDelivr)
+- Tone.js
+- Material Symbols
+- DaisyUI/Tailwind (legacy pages)
 
 </details>
 
@@ -56,42 +60,36 @@ This document outlines the full development toolset for the Vue.js refactor of M
 </details>
 
 <details>
-<summary><strong>🎵 Audio Processing Libraries</strong></summary>
 
-- **Aubio** – WebAssembly build of aubio library for pitch detection and audio analysis
-- **Web Audio API** – Native browser audio processing capabilities
-- **FFT** – Fast Fourier Transform for frequency analysis
-
-</details>
-
-<details>
-<summary><strong>🛠️ Development Tools & Scripts</strong></summary>
-
-- **Python Scripts** – Custom utility scripts for codebase analysis
-  - `scan-orphans.py` – Finds unused JavaScript and JSON files
-  - `finder.py` – Search utility for scanning code patterns
-- **PowerShell Scripts** – Build and deployment automation
-  - `deploy.ps1` – Netlify deployment wrapper
-  - `build-alpha-vue-spa.ps1` – SPA build process
-  - `fetch-aubio.ps1` – Downloads Aubio WebAssembly binaries
-- **Batch Files** – Windows command shortcuts
-  - `finder.bat` & `orphans.bat` – Quick access to Python utilities
+**Audio & Pitch Detection:**
+- Aubio (WebAssembly pitch detection)
+- Web Audio API
+- FFT (frequency analysis)
 
 </details>
 
 <details>
-<summary><strong>📺 VS Code Extensions</strong></summary>
 
-- **GitHub Copilot & Chat** – AI-powered code assistance
-- **Tailwind CSS IntelliSense** – Tailwind utility class autocomplete
-- **Prettier** – Code formatting
-- **PowerShell** – PowerShell script support
-- **Python** – Python development environment
-- **Live Server** – Local development server
-- **SonarLint** – Code quality analysis
-- **Markdown All in One** – Enhanced markdown editing
-- **Project Manager** – Workspace management
-- **Meld Diff** – File comparison tool
+**Development Tools & Scripts:**
+- Python: scan-orphans.py, finder.py
+- PowerShell: deploy.ps1, build-alpha-vue-spa.ps1, fetch-aubio.ps1
+- Batch: finder.bat, orphans.bat
+
+</details>
+
+<details>
+
+**VS Code Extensions:**
+- GitHub Copilot & Chat
+- Tailwind CSS IntelliSense
+- Prettier
+- PowerShell
+- Python
+- Live Server
+- SonarLint
+- Markdown All in One
+- Project Manager
+- Meld Diff
 
 </details>
 

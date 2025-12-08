@@ -136,22 +136,25 @@
           <div :class="['collapse border rounded', { 'collapse-open': open.ack }]">
             <div class="collapse-title text-lg font-semibold" role="button" tabindex="0" @click="toggleSection('ack')" @keydown.enter.prevent="toggleSection('ack')" @keydown.space.prevent="toggleSection('ack')">Acknowledgements</div>
             <div class="collapse-content text-sm text-gray-700">
-              <p>Thanks to open-source libraries and community contributors.</p>
-              <ul id="ack-list" class="list-disc pl-5 mt-2">
-                <li v-if="!tools.length" class="text-sm text-gray-500">Loading acknowledgements...</li>
-                <li v-for="t in tools" :key="t.name" class="mb-2">
-                  <span v-if="t.homepage">
-                    <a :href="t.homepage" target="_blank" rel="noopener noreferrer" class="text-blue-700 font-semibold hover:underline">{{ t.name }}</a>
-                  </span>
-                  <span v-else><strong>{{ t.name }}</strong></span>
-                  by <em>{{ t.publisher }}</em>: {{ t.description }}
-                  <div v-if="t.links && t.links.length" class="mt-1">
-                    <ul class="list-disc pl-5 text-sm">
-                      <li v-for="(link, idx) in t.links" :key="idx"><a :href="link" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">{{ link }}</a></li>
-                    </ul>
-                  </div>
-                </li>
+              <p>Thanks to the open-source libraries, backend services, and contributors powering MusicTutorStudio.</p>
+              <ul class="list-disc pl-5 mt-2">
+                <li><strong>Vue.js 3</strong> – SPA framework (<a href="https://vuejs.org/" target="_blank">vuejs.org</a>)</li>
+                <li><strong>Vite</strong> – Build tool/dev server (<a href="https://vitejs.dev/" target="_blank">vitejs.dev</a>)</li>
+                <li><strong>Pinia</strong> – State management (<a href="https://pinia.vuejs.org/" target="_blank">pinia.vuejs.org</a>)</li>
+                <li><strong>Vue Router</strong> – Routing (<a href="https://router.vuejs.org/" target="_blank">router.vuejs.org</a>)</li>
+                <li><strong>Tailwind CSS</strong> – Utility-first styling (<a href="https://tailwindcss.com/" target="_blank">tailwindcss.com</a>)</li>
+                <li><strong>DaisyUI</strong> – Tailwind component library (<a href="https://daisyui.com/" target="_blank">daisyui.com</a>)</li>
+                <li><strong>VexFlow</strong> – Music notation rendering (<a href="https://www.vexflow.com/" target="_blank">vexflow.com</a>)</li>
+                <li><strong>Tone.js</strong> – Web Audio synthesis (<a href="https://tonejs.github.io/" target="_blank">tonejs.github.io</a>)</li>
+                <li><strong>Aubio</strong> – Pitch detection (WebAssembly) (<a href="https://aubio.org/" target="_blank">aubio.org</a>)</li>
+                <li><strong>Supabase</strong> – Backend: Postgres DB, Auth, Storage (<a href="https://supabase.com/" target="_blank">supabase.com</a>)</li>
+                <li><strong>Material Symbols</strong> – Icon font (<a href="https://fonts.google.com/icons" target="_blank">fonts.google.com/icons</a>)</li>
+                <li><strong>Python, PowerShell, Batch</strong> – Development scripts</li>
+                <li><strong>GitHub Copilot</strong> – AI code assistance</li>
+                <li><strong>Playwright, Vitest</strong> – Testing frameworks</li>
+                <li><strong>VS Code Extensions</strong> – Editor tooling</li>
               </ul>
+              <p class="mt-2">Special thanks to all contributors and the open-source community.</p>
             </div>
           </div>
         </div>

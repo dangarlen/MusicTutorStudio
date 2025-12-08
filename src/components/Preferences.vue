@@ -36,42 +36,70 @@
             v-if="resetMode"
             class="p-3 border border-warning rounded bg-warning/10"
           >
-            <div class="font-semibold text-warning mb-1">
-              Set a new password
-            </div>
-            <div class="form-control w-full max-w-xs">
-              <label class="label" for="new-password">
-                <span class="label-text">New password</span>
-              </label>
-              <input
-                id="new-password"
-                v-model="newPassword"
-                type="password"
-                class="input input-bordered w-full"
-              />
-            </div>
-            <div class="form-control w-full max-w-xs">
-              <label class="label" for="confirm-password">
-                <span class="label-text">Confirm new password</span>
-              </label>
-              <input
-                id="confirm-password"
-                v-model="confirmPassword"
-                type="password"
-                class="input input-bordered w-full"
-              />
-            </div>
-            <div class="mt-2 flex gap-2">
-              <button
-                class="btn btn-warning btn-sm"
-                @click="handleApplyNewPassword"
-              >
-                Update Password
-              </button>
-              <button class="btn btn-ghost btn-sm" @click="resetMode = false">
-                Cancel
-              </button>
-            </div>
+            <template v-if="isSignedIn">
+              <div class="font-semibold text-warning mb-1">
+                Set a new password
+              </div>
+              <div class="form-control w-full max-w-xs">
+                <label class="label" for="new-password">
+                  <span class="label-text">New password</span>
+                </label>
+                <input
+                  id="new-password"
+                  v-model="newPassword"
+                  type="password"
+                  class="input input-bordered w-full"
+                />
+              </div>
+              <div class="form-control w-full max-w-xs">
+                <label class="label" for="confirm-password">
+                  <span class="label-text">Confirm new password</span>
+                </label>
+                <input
+                  id="confirm-password"
+                  v-model="confirmPassword"
+                  type="password"
+                  class="input input-bordered w-full"
+                />
+              </div>
+              <div class="mt-2 flex gap-2">
+                <button
+                  class="btn btn-warning btn-sm"
+                  @click="handleApplyNewPassword"
+                >
+                  Update Password
+                </button>
+                <button class="btn btn-ghost btn-sm" @click="resetMode = false">
+                  Cancel
+                </button>
+              </div>
+            </template>
+            <template v-else>
+              <div class="font-semibold text-warning mb-1">Reset your password by email</div>
+              <div class="form-control w-full max-w-xs">
+                <label class="label" for="reset-email">
+                  <span class="label-text">Email address</span>
+                </label>
+                <input
+                  id="reset-email"
+                  v-model="resetEmail"
+                  type="email"
+                  class="input input-bordered w-full"
+                  placeholder="Enter your email"
+                />
+              </div>
+              <div class="mt-2 flex gap-2">
+                <button
+                  class="btn btn-warning btn-sm"
+                  @click="handleEmailPasswordReset"
+                >
+                  Send Reset Email
+                </button>
+                <button class="btn btn-ghost btn-sm" @click="resetMode = false">
+                  Cancel
+                </button>
+              </div>
+            </template>
           </div>
 
           <div class="form-control w-full max-w-xs">
@@ -177,6 +205,43 @@
           <div id="user-message" class="text-sm mt-2">{{ userMsg }}</div>
         </div>
       </div>
+      <!-- TestLog Section -->
+      <div class="collapse collapse-arrow bg-base-100 border border-base-300 mb-6 rounded-xl">
+        <input type="checkbox" class="peer" id="testlog-collapse-toggle" />
+        <div class="collapse-title font-bold text-lg px-4 pt-4 pb-2 flex items-center gap-2">
+          <span class="material-symbols-outlined">bug_report</span>
+          <span>Test</span>
+        </div>
+        <div class="collapse-content px-4 pb-4 space-y-4">
+          <div>
+            <div class="font-semibold mb-1">Test Log Entries</div>
+            <ul class="list-disc pl-5 text-sm max-h-40 overflow-y-auto bg-base-200 rounded p-2 border border-base-300">
+              <li v-for="entry in testLogEntries" :key="entry.id">{{ entry.fldTest }}</li>
+              <li v-if="!testLogEntries.length" class="text-gray-400">No entries yet.</li>
+            </ul>
+          </div>
+          <form class="flex gap-2 items-end" @submit.prevent="addTestLogEntry">
+            <div class="form-control w-full max-w-xs">
+              <label class="label" for="new-testlog-entry">
+                <span class="label-text">Add to Test Log</span>
+              </label>
+              <input
+                id="new-testlog-entry"
+                v-model="newTestLogEntry"
+                type="text"
+                class="input input-bordered w-full"
+                maxlength="255"
+                placeholder="Enter a test log entry"
+              />
+            </div>
+            <button class="btn btn-primary btn-sm" :disabled="addingTestLogEntry || !newTestLogEntry.trim()">
+              <span v-if="addingTestLogEntry" class="loading loading-spinner loading-xs"></span>
+              Add
+            </button>
+          </form>
+          <div v-if="testLogMsg" class="text-xs text-warning">{{ testLogMsg }}</div>
+        </div>
+      </div>
       <!-- Instrument selector (same component/behavior as Create Scales) -->
       <div class="mb-4">
         <InstrumentDropdown
@@ -198,7 +263,58 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from "vue";
+// --- TestLog state ---
+import { onMounted as onMountedTestLog, ref as refTestLog } from "vue";
+const testLogEntries = ref([]);
+const newTestLogEntry = ref("");
+const addingTestLogEntry = ref(false);
+const testLogMsg = ref("");
+
+// Fetch TestLog entries from Supabase
+async function fetchTestLogEntries() {
+  testLogMsg.value = "";
+  try {
+    const { data, error, status } = await supabase
+      .from("TestLog")
+      .select("id, fldTest")
+      .order("created_at", { ascending: false });
+    if (error || status === 400 || status === 404) {
+      testLogMsg.value = `Failed to fetch log: ${error?.message || 'Table or column missing (400/404)'}`;
+      testLogEntries.value = [];
+    } else {
+      testLogEntries.value = Array.isArray(data) ? data : [];
+    }
+  } catch (e) {
+    testLogMsg.value = `Unexpected error fetching log: ${e?.message || e}`;
+    testLogEntries.value = [];
+  }
+}
+
+// Add a new TestLog entry
+async function addTestLogEntry() {
+  if (!newTestLogEntry.value.trim()) return;
+  addingTestLogEntry.value = true;
+  testLogMsg.value = "";
+  try {
+    const { error, status } = await supabase
+      .from("TestLog")
+      .insert([{ fldTest: newTestLogEntry.value.trim() }]);
+    if (error || status === 400 || status === 404) {
+      testLogMsg.value = `Failed to add entry: ${error?.message || 'Table or column missing (400/404)'}`;
+    } else {
+      newTestLogEntry.value = "";
+      await fetchTestLogEntries();
+    }
+  } catch (e) {
+    testLogMsg.value = `Unexpected error adding entry: ${e?.message || e}`;
+  } finally {
+    addingTestLogEntry.value = false;
+  }
+}
+
+// Fetch log entries on mount
+onMountedTestLog(fetchTestLogEntries);
+import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 // --- Supabase Auth wiring ---
 // Use your actual Supabase project URL and anon key
 // Use singleton client to avoid multiple GoTrueClient instances during HMR
@@ -212,6 +328,7 @@ const sessionEmail = ref("");
 const resetMode = ref(false);
 const newPassword = ref("");
 const confirmPassword = ref("");
+const resetEmail = ref("");
 const privacySelection = ref("private"); // 'share' | 'private'
 const showPassword = ref(false);
 const showNewPassword = ref(false);
@@ -285,26 +402,59 @@ async function handleLogout() {
 }
 
 async function handleForgotPassword() {
+  resetMode.value = true;
+  newPassword.value = "";
+  confirmPassword.value = "";
+  resetEmail.value = sessionEmail.value || "";
+}
+
+async function handleApplyNewPassword() {
   userMsg.value = "";
-  const email = (userEmail.value || "").trim();
-  if (!email) {
-    userMsg.value = "Enter email then tap 'Forgot password?'.";
+  if (!newPassword.value || newPassword.value !== confirmPassword.value) {
+    userMsg.value = "Passwords must match.";
     return;
   }
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${location.origin}/alpha-vue-SPA/#/preferences`,
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword.value,
     });
     if (error) {
-      userMsg.value = `Reset failed: ${error.message}`;
+      userMsg.value = `Failed to update password: ${error.message}`;
     } else {
-      userMsg.value = "Reset link sent. Check your email.";
+      userMsg.value = "Password updated. You can now log in.";
+      resetMode.value = false;
+      newPassword.value = "";
+      confirmPassword.value = "";
     }
   } catch (e) {
-    userMsg.value = "Unexpected reset error.";
-    console.warn("[Preferences] handleForgotPassword error", e);
+    userMsg.value = "Unexpected error updating password.";
+    console.warn("[Preferences] handleApplyNewPassword error", e);
   }
 }
+
+async function handleEmailPasswordReset() {
+  userMsg.value = "";
+  if (!resetEmail.value) {
+    userMsg.value = "Please enter your email address.";
+    return;
+  }
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.value);
+    if (error) {
+      userMsg.value = `Failed to send reset email: ${error.message}`;
+    } else {
+      userMsg.value = "Password reset email sent. Check your inbox.";
+      resetMode.value = false;
+      resetEmail.value = "";
+    }
+  } catch (e) {
+    userMsg.value = "Unexpected error sending reset email.";
+    console.warn("[Preferences] handleEmailPasswordReset error", e);
+  }
+}
+
+const isSignedIn = computed(() => !!userId.value);
+
 import Header from "./Header.vue";
 import FooterStandard from "./FooterStandard.vue";
 import InstrumentDropdown from "./InstrumentDropdown.vue";
@@ -369,30 +519,6 @@ onMounted(() => {
     store.practiceUnitHeader.User = userId.value;
   }
 });
-
-async function handleApplyNewPassword() {
-  userMsg.value = "";
-  if (!newPassword.value || newPassword.value !== confirmPassword.value) {
-    userMsg.value = "Passwords must match.";
-    return;
-  }
-  try {
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword.value,
-    });
-    if (error) {
-      userMsg.value = `Failed to update password: ${error.message}`;
-    } else {
-      userMsg.value = "Password updated. You can now log in.";
-      resetMode.value = false;
-      newPassword.value = "";
-      confirmPassword.value = "";
-    }
-  } catch (e) {
-    userMsg.value = "Unexpected error updating password.";
-    console.warn("[Preferences] handleApplyNewPassword error", e);
-  }
-}
 
 function savePreferences() {
   if (!store.instrument) {

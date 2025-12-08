@@ -115,6 +115,11 @@ const routes = [
     name: "debug-state",
     component: DebugState,
   },
+    {
+      path: '/:catchAll(.*)',
+      name: 'auth-callback',
+      component: () => import('../components/AuthCallbackHandler.vue'),
+    },
 ];
 
 const router = createRouter({
