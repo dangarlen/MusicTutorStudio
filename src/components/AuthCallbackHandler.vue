@@ -58,6 +58,14 @@ async function handlePasswordReset() {
     logDiag('Password mismatch', { newPassword: newPassword.value, confirmPassword: confirmPassword.value });
     return;
   }
+  // Check for valid session before allowing password reset
+  const session = supabase.auth.getSession ? (await supabase.auth.getSession()).data.session : supabase.auth.session;
+  if (!session || !session.user) {
+    error.value = "Password reset failed: Auth session missing!";
+    logDiag('No valid session for password reset', session);
+    redirecting.value = false;
+    return;
+  }
   try {
     redirecting.value = true;
     logDiag('Calling supabase.auth.updateUser', {});
@@ -119,14 +127,35 @@ onMounted(async () => {
   const params = parseParams();
   logDiag('Parsed params', params);
 
-  // Password recovery flow
-  if ((params.type === 'recovery' && params.token) || (params.type === 'recovery' && params.access_token)) {
-    recoveryMode.value = true;
-    logDiag('Recovery mode detected', params);
-    return;
+  // Password recovery flow: exchange token for session before showing form
+  if ((params.type === 'recovery' && params.access_token) || (params.type === 'recovery' && params.token)) {
+    try {
+      redirecting.value = true;
+      const accessToken = params.access_token || params.token;
+      logDiag('Recovery mode detected, exchanging token for session', { accessToken });
+      // Supabase v2: setSession
+      const { data, error: supaError } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: params.refresh_token || ''
+      });
+      logDiag('setSession (recovery) result', { data, supaError });
+      if (supaError) {
+        error.value = 'Password reset failed: ' + supaError.message;
+        redirecting.value = false;
+        return;
+      }
+      recoveryMode.value = true;
+      redirecting.value = false;
+      return;
+    } catch (e) {
+      error.value = 'Password reset failed: ' + (e.message || e);
+      logDiag('Exception in setSession (recovery)', e);
+      redirecting.value = false;
+      return;
+    }
   }
 
-  // If access_token is present, update session
+  // If access_token is present (non-recovery), update session and redirect
   if (params.access_token) {
     try {
       redirecting.value = true;
@@ -141,7 +170,6 @@ onMounted(async () => {
         redirecting.value = false;
         return;
       }
-      // Redirect to home or preferences
       router.push('/preferences');
     } catch (e) {
       error.value = 'Unexpected error: ' + (e.message || e);
