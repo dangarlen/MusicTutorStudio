@@ -1,23 +1,27 @@
 {
   "devices": [
-    { "id": "tl_sg116", "category": "Core Network", "name": "TP-Link TL-SG116 Gigabit Switch", "location": "Shelf – NSS", "notes": "Ethernet + Power; 2 spare Ethernet ports available" },
+    { "id": "ont", "category": "Core Network", "name": "Verizon Optical Network Terminal (ONT)", "location": "Closet", "notes": "Fiber" },
     { "id": "moca_adapter", "category": "Core Network", "name": "MoCA Ethernet Adapter", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "tl_sg116", "category": "Core Network", "name": "TP-Link TL-SG116 Gigabit Switch", "location": "Shelf – NSS", "notes": "Ethernet + Power; 2 spare Ethernet ports available" },
+    { "id": "router", "category": "Wireless Router", "name": "Verizon Router CR1000A", "location": "Closet", "notes": "Wireless" },
+    { "id": "google_nest", "category": "AI Assistant", "name": "Google Nest Hub Smart Display", "location": "Office", "notes": "Wireless" },
     { "id": "yolink_hub", "category": "IoT Hubs", "name": "YoLink Speaker Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
     { "id": "verizon_microcell", "category": "IoT Hubs", "name": "Verizon MicroCell", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
     { "id": "lutron_caseta", "category": "IoT Hubs", "name": "Lutron Caseta Wireless Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
     { "id": "flic_hub", "category": "IoT Hubs", "name": "Flic Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
     { "id": "flic2_hub", "category": "IoT Hubs", "name": "Flic 2 Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
     { "id": "philips_hue_hub", "category": "IoT Hubs", "name": "Philips Hue Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
-   
-   { "id": "google_nest", "category": "AI Assistant",  "name": "Google Nest Hub Smart Display", "location": "Office", "notes": "Wireless" },
-   
     { "id": "ooma_voip", "category": "VoIP Phones", "name": "Ooma Telo Base Station", "location": "Shelf – RPC–3 top", "notes": "Ethernet + Power" },
-    { "id": "router", "category": "Wireless Router",  "name": "Verizon Router CR1000A", "location": "Closet", "notes": "Wireless" }
-  ],  
-  "connections": [
-    { "from": "moca_adapter", "to": "tl_sg116", "type": "Ethernet" },
-{ "from": "google_nest", "to": "router", "type": "Wireless" },
+    { "id": "synology_ds720", "category": "NAS", "name": "Synology DS720+ NAS", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "mybooklive", "category": "NAS", "name": "WD MyBookLive NAS", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "hdhomerun_duo", "category": "TV Tuner", "name": "HDHomeRun Duo", "location": "Shelf – NSS", "notes": "Ethernet + Power" }
+  ],
 
+  "connections": [
+    { "from": "ont", "to": "moca_adapter" , "type": "Cable" },
+    { "from": "ont", "to": "router", "type": "Ethernet"  },
+    { "from": "moca_adapter", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "google_nest", "to": "router", "type": "Wireless" },
     { "from": "yolink_hub", "to": "tl_sg116", "type": "Ethernet" },
     { "from": "verizon_microcell", "to": "tl_sg116", "type": "Ethernet" },
     { "from": "lutron_caseta", "to": "tl_sg116", "type": "Ethernet" },
