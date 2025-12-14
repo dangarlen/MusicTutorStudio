@@ -1,3 +1,4 @@
+import InternalTools from "../pages/InternalTools.vue";
 import { createRouter, createWebHashHistory } from "vue-router";
 
 import Home from "../components/Home.vue";
@@ -29,6 +30,7 @@ import EditPracticeUnitScaleInMemory from "../components/EditPracticeUnitScaleIn
 import DebugState from "../components/DebugState.vue";
 
 const routes = [
+    { path: "/internal-tools", name: "internal-tools", component: InternalTools },
   { path: "/", name: "home", component: Home },
   { path: "/practice", name: "practice", component: Practice },
   {

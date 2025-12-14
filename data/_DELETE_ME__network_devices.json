@@ -1,0 +1,289 @@
+    {
+      "id": "tl_sg116",
+      "category": "Core Network",
+      "name": "TP-Link TL-SG116 Gigabit Switch",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power; 2 spare Ethernet ports available"
+    },
+    {
+      "id": "moca_adapter",
+      "category": "Core Network",
+      "name": "MoCA Ethernet Adapter",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+
+    {
+      "id": "yolink_hub",
+      "category": "IoT Hubs",
+      "name": "YoLink Speaker Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "verizon_microcell",
+      "category": "IoT Hubs",
+      "name": "Verizon MicroCell",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "lutron_caseta",
+      "category": "IoT Hubs",
+      "name": "Lutron Caseta Wireless Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "flic_hub",
+      "category": "IoT Hubs",
+      "name": "Flic Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "flic2_hub",
+      "category": "IoT Hubs",
+      "name": "Flic 2 Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "philips_hue_hub",
+      "category": "IoT Hubs",
+      "name": "Philips Hue Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+
+{
+{
+  "devices": [
+    {
+      "id": "tl_sg116",
+      "category": "Core Network",
+      "name": "TP-Link TL-SG116 Gigabit Switch",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power; 2 spare Ethernet ports available"
+    },
+    {
+      "id": "moca_adapter",
+      "category": "Core Network",
+      "name": "MoCA Ethernet Adapter",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "yolink_hub",
+      "category": "IoT Hubs",
+      "name": "YoLink Speaker Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "verizon_microcell",
+      "category": "IoT Hubs",
+      "name": "Verizon MicroCell",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "lutron_caseta",
+      "category": "IoT Hubs",
+      "name": "Lutron Caseta Wireless Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "flic_hub",
+      "category": "IoT Hubs",
+      "name": "Flic Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "flic2_hub",
+      "category": "IoT Hubs",
+      "name": "Flic 2 Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "philips_hue_hub",
+      "category": "IoT Hubs",
+      "name": "Philips Hue Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "ooma_voip",
+      "category": "VoIP Phones",
+      "name": "Ooma Telo Base Station",
+      "location": "Shelf – RPC–3 top",
+      "notes": "Ethernet + Power"
+    }
+  ]
+}
+  "devices": [
+    {
+      "id": "tl_sg116",
+      "category": "Core Network",
+      "name": "TP-Link TL-SG116 Gigabit Switch",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power; 2 spare Ethernet ports available"
+    },
+    {
+      "id": "moca_adapter",
+      "category": "Core Network",
+      "name": "MoCA Ethernet Adapter",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "yolink_hub",
+      "category": "IoT Hubs",
+      "name": "YoLink Speaker Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "verizon_microcell",
+      "category": "IoT Hubs",
+      "name": "Verizon MicroCell",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "lutron_caseta",
+      "category": "IoT Hubs",
+      "name": "Lutron Caseta Wireless Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "flic_hub",
+      "category": "IoT Hubs",
+      "name": "Flic Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "flic2_hub",
+      "category": "IoT Hubs",
+      "name": "Flic 2 Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "philips_hue_hub",
+      "category": "IoT Hubs",
+      "name": "Philips Hue Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "ooma_voip",
+      "category": "VoIP Phones",
+      "name": "Ooma Telo Base Station",
+      "location": "Shelf – RPC–3 top",
+      "notes": "Ethernet + Power"
+    }
+  ]
+}
+    {
+      "id": "synology_ds720",
+      "category": "Storage & Media",
+      "name": "Synology DS720+ NAS",
+      "location": "Shelf – RPC‑3 top",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "mybooklive",
+      "category": "Storage & Media",
+      "name": "MyBookLive",
+      "location": "Shelf – RPC‑3 top",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "hdhomerun_duo",
+      "category": "Storage & Media",
+      "name": "HomeRun Connect Duo",
+      "location": "Shelf – RPC‑3 top",
+      "notes": "Ethernet + Power"
+    },
+
+    {
+      "id": "ooma_voip",
+      "category": "Telephony",
+      "name": "Ooma VoIP Telephone Box",
+      "location": "Shelf – RPC‑3 top",
+      "notes": "Ethernet + Power"
+    },
+
+    {
+      "id": "drg_nuc",
+      "category": "Computing & Output",
+      "name": "DRG_NUC",
+      "location": "Desk",
+      "notes": "Ethernet + USB + Power"
+    },
+    {
+      "id": "brother_printer",
+      "category": "Computing & Output",
+      "name": "Brother HL-L2460DW Printer",
+      "location": "Desk",
+      "notes": "Ethernet + Power"
+    },
+
+    {
+      "id": "nest_hub",
+      "category": "Wireless Gadgets",
+      "name": "Google Nest Hub Smart Display",
+      "location": "Shelf – decorative",
+      "notes": "Power only"
+    },
+    {
+      "id": "aiy_voice_kit",
+      "category": "Wireless Gadgets",
+      "name": "Google AIY Voice Kit",
+      "location": "Shelf – decorative",
+      "notes": "Power only"
+    },
+    {
+      "id": "google_home_mini",
+      "category": "Wireless Gadgets",
+      "name": "Google Home Mini",
+      "location": "Shelf – decorative",
+      "notes": "Power only"
+    },
+    {
+      "id": "echo_dot_gen2",
+      "category": "Wireless Gadgets",
+      "name": "Amazon Echo Dot (Gen 2)",
+      "location": "Shelf – decorative",
+      "notes": "Power only"
+    },
+
+    {
+      "id": "baytech_rpc3",
+      "category": "Power Control Units",
+      "name": "Baytech RPC‑3 RS‑232 Remote Switch (8-port)",
+      "location": "Shelf – 16\" wide",
+      "notes": "Fully utilized; controls LED bulbs, AIY kit, Echo Dot, Home Mini, HomeRun Duo, MyBookLive, Ooma"
+    },
+    {
+      "id": "adj_pc100a",
+      "category": "Power Control Units",
+      "name": "ADJ PC-100A Power Panel (8 switches)",
+      "location": "Under shelf",
+      "notes": "Power only"
+    },
+    {
+      "id": "power_strips",
+      "category": "Power Control Units",
+      "name": "Two 8-Outlet Power Strips",
+      "location": "Under shelf",
+      "notes": "16 switched outlets; power only"
+    }
+  ]
+}

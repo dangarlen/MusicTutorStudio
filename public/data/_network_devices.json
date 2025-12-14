@@ -1,0 +1,67 @@
+{
+  "devices": [
+    {
+      "id": "tl_sg116",
+      "category": "Core Network",
+      "name": "TP-Link TL-SG116 Gigabit Switch",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power; 2 spare Ethernet ports available"
+    },
+    {
+      "id": "moca_adapter",
+      "category": "Core Network",
+      "name": "MoCA Ethernet Adapter",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "yolink_hub",
+      "category": "IoT Hubs",
+      "name": "YoLink Speaker Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "verizon_microcell",
+      "category": "IoT Hubs",
+      "name": "Verizon MicroCell",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "lutron_caseta",
+      "category": "IoT Hubs",
+      "name": "Lutron Caseta Wireless Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "flic_hub",
+      "category": "IoT Hubs",
+      "name": "Flic Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "flic2_hub",
+      "category": "IoT Hubs",
+      "name": "Flic 2 Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "philips_hue_hub",
+      "category": "IoT Hubs",
+      "name": "Philips Hue Hub",
+      "location": "Shelf – NSS",
+      "notes": "Ethernet + Power"
+    },
+    {
+      "id": "ooma_voip",
+      "category": "VoIP Phones",
+      "name": "Ooma Telo Base Station",
+      "location": "Shelf – RPC–3 top",
+      "notes": "Ethernet + Power"
+    }
+  ]
+}

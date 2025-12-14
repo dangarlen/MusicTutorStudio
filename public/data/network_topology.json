@@ -1,0 +1,32 @@
+{
+  "devices": [
+    { "id": "tl_sg116", "category": "Core Network", "name": "TP-Link TL-SG116 Gigabit Switch", "location": "Shelf – NSS", "notes": "Ethernet + Power; 2 spare Ethernet ports available" },
+    { "id": "moca_adapter", "category": "Core Network", "name": "MoCA Ethernet Adapter", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "yolink_hub", "category": "IoT Hubs", "name": "YoLink Speaker Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "verizon_microcell", "category": "IoT Hubs", "name": "Verizon MicroCell", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "lutron_caseta", "category": "IoT Hubs", "name": "Lutron Caseta Wireless Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "flic_hub", "category": "IoT Hubs", "name": "Flic Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "flic2_hub", "category": "IoT Hubs", "name": "Flic 2 Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "philips_hue_hub", "category": "IoT Hubs", "name": "Philips Hue Hub", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+   
+   { "id": "google_nest", "category": "AI Assistant",  "name": "Google Nest Hub Smart Display", "location": "Office", "notes": "Wireless" },
+   
+    { "id": "ooma_voip", "category": "VoIP Phones", "name": "Ooma Telo Base Station", "location": "Shelf – RPC–3 top", "notes": "Ethernet + Power" },
+    { "id": "router", "category": "Wireless Router",  "name": "Verizon Router CR1000A", "location": "Closet", "notes": "Wireless" }
+  ],  
+  "connections": [
+    { "from": "moca_adapter", "to": "tl_sg116", "type": "Ethernet" },
+{ "from": "google_nest", "to": "router", "type": "Wireless" },
+
+    { "from": "yolink_hub", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "verizon_microcell", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "lutron_caseta", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "flic_hub", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "flic2_hub", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "philips_hue_hub", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "synology_ds720", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "mybooklive", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "hdhomerun_duo", "to": "tl_sg116", "type": "Ethernet" },
+    { "from": "ooma_voip", "to": "tl_sg116", "type": "Ethernet" }
+  ]
+}

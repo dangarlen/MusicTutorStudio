@@ -240,6 +240,9 @@
             </button>
           </form>
           <div v-if="testLogMsg" class="text-xs text-warning">{{ testLogMsg }}</div>
+                  <div class="mt-2 text-xs text-right">
+                    <router-link to="/internal-tools" class="link link-hover text-gray-400 hover:text-primary">Network Interconnect Tools</router-link>
+                  </div>
         </div>
       </div>
       <!-- Instrument selector (same component/behavior as Create Scales) -->
