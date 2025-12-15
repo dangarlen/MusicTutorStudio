@@ -18,11 +18,11 @@
   ],
 
   "connections": [
-    { "from": "ont", "to": "moca_adapter" , "type": "Cable" },
-    { "from": "ont", "to": "router", "type": "Ethernet"  },
+    { "from": "ont", "to": "moca_adapter" , "type": "Cable", "fromLabel": "OUT", "toLabel": "DATA" },
+    { "from": "ont", "to": "router", "type": "Ethernet", "fromLabel": "LAN1", "toLabel": "1"  },
     { "from": "moca_adapter", "to": "tl_sg116", "type": "Ethernet" },
     { "from": "router", "to": "google_nest", "type": "Wireless" },
-    { "from": "tl_sg116", "to": "yolink_hub", "type": "Ethernet" },
+    { "from": "tl_sg116", "to": "yolink_hub", "type": "Ethernet", "fromLabel": "2", "toLabel": "LAN" },
     { "from": "tl_sg116", "to": "verizon_microcell", "type": "Ethernet" },
     { "from": "tl_sg116", "to": "lutron_caseta", "type": "Ethernet" },
     { "from": "tl_sg116", "to": "flic_hub", "type": "Ethernet" },

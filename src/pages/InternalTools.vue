@@ -6,13 +6,12 @@ import FooterStandard from '../components/FooterStandard.vue'
 // ---------- helpers ----------
 function renderDebugTree(node, prefix = '', isLast = true) {
   if (!node) return '';
-  // If prefix is empty, this is a root: no connector. Otherwise show branch connector.
   const connector = prefix === '' ? '' : (isLast ? '└── ' : '├── ');
-  let result = `${prefix}${connector}${node.name}\n`;
+  const labelText = node.label ? `[${node.label}] ` : '';
+  let result = `${prefix}${connector}${labelText}${node.name}\n`;
   const children = node.children || [];
   for (let i = 0; i < children.length; i++) {
     const last = i === children.length - 1;
-    // Always extend prefix with either spaces or pipes so children get connectors
     const childPrefix = prefix + (isLast ? '    ' : '│   ');
     result += renderDebugTree(children[i], childPrefix, last);
   }
@@ -21,35 +20,49 @@ function renderDebugTree(node, prefix = '', isLast = true) {
 
 function buildTextTreeWithDebug(devices, connections) {
   const idToName = Object.fromEntries(devices.map(d => [d.id || d.name, d.name]));
+  const labelMap = new Map();
+  connections.forEach(c => {
+    labelMap.set(`${c.from}|${c.to}`, {
+      fromLabel: c.fromLabel,
+      toLabel: c.toLabel,
+      type: c.type
+    });
+  });
+
   const adj = {};
   devices.forEach(d => { adj[d.id || d.name] = []; });
   connections.forEach(c => {
     if (adj[c.from]) adj[c.from].push(c.to);
   });
+
   const allTargets = new Set(connections.map(c => c.to));
   const roots = devices.filter(d => !allTargets.has(d.id || d.name));
   if (!roots.length) {
     const treeString = devices.map(d => idToName[d.id || d.name]).join('\n');
-    const debugTree = devices.map(d => ({ name: idToName[d.id || d.name], children: [] }));
+    const debugTree = devices.map(d => ({ name: idToName[d.id || d.name], label: '', children: [] }));
     return { treeString, debugTree };
   }
+
   const lines = [];
   const debugTree = [];
-  function dfs(node, prefix, isLast) {
+  function dfs(node, prefix, isLast, incomingLabel) {
     const connector = prefix === '' ? '' : (isLast ? '└── ' : '├── ');
-    lines.push(prefix + connector + idToName[node]);
+    const labelText = incomingLabel ? `[${incomingLabel}] ` : '';
+    lines.push(prefix + connector + labelText + idToName[node]);
     const children = adj[node] || [];
-    const debugNode = { name: idToName[node], children: [] };
+    const debugNode = { name: idToName[node], label: incomingLabel || '', children: [] };
     for (let i = 0; i < children.length; i++) {
       const last = i === children.length - 1;
       const childPrefix = prefix + (isLast ? '    ' : '│   ');
-      const childDebug = dfs(children[i], childPrefix, last);
+      const lbl = labelMap.get(`${node}|${children[i]}`);
+      const edgeLabel = lbl ? [lbl.fromLabel, lbl.type, lbl.toLabel].filter(Boolean).join(' / ') : '';
+      const childDebug = dfs(children[i], childPrefix, last, edgeLabel);
       debugNode.children.push(childDebug);
     }
     return debugNode;
   }
   for (let i = 0; i < roots.length; i++) {
-    debugTree.push(dfs(roots[i].id || roots[i].name, '', i === roots.length - 1));
+    debugTree.push(dfs(roots[i].id || roots[i].name, '', i === roots.length - 1, ''));
   }
   return { treeString: lines.join('\n'), debugTree };
 }
@@ -84,7 +97,12 @@ function generateMermaid({ devices, connections }) {
   for (const c of connections) {
     const from = idToName[c.from] || c.from;
     const to = idToName[c.to] || c.to;
-    const label = c.type ? `|${c.type}|` : '';
+    const labelParts = [];
+    if (c.fromLabel) labelParts.push(c.fromLabel);
+    if (c.type) labelParts.push(c.type);
+    if (c.toLabel) labelParts.push(c.toLabel);
+    const labelText = labelParts.join(' / ');
+    const label = labelText ? `|${labelText}|` : '';
     mermaid += `  ${c.from}["${from}"] -->${label} ${c.to}["${to}"]\n`;
   }
   return mermaid;
