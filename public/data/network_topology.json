@@ -14,7 +14,10 @@
     { "id": "ooma_voip", "category": "VoIP Phones", "name": "Ooma Telo Base Station", "location": "Shelf – RPC–3 top", "notes": "Ethernet + Power" },
     { "id": "synology_ds720", "category": "NAS", "name": "Synology DS720+ NAS", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
     { "id": "mybooklive", "category": "NAS", "name": "WD MyBookLive NAS", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
-    { "id": "hdhomerun_duo", "category": "TV Tuner", "name": "HDHomeRun Duo", "location": "Shelf – NSS", "notes": "Ethernet + Power" }
+    { "id": "hdhomerun_duo", "category": "TV Tuner", "name": "HDHomeRun Duo", "location": "Shelf – NSS", "notes": "Ethernet + Power" },
+    { "id": "power_strip_a", "category": "Power", "name": "AC Power Strip A", "location": "Shelf – NSS", "notes": "AC outlets" },
+    { "id": "usb_hub_b", "category": "Power", "name": "USB Power Hub B", "location": "Shelf – NSS", "notes": "USB power outputs" },
+    { "id": "closet_outlet", "category": "Power", "name": "Closet Outlet", "location": "Closet", "notes": "AC outlet" }
   ],
 
   "connections": [
@@ -31,5 +34,9 @@
     { "from": "tl_sg116", "to": "synology_ds720", "type": "Ethernet" },
     { "from": "tl_sg116", "to": "mybooklive", "type": "Ethernet" },
     { "from": "tl_sg116", "to": "hdhomerun_duo", "type": "Ethernet" },
-    { "from": "tl_sg116", "to": "ooma_voip", "type": "Ethernet" }  ]
+    { "from": "tl_sg116", "to": "ooma_voip", "type": "Ethernet" },
+    { "from": "power_strip_a", "to": "moca_adapter", "type": "Power", "fromLabel": "AC #1", "toLabel": "Power" },
+    { "from": "usb_hub_b", "to": "yolink_hub", "type": "Power", "fromLabel": "USB #2", "toLabel": "Micro USB" },
+    { "from": "closet_outlet", "to": "router", "type": "Power", "fromLabel": "AC", "toLabel": "Power" }
+  ]
 }

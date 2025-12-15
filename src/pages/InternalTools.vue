@@ -105,6 +105,12 @@ function generateMermaid({ devices, connections }) {
     const label = labelText ? `|${labelText}|` : '';
     mermaid += `  ${c.from}["${from}"] -->${label} ${c.to}["${to}"]\n`;
   }
+  // Style power components with a contrasting color
+  const powerIds = devices.filter(d => (d.category || '').toLowerCase() === 'power').map(d => d.id || d.name);
+  if (powerIds.length) {
+    mermaid += '  classDef power fill:#fde68a,stroke:#f59e0b,stroke-width:2px,rx:6,ry:6;\n';
+    mermaid += `  class ${powerIds.join(',')} power;\n`;
+  }
   return mermaid;
 }
 
@@ -188,7 +194,10 @@ async function handleGenerate() {
   mermaidCode.value = generateMermaid({ devices, connections });
 
   const { treeString, debugTree } = buildTextTreeWithDebug(devices, connections);
-  const pretty = debugTree && debugTree.length ? renderDebugTree(debugTree[0]) : treeString;
+  let pretty = treeString;
+  if (debugTree && debugTree.length) {
+    pretty = debugTree.map(node => renderDebugTree(node)).join('\n');
+  }
   textDiagram.value = { treeString: pretty, debugTree: null };
 
   await nextTick();
