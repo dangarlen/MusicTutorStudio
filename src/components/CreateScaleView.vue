@@ -674,6 +674,7 @@ function buildScale() {
   });
   store.noteArray = generatedNotes;
   testStaffStore.noteArray = generatedNotes;
+  persistLastScaleSelection();
   // Automatically copy scale SPN to clipboard after building preview
   copyScaleSPN();
 }
@@ -861,6 +862,7 @@ function getFirstNoteOfScale(key, scaleType) {
 
 // Persist Staff Formatting toggles in localStorage
 const STAFF_OPTS_KEY = "mts.staffOptions";
+const LAST_SCALE_KEY = "mts.lastScaleSelection";
 onMounted(() => {
   try {
     const raw = localStorage.getItem(STAFF_OPTS_KEY);
@@ -885,6 +887,65 @@ watch(
   },
   { deep: true }
 );
+
+// Restore last-used scale (and instrument) from localStorage
+function restoreLastScaleSelection() {
+  try {
+    const raw = localStorage.getItem(LAST_SCALE_KEY);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    const instrumentName = saved?.instrumentName;
+    if (instrumentName && Array.isArray(store.instruments)) {
+      const match = store.instruments.find((i) => i.instrument === instrumentName);
+      if (match) store.practiceUnitHeader.instrument = match;
+    }
+
+    const sel = saved?.scaleSelections;
+    if (sel && typeof sel === "object") {
+      Object.assign(store.scaleSelections, {
+        key: sel.key || store.scaleSelections.key,
+        scaleType: sel.scaleType || store.scaleSelections.scaleType,
+        startingOctave: sel.startingOctave || store.scaleSelections.startingOctave,
+        octaveCount: sel.octaveCount || store.scaleSelections.octaveCount,
+        direction: sel.direction || store.scaleSelections.direction,
+        noteDuration: sel.noteDuration || store.scaleSelections.noteDuration,
+        timeSignature: sel.timeSignature || store.scaleSelections.timeSignature,
+      });
+
+      if (sel.staffOptions && typeof sel.staffOptions === "object") {
+        store.scaleSelections.staffOptions = {
+          ...store.scaleSelections.staffOptions,
+          ...sel.staffOptions,
+        };
+      }
+    }
+    return true;
+  } catch (e) {
+    console.warn("[CreateScale] Failed to restore last scale selection", e);
+    return false;
+  }
+}
+
+function persistLastScaleSelection() {
+  try {
+    const payload = {
+      instrumentName: store.practiceUnitHeader.instrument?.instrument || null,
+      scaleSelections: {
+        key: store.scaleSelections.key,
+        scaleType: store.scaleSelections.scaleType,
+        startingOctave: store.scaleSelections.startingOctave,
+        octaveCount: store.scaleSelections.octaveCount,
+        direction: store.scaleSelections.direction,
+        noteDuration: store.scaleSelections.noteDuration,
+        timeSignature: store.scaleSelections.timeSignature,
+        staffOptions: store.scaleSelections.staffOptions,
+      },
+    };
+    localStorage.setItem(LAST_SCALE_KEY, JSON.stringify(payload));
+  } catch (e) {
+    console.warn("[CreateScale] Failed to persist last scale selection", e);
+  }
+}
 
 // Watch for changes to scale or instrument and update startingOctave
 watch(
@@ -1641,6 +1702,12 @@ onMounted(async () => {
   ) {
     console.log('[CreateScaleView] No instrument selected, using first available:', store.instruments[0].instrument);
     store.practiceUnitHeader.instrument = store.instruments[0];
+  }
+
+  // Try to restore the last-used scale; otherwise build the default (C major, C4)
+  const restored = restoreLastScaleSelection();
+  if (!store.noteArray || store.noteArray.length === 0 || !restored) {
+    buildScale();
   }
 });
 </script>

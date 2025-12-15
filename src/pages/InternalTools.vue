@@ -4,16 +4,16 @@ import Header from '../components/Header.vue'
 import FooterStandard from '../components/FooterStandard.vue'
 
 // ---------- helpers ----------
-function renderDebugTree(node, prefix = '', isLast = true) {
+function renderDebugTree(node, prefix = '', isLast = true, isRoot = false) {
   if (!node) return '';
-  const connector = prefix === '' ? '' : (isLast ? '└── ' : '├── ');
+  const connector = isRoot ? '' : (isLast ? '└── ' : '├── ');
   const labelText = node.label ? `[${node.label}] ` : '';
   let result = `${prefix}${connector}${labelText}${node.name}\n`;
   const children = node.children || [];
   for (let i = 0; i < children.length; i++) {
     const last = i === children.length - 1;
-    const childPrefix = prefix + (isLast ? '    ' : '│   ');
-    result += renderDebugTree(children[i], childPrefix, last);
+    const childPrefix = prefix + (isRoot ? '' : (isLast ? '    ' : '│   '));
+    result += renderDebugTree(children[i], childPrefix, last, false);
   }
   return result;
 }
@@ -105,7 +105,6 @@ function generateMermaid({ devices, connections }) {
     const label = labelText ? `|${labelText}|` : '';
     mermaid += `  ${c.from}["${from}"] -->${label} ${c.to}["${to}"]\n`;
   }
-  // Style power components with a contrasting color
   const powerIds = devices.filter(d => (d.category || '').toLowerCase() === 'power').map(d => d.id || d.name);
   if (powerIds.length) {
     mermaid += '  classDef power fill:#fde68a,stroke:#f59e0b,stroke-width:2px,rx:6,ry:6;\n';
@@ -123,7 +122,7 @@ const mermaidSvg = ref('');
 const mermaidError = ref('');
 const textDiagram = ref({ treeString: '', debugTree: null });
 const loading = ref(false);
-// Table-edit state for CRUD UI
+const interconnectRows = ref([]);
 const showTableEditor = ref(false);
 const tableError = ref('');
 const devicesTable = ref([]);
@@ -143,10 +142,7 @@ function loadTablesFromJson() {
 function syncJsonFromTables() {
   tableError.value = '';
   try {
-    const payload = {
-      devices: devicesTable.value,
-      connections: connectionsTable.value
-    };
+    const payload = { devices: devicesTable.value, connections: connectionsTable.value };
     jsonText.value = JSON.stringify(payload, null, 2);
   } catch (e) {
     tableError.value = 'Failed to stringify tables into JSON: ' + (e.message || e);
@@ -200,6 +196,7 @@ async function reloadData() {
   mermaidSvg.value = '';
   mermaidError.value = '';
   textDiagram.value = { treeString: '', debugTree: null };
+  interconnectRows.value = [];
   loading.value = false;
 }
 
@@ -229,6 +226,7 @@ async function handleGenerate() {
   mermaidSvg.value = '';
   mermaidError.value = '';
   textDiagram.value = { treeString: '', debugTree: null };
+  interconnectRows.value = [];
 
   let parsed;
   try {
@@ -252,22 +250,34 @@ async function handleGenerate() {
   markdown.value = generateMarkdown({ devices, connections });
   mermaidCode.value = generateMermaid({ devices, connections });
 
-  const { treeString, debugTree } = buildTextTreeWithDebug(devices, connections);
-  let pretty = treeString;
-  if (debugTree && debugTree.length) {
-    pretty = debugTree.map(node => renderDebugTree(node)).join('\n');
-  }
-  textDiagram.value = { treeString: pretty, debugTree: null };
+  // Build interconnect table rows
+  const nameMap = Object.fromEntries(devices.map(d => [d.id || d.name, d.name]));
+  interconnectRows.value = connections.map(c => ({
+    fromId: c.from,
+    toId: c.to,
+    fromName: nameMap[c.from] || c.from,
+    toName: nameMap[c.to] || c.to,
+    type: c.type || '',
+    fromLabel: c.fromLabel || '',
+    toLabel: c.toLabel || ''
+  }));
+
+  const { treeString } = buildTextTreeWithDebug(devices, connections);
+  textDiagram.value = { treeString, debugTree: null };
 
   await nextTick();
   try {
-    let mermaid;
-    if (window.mermaid) {
-      mermaid = window.mermaid;
-    } else {
-      mermaid = await import('mermaid');
-      window.mermaid = mermaid.default || mermaid;
+    let mermaid = window.mermaid;
+    if (!mermaid) {
+      // Use a pinned CDN ESM build for consistency
+      const mod = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+      mermaid = mod.default || mod;
+      window.mermaid = mermaid;
+      if (typeof mermaid.initialize === 'function') {
+        mermaid.initialize({ startOnLoad: false });
+      }
     }
+
     let svg;
     if (typeof mermaid.render === 'function') {
       if (typeof mermaid.renderAsync === 'function') {
@@ -304,6 +314,66 @@ function copyTextDiagram() {
   const text = textDiagram.value?.treeString || '';
   if (!text) return;
   navigator.clipboard.writeText(text);
+}
+
+function copyInterconnectTable() {
+  if (!interconnectRows.value.length) return;
+  const header = ['From (id)', 'From (name)', 'To (id)', 'To (name)', 'Type', 'From Label', 'To Label'];
+  const lines = [header.join('\t')];
+  interconnectRows.value.forEach(r => {
+    lines.push([
+      r.fromId || '',
+      r.fromName || '',
+      r.toId || '',
+      r.toName || '',
+      r.type || '',
+      r.fromLabel || '',
+      r.toLabel || ''
+    ].join('\t'));
+  });
+  navigator.clipboard.writeText(lines.join('\n'));
+}
+
+async function copyMermaidImage() {
+  if (!mermaidSvg.value) return;
+  const svgText = mermaidSvg.value;
+  const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
+  if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+    try {
+      const item = new ClipboardItem({
+        'image/svg+xml': svgBlob,
+        'text/plain': new Blob([svgText], { type: 'text/plain' })
+      });
+      await navigator.clipboard.write([item]);
+      console.info('Mermaid SVG (blob) copied to clipboard successfully.');
+      return;
+    } catch (err) {
+      console.warn('ClipboardItem SVG copy failed; falling back to text.', err);
+    }
+  }
+
+  // Fallback: plain text
+  try {
+    await navigator.clipboard.writeText(svgText);
+    console.info('Mermaid SVG copied to clipboard successfully (text).');
+  } catch (err) {
+    console.error('Clipboard text copy failed.', err);
+  }
+}
+
+async function downloadMermaidImage() {
+  if (!mermaidSvg.value) return;
+  const svgText = mermaidSvg.value;
+  const blob = new Blob([svgText], { type: 'image/svg+xml' });
+  const dlUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = dlUrl;
+  a.download = 'network-graph.svg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(dlUrl);
+  console.info('SVG download triggered.');
 }
 
 onMounted(reloadData)
@@ -426,24 +496,75 @@ onMounted(reloadData)
           </div>
         </div>
       </div>
-      <div class="mt-8">
-        <div class="mb-2 font-semibold">Mermaid Diagram Preview</div>
-        <div class="bg-base-100 border border-base-300 rounded p-2 overflow-auto" style="min-height:12rem;">
-          <div v-if="mermaidSvg" v-html="mermaidSvg"></div>
-          <div v-else class="text-gray-400">No diagram generated yet.</div>
-        </div>
-        <div v-if="mermaidError" class="text-error text-xs mt-2">{{ mermaidError }}</div>
-      </div>
-      <div class="mt-8">
-        <div class="mb-2 flex items-center justify-between">
-          <span class="font-semibold">Network Text Diagram</span>
-          <button class="btn btn-xs btn-outline" @click="copyTextDiagram" :disabled="!textDiagram.treeString">Copy</button>
-        </div>
-        <div class="bg-base-100 border border-base-300 rounded p-2 overflow-auto font-mono text-xs" style="min-height:8rem;">
-          <pre v-if="textDiagram.treeString"
-            style="font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'Liberation Mono', 'Courier New', monospace; font-size: 1.1em; letter-spacing: 0.03em; white-space: pre;"
-          >{{ textDiagram.treeString }}</pre>
-        </div>
+      <div class="mt-8 space-y-4">
+        <details class="border border-base-300 rounded" open>
+          <summary class="px-3 py-2 cursor-pointer font-semibold flex items-center justify-between">
+            <span>Mermaid Diagram Preview</span>
+            <div class="flex gap-2">
+              <button class="btn btn-xs btn-outline" @click.stop="copyMermaidImage" :disabled="!mermaidSvg">Copy SVG</button>
+              <button class="btn btn-xs btn-outline" @click.stop="downloadMermaidImage" :disabled="!mermaidSvg">Download SVG</button>
+            </div>
+          </summary>
+          <div class="p-3">
+            <div class="bg-base-100 border border-base-300 rounded p-2 overflow-auto" style="min-height:12rem;">
+              <div v-if="mermaidSvg" v-html="mermaidSvg"></div>
+              <div v-else class="text-gray-400">No diagram generated yet.</div>
+            </div>
+            <div v-if="mermaidError" class="text-error text-xs mt-2">{{ mermaidError }}</div>
+          </div>
+        </details>
+
+        <details class="border border-base-300 rounded">
+          <summary class="px-3 py-2 cursor-pointer font-semibold flex items-center justify-between">
+            <span>Network Interconnect Table</span>
+            <button class="btn btn-xs btn-outline" @click.stop="copyInterconnectTable" :disabled="!interconnectRows.length">Copy</button>
+          </summary>
+          <div class="p-3">
+            <div class="overflow-auto">
+              <table class="table table-xs w-full">
+                <thead>
+                  <tr>
+                    <th>From (id)</th>
+                    <th>From (name)</th>
+                    <th>To (id)</th>
+                    <th>To (name)</th>
+                    <th>Type</th>
+                    <th>From Label</th>
+                    <th>To Label</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="!interconnectRows.length">
+                    <td colspan="7" class="text-center text-gray-400">Generate to populate this table.</td>
+                  </tr>
+                  <tr v-for="(row, idx) in interconnectRows" :key="idx">
+                    <td>{{ row.fromId }}</td>
+                    <td>{{ row.fromName }}</td>
+                    <td>{{ row.toId }}</td>
+                    <td>{{ row.toName }}</td>
+                    <td>{{ row.type }}</td>
+                    <td>{{ row.fromLabel }}</td>
+                    <td>{{ row.toLabel }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <details class="border border-base-300 rounded">
+          <summary class="px-3 py-2 cursor-pointer font-semibold flex items-center justify-between">
+            <span>Network Text Diagram</span>
+            <button class="btn btn-xs btn-outline" @click.stop="copyTextDiagram" :disabled="!textDiagram.treeString">Copy</button>
+          </summary>
+          <div class="p-3">
+            <div class="bg-base-100 border border-base-300 rounded p-2 overflow-auto font-mono text-xs" style="min-height:8rem;">
+              <pre v-if="textDiagram.treeString"
+                style="font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'Liberation Mono', 'Courier New', monospace; font-size: 1.1em; letter-spacing: 0.03em; white-space: pre;"
+              >{{ textDiagram.treeString }}</pre>
+            </div>
+          </div>
+        </details>
       </div>
     </main>
     <FooterStandard />
