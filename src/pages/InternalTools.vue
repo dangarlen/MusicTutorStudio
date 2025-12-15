@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import Header from '../components/Header.vue'
 import FooterStandard from '../components/FooterStandard.vue'
 
@@ -127,6 +127,56 @@ const showTableEditor = ref(false);
 const tableError = ref('');
 const devicesTable = ref([]);
 const connectionsTable = ref([]);
+const tableFilter = ref('');
+const replaceFind = ref('');
+const replaceWith = ref('');
+const replaceResult = ref('');
+const saveFileName = ref('network_topology.json');
+const saveMessage = ref('');
+const uploadMessage = ref('');
+
+const filteredDevices = computed(() => {
+  const q = (tableFilter.value || '').toLowerCase();
+  if (!q) return devicesTable.value;
+  return devicesTable.value.filter((d) =>
+    ['id', 'name', 'category', 'location', 'notes'].some((key) =>
+      String(d[key] || '').toLowerCase().includes(q)
+    )
+  );
+});
+
+const filteredConnections = computed(() => {
+  const q = (tableFilter.value || '').toLowerCase();
+  if (!q) return connectionsTable.value;
+  return connectionsTable.value.filter((c) =>
+    ['from', 'to', 'type', 'fromLabel', 'toLabel'].some((key) =>
+      String(c[key] || '').toLowerCase().includes(q)
+    )
+  );
+});
+
+function applyGlobalReplace() {
+  replaceResult.value = '';
+  const find = replaceFind.value;
+  if (!find) {
+    replaceResult.value = 'Enter text to find.';
+    return;
+  }
+  const replacement = replaceWith.value || '';
+  let count = 0;
+  const replaceInObject = (obj, keys) => {
+    keys.forEach((k) => {
+      const val = obj[k];
+      if (typeof val === 'string' && val.includes(find)) {
+        obj[k] = val.split(find).join(replacement);
+        count += 1;
+      }
+    });
+  };
+  devicesTable.value.forEach((d) => replaceInObject(d, ['id', 'name', 'category', 'location', 'notes']));
+  connectionsTable.value.forEach((c) => replaceInObject(c, ['from', 'to', 'type', 'fromLabel', 'toLabel']));
+  replaceResult.value = count ? `Replaced in ${count} field(s).` : 'No matches found.';
+}
 
 function loadTablesFromJson() {
   tableError.value = '';
@@ -141,12 +191,58 @@ function loadTablesFromJson() {
 
 function syncJsonFromTables() {
   tableError.value = '';
+  saveMessage.value = '';
+  uploadMessage.value = '';
   try {
     const payload = { devices: devicesTable.value, connections: connectionsTable.value };
     jsonText.value = JSON.stringify(payload, null, 2);
   } catch (e) {
     tableError.value = 'Failed to stringify tables into JSON: ' + (e.message || e);
   }
+}
+
+function saveJsonToFile() {
+  saveMessage.value = '';
+  uploadMessage.value = '';
+  try {
+    const parsed = JSON.parse(jsonText.value || '{}');
+    const blob = new Blob([JSON.stringify(parsed, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = saveFileName.value || 'network_topology.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    saveMessage.value = `Downloaded ${a.download}`;
+  } catch (e) {
+    tableError.value = 'Cannot save JSON: ' + (e.message || e);
+  }
+}
+
+function handleUploadJson(event) {
+  tableError.value = '';
+  uploadMessage.value = '';
+  const file = event?.target?.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      jsonText.value = JSON.stringify(parsed, null, 2);
+      loadTablesFromJson();
+      uploadMessage.value = `Loaded ${file.name}`;
+    } catch (e) {
+      tableError.value = 'Cannot parse uploaded JSON: ' + (e.message || e);
+    }
+    event.target.value = '';
+  };
+  reader.onerror = () => {
+    tableError.value = 'Failed to read uploaded file.';
+    event.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 function addDeviceRow() {
@@ -160,7 +256,19 @@ function addDeviceRow() {
 }
 
 function deleteDeviceRow(index) {
-  devicesTable.value.splice(index, 1);
+  const target = filteredDevices.value[index];
+  const idx = devicesTable.value.indexOf(target);
+  if (idx >= 0) devicesTable.value.splice(idx, 1);
+}
+
+function duplicateDeviceRow(index) {
+  const target = filteredDevices.value[index];
+  const idx = devicesTable.value.indexOf(target);
+  if (idx >= 0) {
+    const copy = { ...devicesTable.value[idx] };
+    copy.id = `${copy.id || 'device'}_copy_${Date.now()}`;
+    devicesTable.value.splice(idx + 1, 0, copy);
+  }
 }
 
 function addConnectionRow() {
@@ -174,7 +282,18 @@ function addConnectionRow() {
 }
 
 function deleteConnectionRow(index) {
-  connectionsTable.value.splice(index, 1);
+  const target = filteredConnections.value[index];
+  const idx = connectionsTable.value.indexOf(target);
+  if (idx >= 0) connectionsTable.value.splice(idx, 1);
+}
+
+function duplicateConnectionRow(index) {
+  const target = filteredConnections.value[index];
+  const idx = connectionsTable.value.indexOf(target);
+  if (idx >= 0) {
+    const copy = { ...connectionsTable.value[idx] };
+    connectionsTable.value.splice(idx + 1, 0, copy);
+  }
 }
 
 // ---------- actions ----------
@@ -413,77 +532,6 @@ onMounted(reloadData)
             </ul>
           </div>
 
-          <details class="mt-4 border border-base-300 rounded" :open="showTableEditor">
-            <summary class="px-3 py-2 cursor-pointer font-semibold flex items-center justify-between">
-              <span>Edit JSON (table view)</span>
-              <span class="text-xs text-gray-500">collapsible</span>
-            </summary>
-            <div class="p-3 space-y-3 bg-base-100">
-              <div class="flex gap-2 flex-wrap items-center">
-                <button class="btn btn-xs" @click="loadTablesFromJson">Load from JSON</button>
-                <button class="btn btn-xs btn-primary" @click="syncJsonFromTables">Sync to JSON</button>
-                <button class="btn btn-xs btn-outline" @click="addDeviceRow">Add device</button>
-                <button class="btn btn-xs btn-outline" @click="addConnectionRow">Add connection</button>
-              </div>
-              <div v-if="tableError" class="text-error text-xs">{{ tableError }}</div>
-
-              <div>
-                <div class="font-semibold mb-1">Devices</div>
-                <div class="overflow-auto">
-                  <table class="table table-xs w-full">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Location</th>
-                        <th>Notes</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(d, idx) in devicesTable" :key="idx">
-                        <td><input v-model="d.id" class="input input-xs input-bordered w-full" /></td>
-                        <td><input v-model="d.name" class="input input-xs input-bordered w-full" /></td>
-                        <td><input v-model="d.category" class="input input-xs input-bordered w-full" /></td>
-                        <td><input v-model="d.location" class="input input-xs input-bordered w-full" /></td>
-                        <td><input v-model="d.notes" class="input input-xs input-bordered w-full" /></td>
-                        <td><button class="btn btn-error btn-xs" @click="deleteDeviceRow(idx)">Delete</button></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div>
-                <div class="font-semibold mb-1">Connections</div>
-                <div class="overflow-auto">
-                  <table class="table table-xs w-full">
-                    <thead>
-                      <tr>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Type</th>
-                        <th>From Label</th>
-                        <th>To Label</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(c, idx) in connectionsTable" :key="idx">
-                        <td><input v-model="c.from" class="input input-xs input-bordered w-full" /></td>
-                        <td><input v-model="c.to" class="input input-xs input-bordered w-full" /></td>
-                        <td><input v-model="c.type" class="input input-xs input-bordered w-full" /></td>
-                        <td><input v-model="c.fromLabel" class="input input-xs input-bordered w-full" /></td>
-                        <td><input v-model="c.toLabel" class="input input-xs input-bordered w-full" /></td>
-                        <td><button class="btn btn-error btn-xs" @click="deleteConnectionRow(idx)">Delete</button></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </details>
         </div>
         <div>
           <div class="mb-2 flex items-center justify-between">
@@ -496,6 +544,117 @@ onMounted(reloadData)
           </div>
         </div>
       </div>
+
+      <details class="mt-4 border border-base-300 rounded w-full" :open="showTableEditor">
+        <summary class="px-3 py-2 cursor-pointer font-semibold flex items-center justify-between">
+          <span>Edit JSON (table view)</span>
+          <span class="text-xs text-gray-500">collapsible</span>
+        </summary>
+        <div class="p-3 space-y-3 bg-base-100">
+          <div class="flex gap-2 flex-wrap items-center">
+            <button class="btn btn-xs" @click="loadTablesFromJson">Load from JSON</button>
+            <button class="btn btn-xs btn-primary" @click="syncJsonFromTables">Sync to JSON</button>
+            <label class="btn btn-xs" for="json-upload">Upload JSON</label>
+            <input id="json-upload" type="file" accept="application/json" class="hidden" @change="handleUploadJson" />
+            <div class="flex items-center gap-1">
+              <input
+                v-model="saveFileName"
+                type="text"
+                placeholder="network_topology.json"
+                class="input input-xs input-bordered w-48"
+              />
+              <button class="btn btn-xs btn-accent" @click="saveJsonToFile">Save As</button>
+            </div>
+            <button class="btn btn-xs btn-outline" @click="addDeviceRow">Add device</button>
+            <button class="btn btn-xs btn-outline" @click="addConnectionRow">Add connection</button>
+            <input
+              v-model="tableFilter"
+              type="text"
+              placeholder="Filter devices & connections"
+              class="input input-xs input-bordered w-full max-w-xs"
+            />
+            <div class="flex flex-wrap items-center gap-2">
+              <input
+                v-model="replaceFind"
+                type="text"
+                placeholder="Find text"
+                class="input input-xs input-bordered w-32"
+              />
+              <input
+                v-model="replaceWith"
+                type="text"
+                placeholder="Replace with"
+                class="input input-xs input-bordered w-32"
+              />
+              <button class="btn btn-xs" @click="applyGlobalReplace">Find & Replace</button>
+              <span class="text-xs text-gray-600" v-if="replaceResult">{{ replaceResult }}</span>
+            </div>
+          </div>
+          <div v-if="tableError" class="text-error text-xs">{{ tableError }}</div>
+          <div v-if="uploadMessage" class="text-success text-xs">{{ uploadMessage }}</div>
+          <div v-if="saveMessage" class="text-success text-xs">{{ saveMessage }}</div>
+
+          <div class="divider my-2"></div>
+
+          <div>
+            <div class="font-semibold mb-1">Devices</div>
+            <div class="overflow-auto">
+              <table class="table table-xs w-full">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Notes</th>
+                    <th class="w-20">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(d, idx) in filteredDevices" :key="idx">
+                    <td><input v-model="d.id" class="input input-xs input-bordered w-full" /></td>
+                    <td><input v-model="d.name" class="input input-xs input-bordered w-full" /></td>
+                    <td><input v-model="d.category" class="input input-xs input-bordered w-full" /></td>
+                    <td><input v-model="d.location" class="input input-xs input-bordered w-full" /></td>
+                    <td><input v-model="d.notes" class="input input-xs input-bordered w-full" /></td>
+                    <td>
+                      <button class="btn btn-ghost btn-xs" @click="duplicateDeviceRow(idx)">Dup</button>
+                      <button class="btn btn-ghost btn-xs text-error" @click="deleteDeviceRow(idx)">Del</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <div class="font-semibold mb-1">Connections</div>
+            <div class="overflow-auto">
+              <table class="table table-xs w-full">
+                <thead>
+                  <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Type</th>
+                    <th class="w-20">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(c, idx) in filteredConnections" :key="idx">
+                    <td><input v-model="c.from" class="input input-xs input-bordered w-full" /></td>
+                    <td><input v-model="c.to" class="input input-xs input-bordered w-full" /></td>
+                    <td><input v-model="c.type" class="input input-xs input-bordered w-full" /></td>
+                    <td>
+                      <button class="btn btn-ghost btn-xs" @click="duplicateConnectionRow(idx)">Dup</button>
+                      <button class="btn btn-ghost btn-xs text-error" @click="deleteConnectionRow(idx)">Del</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </details>
       <div class="mt-8 space-y-4">
         <details class="border border-base-300 rounded" open>
           <summary class="px-3 py-2 cursor-pointer font-semibold flex items-center justify-between">
