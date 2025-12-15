@@ -123,6 +123,63 @@ const mermaidSvg = ref('');
 const mermaidError = ref('');
 const textDiagram = ref({ treeString: '', debugTree: null });
 const loading = ref(false);
+// Table-edit state for CRUD UI
+const showTableEditor = ref(false);
+const tableError = ref('');
+const devicesTable = ref([]);
+const connectionsTable = ref([]);
+
+function loadTablesFromJson() {
+  tableError.value = '';
+  try {
+    const parsed = JSON.parse(jsonText.value || '{}');
+    devicesTable.value = Array.isArray(parsed.devices) ? JSON.parse(JSON.stringify(parsed.devices)) : [];
+    connectionsTable.value = Array.isArray(parsed.connections) ? JSON.parse(JSON.stringify(parsed.connections)) : [];
+  } catch (e) {
+    tableError.value = 'Cannot parse JSON for table view: ' + (e.message || e);
+  }
+}
+
+function syncJsonFromTables() {
+  tableError.value = '';
+  try {
+    const payload = {
+      devices: devicesTable.value,
+      connections: connectionsTable.value
+    };
+    jsonText.value = JSON.stringify(payload, null, 2);
+  } catch (e) {
+    tableError.value = 'Failed to stringify tables into JSON: ' + (e.message || e);
+  }
+}
+
+function addDeviceRow() {
+  devicesTable.value.push({
+    id: `device_${Date.now()}`,
+    category: '',
+    name: 'New Device',
+    location: '',
+    notes: ''
+  });
+}
+
+function deleteDeviceRow(index) {
+  devicesTable.value.splice(index, 1);
+}
+
+function addConnectionRow() {
+  connectionsTable.value.push({
+    from: '',
+    to: '',
+    type: '',
+    fromLabel: '',
+    toLabel: ''
+  });
+}
+
+function deleteConnectionRow(index) {
+  connectionsTable.value.splice(index, 1);
+}
 
 // ---------- actions ----------
 async function reloadData() {
@@ -132,9 +189,11 @@ async function reloadData() {
     if (!resp.ok) throw new Error('Failed to load network_topology.json');
     const data = await resp.json();
     jsonText.value = JSON.stringify(data, null, 2);
+    loadTablesFromJson();
   } catch (e) {
     jsonText.value = '{\n  "devices": [],\n  "connections": []\n}';
     errors.value = ['Could not load network_topology.json: ' + (e.message || e)];
+    loadTablesFromJson();
   }
   markdown.value = '';
   mermaidCode.value = '';
@@ -283,6 +342,78 @@ onMounted(reloadData)
               </li>
             </ul>
           </div>
+
+          <details class="mt-4 border border-base-300 rounded" :open="showTableEditor">
+            <summary class="px-3 py-2 cursor-pointer font-semibold flex items-center justify-between">
+              <span>Edit JSON (table view)</span>
+              <span class="text-xs text-gray-500">collapsible</span>
+            </summary>
+            <div class="p-3 space-y-3 bg-base-100">
+              <div class="flex gap-2 flex-wrap items-center">
+                <button class="btn btn-xs" @click="loadTablesFromJson">Load from JSON</button>
+                <button class="btn btn-xs btn-primary" @click="syncJsonFromTables">Sync to JSON</button>
+                <button class="btn btn-xs btn-outline" @click="addDeviceRow">Add device</button>
+                <button class="btn btn-xs btn-outline" @click="addConnectionRow">Add connection</button>
+              </div>
+              <div v-if="tableError" class="text-error text-xs">{{ tableError }}</div>
+
+              <div>
+                <div class="font-semibold mb-1">Devices</div>
+                <div class="overflow-auto">
+                  <table class="table table-xs w-full">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Location</th>
+                        <th>Notes</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(d, idx) in devicesTable" :key="idx">
+                        <td><input v-model="d.id" class="input input-xs input-bordered w-full" /></td>
+                        <td><input v-model="d.name" class="input input-xs input-bordered w-full" /></td>
+                        <td><input v-model="d.category" class="input input-xs input-bordered w-full" /></td>
+                        <td><input v-model="d.location" class="input input-xs input-bordered w-full" /></td>
+                        <td><input v-model="d.notes" class="input input-xs input-bordered w-full" /></td>
+                        <td><button class="btn btn-error btn-xs" @click="deleteDeviceRow(idx)">Delete</button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div>
+                <div class="font-semibold mb-1">Connections</div>
+                <div class="overflow-auto">
+                  <table class="table table-xs w-full">
+                    <thead>
+                      <tr>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Type</th>
+                        <th>From Label</th>
+                        <th>To Label</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(c, idx) in connectionsTable" :key="idx">
+                        <td><input v-model="c.from" class="input input-xs input-bordered w-full" /></td>
+                        <td><input v-model="c.to" class="input input-xs input-bordered w-full" /></td>
+                        <td><input v-model="c.type" class="input input-xs input-bordered w-full" /></td>
+                        <td><input v-model="c.fromLabel" class="input input-xs input-bordered w-full" /></td>
+                        <td><input v-model="c.toLabel" class="input input-xs input-bordered w-full" /></td>
+                        <td><button class="btn btn-error btn-xs" @click="deleteConnectionRow(idx)">Delete</button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </details>
         </div>
         <div>
           <div class="mb-2 flex items-center justify-between">
