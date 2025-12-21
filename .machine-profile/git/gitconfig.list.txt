@@ -1,0 +1,2 @@
+﻿user.email=dan.g@kgsystems.com
+user.name=Dan Garlen

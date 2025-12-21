@@ -1,0 +1,96 @@
+{
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "chat.tools.terminal.autoApprove": {
+        "node \"c:\\Dev\\MusicTutorStudio\\Code\\MinimalCopilotTest\\test.js\"": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "npm run build\"": true,
+        "powershell -NoProfile -Command \"npm view aubiojs version --json\"": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "powershell -NoProfile -Command \"cd 'C:\\Dev\\MusicTutorStudio\\Code\\tools'; tar -xzf aubiojs-0.2.1.tgz; Copy-Item -Path 'package/build/aubio.js' -Destination 'C:\\Dev\\MusicTutorStudio\\Code\\public\\alpha-vue-SPA\\libs\\aubio.js' -Force; Write-Host 'Copied aubio.js to libs'; Remove-Item -Recurse -Force package;\"": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^Get-Process \\| Where-Object \\{\\$_\\.ProcessName -like \"\\*chrome\\*\" -or \\$_\\.ProcessName -like \"\\*msedge\\*\" -or \\$_\\.ProcessName -like \"\\*firefox\\*\"\\} \\| Select-Object ProcessName, Id \\| Format-Table$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node validation-summary\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node vue-src-alpha/comprehensive-test-plan\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node testing-results-final\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node practice-units-enhancement-summary\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node practice-settings-review\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "npm run dev": true,
+        "/^cd c:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\vue-src-alpha; npm install pianosvg$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^npm run build 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^Copy-Item \"c:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\public\\\\data\\\\instruments\\.json\" \"c:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\vue-src-alpha\\\\public\\\\data\\\\instruments\\.json\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^Copy-Item \"c:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\public\\\\data\\\\enums\\.json\" \"c:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\vue-src-alpha\\\\public\\\\data\\\\enums\\.json\" -ErrorAction SilentlyContinue; Copy-Item \"c:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\public\\\\data\\\\scaleKeys\\.json\" \"c:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\vue-src-alpha\\\\public\\\\data\\\\scaleKeys\\.json\" -ErrorAction SilentlyContinue; Get-ChildItem \"c:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\vue-src-alpha\\\\public\\\\data\\\\\" \\| Select-Object Name$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "npm run build": true,
+        "/^powershell -NoProfile -Command \"Get-Command -Syntax \\(Get-Item 'C:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\tools\\\\view-and-deploy-test\\.ps1'\\)\\.FullName\" 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^powershell -ExecutionPolicy Bypass -File \"C:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\tools\\\\view-and-deploy-test\\.ps1\" -WhatIf 2>&1 \\| Select-Object -First 50$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^Move-Item -Path \"C:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\tools\\\\view-and-deploy-test\\.ps1\" -Destination \"C:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\tools\\\\view-and-deploy-test\\.ps1\\.broken\" -Force; Move-Item -Path \"C:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\tools\\\\view-and-deploy-test-FIXED\\.ps1\" -Destination \"C:\\\\Dev\\\\MusicTutorStudio\\\\Code\\\\tools\\\\view-and-deploy-test\\.ps1\" -Force; Write-Host \"File replaced successfully\" -ForegroundColor Green$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "Copy-Item": true,
+        "/^git --no-pager diff src\\\\components\\\\FooterBase\\.vue$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^git add src\\\\data\\\\footer\\.json tools\\\\upRevFooter\\.ps1 src\\\\components\\\\FooterBase\\.vue; git commit -m \"Move footer\\.json to src/data and update references\"; git --no-pager log -1 --name-status$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^Get-ChildItem -Recurse -File -ErrorAction SilentlyContinue \\| Where-Object \\{ \\$_\\.Name -match 'build-verify-deploy\\\\\\.ps1\\|dev-alpha-vue-spa\\\\\\.ps1\\|footer\\\\\\.json\\|load-footer\\\\\\.js\\|footer\\\\\\.html' \\} \\| Select-Object FullName \\| Format-Table -AutoSize \\| Out-String -Width 4096$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "Out-String": true,
+        "/^git --no-pager status --porcelain ; \\(Select-String -Path \\.\\\\\\*\\*\\\\\\*\\.\\{html,js,ts,vue\\} -Pattern \"footer-fetch\\|footer\\\\\\.json\\|fragments/footer\\\\\\.json\\|footer-container\" -List \\| Select-Object -ExpandProperty Path \\| Sort-Object -Unique\\)$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "npm ls": true
+    },
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "chat.agent.maxRequests": 100,
+    "explorer.confirmDelete": false,
+    "powershell.developer.editorServicesWaitForDebugger": true
+}

@@ -1,0 +1,29 @@
+﻿{
+  "name": "npm",
+  "dependencies": {
+    "cowsay": {
+      "version": "1.6.0",
+      "overridden": false
+    },
+    "depcheck": {
+      "version": "1.4.7",
+      "overridden": false
+    },
+    "netlify-cli": {
+      "version": "23.9.5",
+      "overridden": false
+    },
+    "npm": {
+      "version": "9.9.4",
+      "overridden": false
+    },
+    "serve": {
+      "version": "14.2.5",
+      "overridden": false
+    },
+    "tailwindcss": {
+      "version": "4.1.15",
+      "overridden": false
+    }
+  }
+}

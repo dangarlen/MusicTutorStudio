@@ -1,0 +1,10 @@
+﻿{
+    "exportedAt":  "2025-12-21T06:40:24",
+    "machine":  "DRG_NUC",
+    "os":  "Microsoft Windows 11 Pro",
+    "nodeVersion":  "v22.21.0",
+    "npmVersion":  "9.9.4",
+    "nvmWindows":  null,
+    "pythonVersion":  "Python 3.14.0",
+    "netlifyCLI":  "netlify-cli/23.9.5 win32-x64 node-v22.21.0"
+}
