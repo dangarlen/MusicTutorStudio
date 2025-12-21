@@ -111,6 +111,21 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "📖 Generate App Tree 📖",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/tools/generate-app-tree.js"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
     }
     },
     {
